@@ -1,0 +1,387 @@
+# Proyecto Aplicación y Servicios Web — construcción por versiones
+
+Proyecto de curso (ITM). Aquí NO se descarga un sistema terminado:
+**se construye un sistema real por versiones en C# / ASP.NET Core**, guiado
+por especificaciones. El repositorio siempre contiene la **versión en
+curso, funcionando** — usted la ejecuta, la estudia y luego la
+**reconstruye desde cero** en su propio proyecto.
+
+---
+
+## 1. Cómo le trabaja el estudiante (léame primero)
+
+### Qué necesita instalado (una sola vez)
+
+| Herramienta | Para qué |
+|---|---|
+| **Git** | Clonar el repositorio y traer versiones nuevas |
+| **Docker Desktop** | La BD y la API corren en contenedores (no se instala SQL Server ni .NET) |
+| **VS Code** | El editor — y su terminal integrada (*Terminal → New Terminal*) |
+
+> El SDK de .NET local es **opcional** (solo para desarrollar fase a fase
+> sin Docker): .NET 10.
+
+### Primera vez: cargar y EJECUTAR la versión (un solo comando)
+
+En la terminal integrada de VS Code (*Terminal → New Terminal*, PowerShell):
+
+> ⚠️ **ANTES de clonar — solo si usted ya corrió OTRO proyecto de estos
+> cursos en este PC:** puede quedar un contenedor viejo encendido ocupando
+> el puerto 8035 (pasa al reiniciar el PC: la API vieja revive sin su
+> base de datos y "secuestra" el puerto — el contenedor huérfano). El
+> síntoma: Swagger abre, pero todo responde 500 con *"No address
+> associated with hostname"*, y usted cree que el error es de ESTE
+> proyecto cuando en realidad está hablando con el viejo. Verifíquelo y
+> apáguelo primero:
+>
+> **En este curso los dos comandos se copian y se pegan tal cual.** Pero no
+> por la misma razón, y la diferencia importa:
+>
+> | | ¿Se cambia? |
+> |---|---|
+> | `$_` | **Nunca.** Es sintaxis de PowerShell — significa «cada uno de los que vinieron por la tubería». Si lo reemplaza por algo, deja de funcionar |
+> | `proyecto_` | **Aquí no**, porque todas las carpetas de estos cursos se llaman `proyecto_algo`. Pero es **texto de búsqueda**: en otro proyecto habría que poner el suyo |
+>
+> **O sea: este comando no es universal.** Funciona tal cual en estos cursos
+> porque Docker le pone al contenedor el nombre de la carpeta de la que
+> salió, y todas empiezan igual. Si mañana trabaja en una carpeta llamada
+> `taller_php`, el filtro sería `name=taller_`.
+>
+> **¿Y cómo sabría qué poner?** Corriendo `docker ps` sin filtro, mirando los
+> nombres de la columna `NAMES` y escogiendo el pedazo que tengan en común.
+>
+> **Paso 1 — VERIFICAR.** ¿Quedó algo del curso encendido?
+>
+> ```powershell
+> docker ps --filter "name=proyecto_"
+> ```
+>
+> | La parte | Qué significa |
+> |---|---|
+> | `docker ps` | Lista los contenedores **encendidos** |
+> | `--filter` | «No me muestre todo, filtre» |
+> | `name=` | Filtrar **por nombre**. Es palabra de Docker: también existen `status=` y `ancestor=` |
+> | `proyecto_` | **El texto a buscar.** Esto no es sintaxis: lo escogió quien escribió el comando |
+>
+> **Ojo con esa última parte.** El comando se copia tal cual y funciona, pero
+> `proyecto_` no es una palabra mágica: es el texto por el que se busca.
+> Funciona porque **todas** las carpetas de estos cursos se llaman
+> `proyecto_algo`, y Docker le pone al contenedor el nombre de la carpeta de
+> la que salió. Si su carpeta se llamara `taller_php`, el filtro sería
+> `name=taller_`.
+>
+> Si hay algo, se ve así:
+>
+> ```
+> NAMES                                                 STATUS                    PORTS
+> proyecto_aplicacion_y_servicios_web4-api-facturas-1   Up 2 hours                0.0.0.0:8035->8035/tcp
+> proyecto_aplicacion_y_servicios_web4-sqlserver-1      Up 2 hours (healthy)      0.0.0.0:11466->1433/tcp
+> ```
+>
+> **Si no hay nada, sale solo el encabezado** —`NAMES  STATUS  PORTS`— y
+> ninguna línea debajo. En ese caso no tiene que limpiar nada: siga.
+>
+> **Paso 2 — LIMPIAR.** Apaga de una vez todos los del curso:
+>
+> ```powershell
+> docker ps --filter "name=proyecto_" -q | ForEach-Object { docker stop $_ }
+> ```
+>
+> | La parte | Qué significa |
+> |---|---|
+> | `docker ps --filter …` | Lo mismo de arriba: los del curso que están encendidos |
+> | `-q` | *quiet*. En vez de la tabla, imprime **solo el identificador** de cada uno |
+> | `\|` | La tubería: entrega esa lista al comando que sigue |
+> | `ForEach-Object { … }` | «Para **cada uno** de los que llegaron, haga esto» |
+> | `$_` | **Cada uno de ellos.** Es de PowerShell: no se reemplaza por nada |
+> | `docker stop $_` | Apaga ese contenedor |
+>
+> En una frase: **«de los contenedores del curso que estén encendidos, tome
+> el identificador de cada uno y apáguelo».**
+>
+> Va imprimiendo el identificador de cada uno que apaga. Para comprobar que
+> quedó limpio, repita el paso 1: debe salir solo el encabezado.
+>
+> **Qué efecto tiene:** apaga los contenedores. **No borra nada** — los datos
+> quedan en sus volúmenes y cada proyecto se vuelve a encender con su
+> `docker compose up -d`. Funciona aunque ya no tenga la carpeta vieja.
+> También sirve el botón **Stop** de Docker Desktop, uno por uno.
+>
+> Solo entonces continúe.
+
+```powershell
+git clone https://github.com/ccastro2050/proyecto_aplicacion_y_servicios_web4.git
+cd proyecto_aplicacion_y_servicios_web4
+docker compose up -d --build
+```
+
+**Eso es todo.** La primera vez tarda unos minutos (descarga imágenes,
+el inicializador crea la base, y la primera compilación
+toma ~1 minuto más). Al terminar quedan corriendo **tres contenedores**: la
+base de datos, la API y la **interfaz gráfica**.
+
+### Lo primero que hay que abrir
+
+| Qué | Dónde |
+|---|---|
+| **La interfaz gráfica** — por aquí se empieza | **http://localhost:8099** |
+| **Swagger** — la API, para verla y probarla | http://localhost:8035/swagger |
+| La API — diagnóstico | http://localhost:8035/ |
+| SQL Server (para SQLTools/SSMS, opcional) | `localhost,11466` · `sa`/`Paradigmas123!` |
+
+> **La interfaz gráfica y la API son dos puertos distintos**, y conviene no
+> confundirlos: el **8099** es lo que se abre en el navegador; el **8035**
+> es lo que esa interfaz consume. Abrir `8099/swagger` da 404 — Swagger vive
+> en la API.
+
+### El menú de la interfaz gráfica
+
+**Doce entradas**, agrupadas por versión — y es la forma más rápida de ver que cada versión **incluye la anterior**:
+
+| Dirección | En el menú | De la |
+|---|---|---|
+| `/productos` | Productos | v1 |
+| `/empresas` | Empresas | v1 |
+| `/personas` | Personas | v1 |
+| `/roles` | Roles | v1 |
+| `/rutas` | Rutas | v1 |
+| `/usuarios` | Usuarios | v1 |
+| `/clientes` | Clientes | v2 |
+| `/vendedores` | Vendedores | v2 |
+| `/facturas` | Facturas | v2 |
+| `/usuario-con-roles` | Usuarios y roles | v2 |
+| `/rol-usuario` | Roles por usuario | v2 |
+| `/ruta-rol` | Permisos por rol | v2 |
+
+> **El menú nombra RECURSOS del dominio, no tablas ni rutas de la API.**
+> Dice «Facturas», no `/api/factura`.
+
+### Y en esta versión hay que identificarse primero
+
+**La v3 le pone la puerta a todo lo anterior.** Sin iniciar sesión, la interfaz
+manda a `/sesion` y la API responde **401**.
+
+| Correo | Contraseña | Qué ve en el menú |
+|---|---|---|
+| `admin@correo.com` | `admin123` | **las 12** interfaces |
+| `vendedor1@correo.com` | `vendedor123` | Facturas y Clientes — **no** Usuarios, Personas ni Productos |
+| `cliente1@correo.com` | `cliente123` | Productos — **no** Facturas ni Clientes, al revés que el vendedor |
+
+> **En Swagger hay que autorizar antes de probar nada:** `POST /api/sesion` con
+> uno de esos correos → copie el `token` de la respuesta → botón **Authorize**
+> arriba a la derecha → pegue **solo el token** (la palabra `Bearer` la pone
+> Swagger).
+
+**La prueba que importa:** entre como `vendedor1` y escriba **`/usuarios` en la
+barra de direcciones**. La interfaz se abre y tiene que decir que no tiene
+permiso, con **cero filas**. Si mostrara los datos, el control estaba en el
+menú — y esconder una entrada del menú **no es** control de acceso.
+
+> **Recargar con F5 cierra la sesión.** El token vive en el circuito de Blazor
+> Server, en memoria del servidor, y no baja al navegador.
+
+> ℹ️ Este proyecto usa los puertos 8035, 11466 y 15462: si alguno ya está ocupado
+> en su máquina, cámbielo en `docker-compose.yml` (el lado izquierdo del
+> `"puerto:puerto"`).
+>
+> ⚠️ SQL Server necesita ~2 GB de RAM libres en Docker Desktop.
+
+### Los días siguientes (volver a encender)
+
+```powershell
+docker compose up -d        # segundos; los datos se conservan
+```
+
+### Cuando hay cambios
+
+| Qué cambió | Qué hacer |
+|---|---|
+| **Usted edita un `.cs`** | **Nada** — el código está montado como volumen y `dotnet watch` recompila y reinicia solo (espere unos segundos) |
+| **El profesor publicó una versión nueva** | `git pull` y `docker compose up -d --build` |
+| **Cambió el `Dockerfile` o el `.csproj`** | `docker compose up -d --build` (reconstruye la imagen) |
+| **Quiere resetear la BD** a sus datos originales | `docker compose down -v` y luego `docker compose up -d` (⚠️ borra los datos) |
+| **Apagar todo** | `docker compose down` (los datos se conservan) |
+
+### Y ahora, SU trabajo: reconstruirla desde cero
+
+Ejecutar la versión del repo es solo el punto de partida. Lo que se evalúa
+es **reconstruirla usted mismo, en una carpeta propia (fuera del clon)**,
+siguiendo las especificaciones — con o sin ayuda de IA:
+
+> 🤖 ¿Va a trabajar con IA? Siga la **[Guía para construir la versión con
+> IA](docs/spec_kit/versiones/v5_otros_motores/GUIA_IA5.md)** — cubre los dos caminos con su prompt exacto listo
+> para copiar: **chat web** (Gemini, DeepSeek, ChatGPT: qué archivos
+> subirle) e **IDE agéntico** (Antigravity, Cursor, Claude Code: cómo
+> supervisar al agente).
+
+### Conceptos resumidos (los que acaba de usar)
+
+| Concepto | En una frase |
+|---|---|
+| **Clonar** | Descargar el repositorio con su historial; `git pull` trae lo nuevo |
+| **Contenedor** | BD y API corren en "cajas" de Docker: nada que instalar, se borran y recrean sin miedo |
+| **docker compose** | UN archivo declara todo el sistema y UN comando lo levanta (`up -d`) |
+| **Volumen** | Donde viven los datos: `down` los conserva, `down -v` los borra (reset) |
+| **dotnet watch** | El vigilante del código: guardar un `.cs` recompila y reinicia la API sola |
+| **Spec kit** | Los documentos que dicen QUÉ/CÓMO/EN QUÉ ORDEN — la fuente de verdad |
+| **Versión / tag** | Un incremento cerrado y verificado (`v1`, `v2`, …): se avanza solo en verde |
+
+> Detalle de los conceptos Docker: [docs/CONCEPTOS_DOCKER.md](docs/conceptos/CONCEPTOS_DOCKER.md).
+
+---
+
+## 2. Estructura del repositorio
+
+Qué es cada carpeta y cada archivo, y para qué sirve:
+
+```
+proyecto_aplicacion_y_servicios_web4/
+├── docker-compose.yml           # TODO el sistema declarado: SQL Server + inicializador
+│                                #   + PostgreSQL (v4) + API — y el interruptor MOTOR_BD
+├── db/
+│   ├── bdfacturas.sql           # Crea bdfacturas COMPLETA (12 tablas, triggers, SPs,
+│   │                            #   datos) — dialecto SQL Server
+│   ├── bdfacturas_postgres.sql  # La MISMA bdfacturas en dialecto PostgreSQL (v4) —
+│   │                            #   postgres SÍ la auto-ejecuta (sin inicializador)
+│   └── init.sh                  # El inicializador: SQL Server no auto-ejecuta scripts;
+│                                #   este contenedor los corre UNA vez y termina
+│
+├── backupdb/                    # Respaldos (.bak) de la BD — su README explica
+│                                #   cómo hacer el backup y cómo restaurarlo
+│
+├── postman/                     # La colección de Postman lista para importar:
+│                                #   los endpoints de v1 + v2 en orden didáctico
+│
+├── api_facturas/                # LA API (v1 + v2) — C#/ASP.NET Core (puerto 8035)
+│   ├── ApiFacturas.csproj       # El proyecto .NET (paquetes: SqlClient, Dapper y Swashbuckle)
+│   ├── Program.cs               # Punto de entrada: ENSAMBLADOR (DI) + 422 + rutas
+│   ├── appsettings.json         # Cadena de conexión (default localhost,11466)
+│   ├── Dockerfile               # Imagen sdk:10.0 + dotnet watch
+│   ├── Controllers/             # Capa 1 — HTTP: Producto, Persona y Factura (v2)
+│   ├── Modelos/                 # Los MODELOS: Producto, Persona (v2) y Factura +
+│   │                            #   ProductoDeFactura (v2: los arma la BD vía SPs)
+│   ├── Peticiones/              # Los body por verbo → 422; FacturaCrear (v2) valida
+│   │                            #   una LISTA anidada de renglones
+│   ├── Servicios/               # Capa 2 — negocio: interfaces + reglas por entidad
+│   ├── Repositorios/            # Capa 3 — datos: Dapper (SQL a mano), un dialecto por motor
+│   │                            #   (*SqlServer.cs y *Postgres.cs — v4); el de factura
+│   │                            #   llama PROCEDIMIENTOS ALMACENADOS y traduce sus errores
+│   ├── Fabricas/                # v4: la FÁBRICA de repositorios — el único punto
+│   │                            #   que decide el motor (IFabrica + una por motor)
+│   ├── Excepciones/             # NoEncontradoExcepcion → 404 · ConflictoExcepcion → 409 (v2)
+│   └── pruebas/                 # Proyecto de consola: producto Y persona con
+│                                #   repositorios FALSOS (criterio 6, corre sin BD)
+├── docs/
+│   ├── spec_kit/                # LAS ESPECIFICACIONES: constitución permanente +
+│   │                            #   una carpeta por versión con sus 9 .md
+│   │                            #   + la GUIA_IA de ESA versión (GUIA_IA1, GUIA_IA2…) (cómo
+│   │                            #   construirla con ayuda de una IA)
+│   ├── conceptos/               # QUÉ HAY QUE SABER: 22 .md con sus ilustraciones
+│   │                            #   propias — POO, SOLID y patrones, ACID, Docker,
+│   │                            #   asincronía, pruebas, SDD, los dos tutoriales de BD
+│   └── dominio/                 # QUÉ ES ESTE SISTEMA: 17 .md — glosario, reglas de
+│                                #   negocio, diseño de BD, arquitectura, requisitos,
+│                                #   manual de marca, cronograma, sustentación
+│                                #   y elicitacion/ (SIMULADA, lo dice en su primera línea)
+│
+├── .gitignore / .gitattributes  # Higiene del repo (bin/, obj/, .session.sql; .sh con LF)
+└── README.md                    # Este archivo
+```
+
+La regla de lectura: **el sistema vive en `docker-compose.yml`**, la API
+vive en `api_facturas/` (una carpeta por capa), y **todo lo que explica**
+vive en `docs/`. Cuando lleguen las versiones siguientes, aquí aparecerán
+más carpetas de componentes (y el compose crecerá con ellas).
+
+## 3. La ruta de versiones
+
+```
+v1  api_facturas (C#/ASP.NET Core): CRUD de producto, solo SQL Server   (cerrada: tag v1)
+v2  persona (el molde replicado) + factura maestro-detalle con SPs   (cerrada: tag v2)
+v3  el RESTO de las entidades: toda la bdfacturas cubierta con
+    UN motor (usuario con BCrypt, tablas puente)   (cerrada: tag v3)
+v4  segundo motor (PostgreSQL) — nace la fábrica de
+    repositorios y el interruptor MOTOR_BD   ← USTED ESTÁ AQUÍ
+v5  tercer motor (MariaDB) + compose completo
+v6  frontend BLAZOR: CRUD de las 12 entidades + login + facturación
+```
+
+La regla del juego: la **constitución** es permanente, cada versión tiene
+su propia spec, y una versión está TERMINADA solo cuando pasa sus criterios
+de aceptación (commit + tag). Mapa completo:
+[docs/spec_kit/versiones/0_mapa_versiones.md](docs/spec_kit/versiones/0_mapa_versiones.md).
+
+## 4. Las especificaciones de la versión actual (v4)
+
+| Documento | Contenido |
+|---|---|
+| [1_constitution.md](docs/spec_kit/1_constitution.md) | Las reglas permanentes del proyecto |
+| [2_spec.md](docs/spec_kit/versiones/v5_otros_motores/2_spec.md) | QUÉ construir y los criterios de aceptación |
+| [3_plan.md](docs/spec_kit/versiones/v5_otros_motores/3_plan.md) | CÓMO: stack, estructura y diseño de las capas |
+| [4_research.md](docs/spec_kit/versiones/v5_otros_motores/4_research.md) | Decisiones y alternativas (el porqué) |
+| [5_data_model.md](docs/spec_kit/versiones/v5_otros_motores/5_data_model.md) | La MISMA bdfacturas en dialecto PostgreSQL (equivalencias y semillas) |
+| [6_contracts.md](docs/spec_kit/versiones/v5_otros_motores/6_contracts.md) | CERO endpoints nuevos: el mismo contrato con ambos motores | |
+| [7_quickstart.md](docs/spec_kit/versiones/v5_otros_motores/7_quickstart.md) | Arranque y la regresión DOBLE (ambos motores) |
+| [8_tasks.md](docs/spec_kit/versiones/v5_otros_motores/8_tasks.md) | Orden de construcción por fases verificables |
+
+## 5. Material conceptual del curso
+
+**Son 22 documentos en [`docs/conceptos/`](docs/conceptos/), cada uno con sus
+ilustraciones propias.** Los que conviene leer primero:
+
+| Documento | Qué cubre |
+|---|---|
+| [El flujo de una petición](docs/conceptos/FLUJO_DE_UNA_PETICION.md) | **Léalo primero:** dónde está el GET, dónde se captura el POST, y el viaje completo por las capas |
+| [Colección de Postman](postman/README.md) | Las 25 peticiones de v1 + v2 listas para importar y probar con clics — la pareja PUT/PATCH, el error de FK, el trigger calculando y el 409 del doble anular |
+| [Ramas y colaboración en Git](docs/conceptos/CONCEPTOS_RAMAS_Y_COLABORACION.md) | **Para el proyecto de aula:** qué es una rama de verdad, por qué ocurre un conflicto, la identidad que decide si su trabajo se le acredita, y la receta paso a paso para un equipo de 3 |
+| [SDD y Spec Kit](docs/conceptos/SDD_SPECKIT.md) | La metodología con la que se trabaja este curso: la spec manda sobre el código |
+| [Pruebas y calidad de las pruebas](docs/conceptos/PRUEBAS_Y_CALIDAD_DE_PRUEBAS.md) | Cobertura, la métrica CRAP y mutation testing: cómo saber si sus pruebas de verdad protegen — y por qué hoy es reto opcional, no alcance del proyecto |
+| [Programación asincrónica](docs/conceptos/PROGRAMACION_ASINCRONICA.md) | Qué resuelve el async/await en la web, qué se daña sin él (con diagramas), y cómo se ve en el código de este proyecto |
+| [El paradigma P.O.O. en C#](docs/conceptos/PARADIGMA_POO.md) | Qué es un paradigma, los 4 pilares, y las propiedades e interfaces de C# |
+| [SOLID, capas y patrones de diseño](docs/conceptos/SOLID_CAPAS_PATRONES.md) | Los 5 principios, las capas y los patrones que este código usa (repositorio, DI, fábrica, DTO) — y en qué versión se demuestra cada uno |
+| [Principios ACID](docs/conceptos/PRINCIPIOS_ACID.md) | Las 4 garantías transaccionales, por qué una facturación las exige |
+| [Conceptos de Docker](docs/conceptos/CONCEPTOS_DOCKER.md) | Imagen, contenedor, volumen, compose (con el del proyecto explicado línea por línea) y por qué NO se necesita Kubernetes |
+
+## 6. El dominio: qué ES este sistema
+
+Los 21 de arriba explican **los conceptos**. Estos 17, en
+[`docs/dominio/`](docs/dominio/), describen **este sistema concreto** — y están
+escritos desde el código, el esquema y la API corriendo, no de memoria.
+
+| Documento | Qué cubre |
+|---|---|
+| [GLOSARIO](docs/dominio/GLOSARIO.md) | Cada palabra del dominio, y las que se confunden entre sí |
+| [REGLAS_DE_NEGOCIO](docs/dominio/REGLAS_DE_NEGOCIO.md) | Las 22 reglas, **con quién las defiende** — y lo que nada defiende |
+| [DISENO_BD](docs/dominio/DISENO_BD.md) | El modelo en sus cuatro etapas, y **por qué** quedó así |
+| [ARQUITECTURA](docs/dominio/ARQUITECTURA.md) | Las capas y, sobre todo, **qué tiene prohibido hacer cada una** |
+| [POLITICA_DE_ERRORES](docs/dominio/POLITICA_DE_ERRORES.md) | Qué código HTTP devuelve cada cosa, y quién lo decide |
+| [REQUISITOS_FUNCIONALES](docs/dominio/REQUISITOS_FUNCIONALES.md) | Los 37 RF de las cinco versiones, con los cinco verbos recurso por recurso |
+| [REQUISITOS_NO_FUNCIONALES](docs/dominio/REQUISITOS_NO_FUNCIONALES.md) | Los 24 RNF **con su forma de comprobarlos**, y lo que el sistema NO promete |
+| [DATOS_DE_PRUEBA](docs/dominio/DATOS_DE_PRUEBA.md) | Qué trae la base sembrada y **para qué sirve cada fila** |
+| [MANUAL_DE_MARCA](docs/dominio/MANUAL_DE_MARCA.md) | La paleta **con sus contrastes WCAG calculados**, no estimados |
+| [PLAN_V1](docs/dominio/PLAN_V1.md) · [PLAN_V2](docs/dominio/PLAN_V2.md) | Las decisiones antes de programar, y los tropiezos de cada versión |
+| [CRONOGRAMA](docs/dominio/CRONOGRAMA.md) | Contado de `git log`, con sus huecos dichos |
+| [FUENTES](docs/dominio/FUENTES.md) | **De dónde salió todo, y de dónde NO** |
+| [SUSTENTACION_DEL_CODIGO](docs/dominio/SUSTENTACION_DEL_CODIGO.md) | **Diez preguntas sobre este código, respondidas** |
+| [elicitacion/](docs/dominio/elicitacion/1_PREGUNTAS.md) | ⚠ **SIMULADA**, y lo advierte en su primera línea |
+
+> **Por dónde empezar, según para qué:**
+>
+> | Si usted… | Lea |
+> |---|---|
+> | va a **sustentar** su código | [SUSTENTACION_DEL_CODIGO](docs/dominio/SUSTENTACION_DEL_CODIGO.md) |
+> | no entiende **por qué** algo quedó así | [DISENO_BD](docs/dominio/DISENO_BD.md) y [FUENTES](docs/dominio/FUENTES.md) |
+> | va a **probar** el sistema | [DATOS_DE_PRUEBA](docs/dominio/DATOS_DE_PRUEBA.md) |
+> | va a **tocar** el código | [ARQUITECTURA](docs/dominio/ARQUITECTURA.md), por las prohibiciones |
+
+> **Y una advertencia sobre copiar de aquí.** Este ejemplo toma decisiones que en
+> el **proyecto de aula NO se valen**, y están señaladas donde aparecen: el
+> motor viene dado (aquí) contra lo escoge el equipo (allá); el borrado en
+> catálogos es físico (aquí) contra lógico (allá); el modelo de datos **llegó
+> hecho** (aquí) contra **se elicita primero** (allá). Ver
+> [FUENTES](docs/dominio/FUENTES.md) §3.
+
+---
+
+*Proyecto Aplicación y Servicios Web · ITM · Base de datos bdfacturas
+(facturación + RBAC).*

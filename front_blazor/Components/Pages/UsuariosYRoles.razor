@@ -1,0 +1,264 @@
+@page "/usuario-con-roles"
+@inject ServicioUsuarioConRoles Servicio
+@inject ServicioRol ServicioRoles
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+@*
+   ============================================================
+   EL SEGUNDO FORMULARIO INTEGRADO de la v2 — el mismo patron de factura,
+   sobre una tabla puente.
+
+   Y las reglas se repiten, que es justamente la leccion:
+
+   1. MARCAR UNA CASILLA NO LLAMA A LA API. Se guarda en un conjunto aqui. El
+      envio es uno solo, con el usuario y todos sus roles juntos.
+
+      Por que: si se creara el usuario y DESPUES se le asignaran los roles, un
+      fallo en la segunda llamada dejaria un usuario sin ningun rol — que no
+      puede hacer nada y que nadie sabe que esta ahi.
+      `crear_usuario_con_roles` existe para que sea UNA transaccion.
+
+   2. CASILLAS, NO UN DESPLEGABLE. Un usuario puede tener VARIOS roles. Un
+      desplegable de uno obligaria a repetir la operacion por cada rol — y
+      volveriamos al problema de arriba.
+
+   3. LA CONTRASEÑA VACIA AL EDITAR SIGNIFICA «DEJELA COMO ESTA». No significa
+      borrarla. Sin esa regla, cambiarle un rol a alguien le borraria la clave.
+
+   4. LOS ROLES SE REEMPLAZAN, NO SE SUMAN. Lo que quede marcado es lo que
+      queda. El procedimiento borra los que habia y pone los que llegan, en la
+      misma transaccion.
+   ============================================================
+*@
+
+<h1>Usuarios y roles</h1>
+
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="tarjeta">
+    <h2>@(editando ? $"Editar {email}" : "Crear un usuario con sus roles")</h2>
+
+    <div class="campos">
+        <label>
+            Correo
+            @* Al editar, el correo es la clave: se muestra y no se cambia. *@
+            <input type="email" @bind="email" disabled="@editando"
+                   placeholder="persona@@correo.com" />
+        </label>
+        <label>
+            Contrasena
+            <input type="password" @bind="contrasena" />
+            @if (editando)
+            {
+                <span class="pista">Dejela vacia para no cambiarla.</span>
+            }
+        </label>
+    </div>
+
+    <fieldset class="casillas">
+        <legend>Roles</legend>
+        @if (roles.Count == 0)
+        {
+            <p class="nota">No hay roles definidos. Cree uno en
+               <a href="roles">Roles</a>.</p>
+        }
+        else
+        {
+            @foreach (var r in roles)
+            {
+                <label class="casilla">
+                    @* Marcar NO envia nada: solo cambia el conjunto de abajo. *@
+                    <input type="checkbox"
+                           checked="@marcados.Contains(r.Id)"
+                           @onchange="e => Marcar(r.Id, (bool)(e.Value ?? false))" />
+                    @r.Nombre
+                </label>
+            }
+        }
+    </fieldset>
+
+    <div class="botones">
+        @if (editando)
+        {
+            <button class="primario" @onclick="Guardar">Guardar</button>
+            <button class="plano" @onclick="Cancelar">Cancelar</button>
+        }
+        else
+        {
+            <button class="primario" @onclick="Crear">Crear</button>
+        }
+    </div>
+</section>
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    <div class="vacio">Todavia no hay usuarios.</div>
+}
+else
+{
+    <table>
+        <thead><tr><th>Correo</th><th>Roles</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var u in lista)
+            {
+                <tr>
+                    <td>@u.Email</td>
+                    <td>
+                        @* Estos roles vienen ANIDADOS dentro del usuario: el
+                           procedimiento los agrupo. El front no recorrio una
+                           lista plana juntando por correo, y la API tampoco. *@
+                        @if (u.Roles.Count == 0)
+                        {
+                            <span class="pista">sin roles</span>
+                        }
+                        else
+                        {
+                            @foreach (var r in u.Roles)
+                            {
+                                <span class="etiqueta">@r.Nombre</span>
+                            }
+                        }
+                    </td>
+                    <td class="acciones">
+                        <button @onclick="() => Editar(u)">Editar</button>
+                        <button class="peligro" @onclick="() => Quitar(u.Email)">Quitar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<UsuarioConRoles> lista = [];
+    private List<Rol> roles = [];
+
+    private string email = "";
+    private string contrasena = "";
+
+    /// <summary>LAS CASILLAS MARCADAS, en memoria. Mientras estan aqui la API no
+    /// sabe nada — igual que los renglones de la factura.</summary>
+    private readonly HashSet<int> marcados = [];
+
+    private bool editando;
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        // Los roles de las casillas y la lista de usuarios A LA VEZ.
+        var tareaRoles = ServicioRoles.ListarAsync();
+        var tareaLista = Cargar();
+        await Task.WhenAll(tareaRoles, tareaLista);
+
+        var rr = tareaRoles.Result;
+        if (rr.Bien) { roles = rr.Dato!; }
+        else { Avisar("No se pudo cargar la lista de roles.", true); }
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    private void Marcar(int idRol, bool marcada)
+    {
+        if (marcada) { marcados.Add(idRol); } else { marcados.Remove(idRol); }
+    }
+
+    private async Task Crear()
+    {
+        if (string.IsNullOrWhiteSpace(email)) { Avisar("Escriba el correo.", true); return; }
+        if (string.IsNullOrWhiteSpace(contrasena)) { Avisar("Escriba la contrasena.", true); return; }
+        if (marcados.Count == 0) { Avisar("Marque al menos un rol.", true); return; }
+
+        // UN SOLO ENVIO: el usuario y todos sus roles.
+        var r = await Servicio.CrearAsync(new UsuarioConRolesEnvio
+        {
+            Email = email,
+            Contrasena = contrasena,
+            Roles = marcados.ToList(),
+        });
+
+        if (r.Bien) { Avisar("Usuario creado con sus roles.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Guardar()
+    {
+        if (marcados.Count == 0) { Avisar("Marque al menos un rol.", true); return; }
+
+        // La contrasena vacia viaja vacia: el procedimiento la interpreta como
+        // «no la cambie». NO se manda null ni se omite el campo.
+        var r = await Servicio.ReemplazarAsync(email, contrasena, marcados.ToList());
+        if (r.Bien)
+        {
+            Avisar(string.IsNullOrWhiteSpace(contrasena)
+                ? "Roles guardados. La contrasena quedo como estaba."
+                : "Roles y contrasena guardados.", false);
+            Cancelar();
+            await Cargar();
+        }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Quitar(string correo)
+    {
+        var r = await Servicio.EliminarAsync(correo);
+        if (r.Bien) { Avisar("Usuario quitado con sus roles.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private void Editar(UsuarioConRoles u)
+    {
+        email = u.Email;
+        contrasena = "";            // vacia = no cambiarla
+        marcados.Clear();
+        // Las casillas arrancan marcadas con lo que el usuario YA tiene: editar
+        // es ver el estado actual, no empezar de cero.
+        foreach (var r in u.Roles) { marcados.Add(r.IdRol); }
+        editando = true;
+        aviso = null;
+    }
+
+    private void Cancelar()
+    {
+        email = ""; contrasena = ""; marcados.Clear(); editando = false;
+    }
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

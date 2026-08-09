@@ -1,0 +1,30 @@
+@inherits LayoutComponentBase
+@inject MenuApp Menu
+
+@*
+   El armazón de todas las interfaces. ES EL MISMO ARCHIVO en la v3 y la v4
+   —byte a byte— porque lo que cambia entre versiones son DATOS: el número de
+   versión y las entradas del menú salen de `MenuApp`, que el `Program.cs`
+   registra con lo suyo.
+
+   La ÚNICA diferencia con el de la v1 y la v2 es la línea `<SesionActual />`,
+   que muestra quién está identificado. No es una diferencia de estilo: es que
+   hasta la v3 no hay sesión que mostrar.
+*@
+
+<NavMenu />
+
+<main class="container py-4">
+    <div class="mx-auto" style="max-width: 1100px;">
+        <SesionActual />
+        @Body
+    </div>
+</main>
+
+<footer class="border-top mt-5 py-4">
+    <div class="container">
+        <div class="mx-auto text-body-secondary small" style="max-width: 1100px;">
+            Aplicación y Servicios Web · <strong>versión @Menu.Version</strong>
+        </div>
+    </div>
+</footer>

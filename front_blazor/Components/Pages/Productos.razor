@@ -1,0 +1,209 @@
+@page "/productos"
+@inject ServicioProducto Servicio
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+<h1>Productos</h1>
+
+@* --- El aviso de error: SIEMPRE visible, nunca en la consola ------------- *@
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+@* --- El formulario ------------------------------------------------------- *@
+<section class="tarjeta">
+    <h2>@(editando ? $"Editar {enEdicion.Codigo}" : "Agregar un producto")</h2>
+
+    <div class="campos">
+        <label>
+            Código
+            <input @bind="enEdicion.Codigo" disabled="@editando" placeholder="PR001" />
+        </label>
+        <label>
+            Nombre
+            <input @bind="enEdicion.Nombre" placeholder="Laptop Lenovo IdeaPad" />
+        </label>
+        <label>
+            Stock
+            <input type="number" @bind="enEdicion.Stock" />
+        </label>
+        <label>
+            Valor unitario
+            <input type="number" step="0.01" @bind="enEdicion.Valorunitario" />
+        </label>
+    </div>
+
+    @*
+        LOS DOS BOTONES DE GUARDAR, y sus nombres no son decorativos:
+        «la ficha completa» es el PUT (reemplazo: si falta un campo, 422) y
+        «solo lo que cambié» es el PATCH (parcial: el mismo cuerpo, 200).
+        La interfaz gráfica NO le dice PUT ni PATCH a la persona.
+    *@
+    <div class="botones">
+        @if (editando)
+        {
+            <button class="primario" @onclick="GuardarCompleta">Guardar la ficha completa</button>
+            <button @onclick="GuardarSoloCambios">Guardar solo lo que cambié</button>
+            <button class="plano" @onclick="Cancelar">Cancelar</button>
+        }
+        else
+        {
+            <button class="primario" @onclick="Crear">Agregar</button>
+        }
+    </div>
+</section>
+
+@* --- La lista ------------------------------------------------------------ *@
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (productos.Count == 0)
+{
+    @* Vacío NO es error: es un recuadro que lo dice. *@
+    <div class="vacio">Todavía no hay productos registrados.</div>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th><th>Nombre</th><th>Stock</th><th>Valor unitario</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in productos)
+            {
+                <tr>
+                    <td>@p.Codigo</td>
+                    <td>@p.Nombre</td>
+                    <td>@p.Stock</td>
+                    <td>@p.Valorunitario.ToString("C0")</td>
+                    <td class="acciones">
+                        <button @onclick="() => Editar(p)">Editar</button>
+                        @* El borrado es LÓGICO, así que la palabra es RETIRAR. *@
+                        <button class="peligro" @onclick="() => Eliminar(p.Codigo)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Producto> productos = [];
+    private Producto enEdicion = new();
+    private bool editando;
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+
+        if (r.Bien) { productos = r.Dato!; }
+        else        { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Crear()
+    {
+        var r = await Servicio.CrearAsync(enEdicion);
+        if (r.Bien)
+        {
+            Avisar($"Producto {enEdicion.Codigo} agregado.", false);
+            enEdicion = new();        // solo se limpia CUANDO SALIÓ BIEN
+            await Cargar();
+        }
+        else
+        {
+            // Y aquí lo que importa: el error NO borra lo que la persona
+            // escribió. Queda en interfaz gráfica para que pueda corregirlo.
+            Avisar(r.Mensaje!, true);
+        }
+    }
+
+    private async Task GuardarCompleta()
+    {
+        var r = await Servicio.ReemplazarAsync(enEdicion.Codigo, enEdicion);
+        await TrasGuardar(r, "Ficha completa guardada.");
+    }
+
+    private async Task GuardarSoloCambios()
+    {
+        var parcial = new { nombre = enEdicion.Nombre, stock = enEdicion.Stock };
+        var r = await Servicio.ActualizarAsync(enEdicion.Codigo, parcial);
+        await TrasGuardar(r, "Cambios guardados.");
+    }
+
+    private async Task TrasGuardar(ServicioProducto.Resultado<Producto> r, string bien)
+    {
+        if (r.Bien)
+        {
+            Avisar(bien, false);
+            Cancelar();
+            await Cargar();
+        }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Eliminar(string codigo)
+    {
+        var r = await Servicio.EliminarAsync(codigo);
+        if (r.Bien) { Avisar($"Producto {codigo} retirado.", false); await Cargar(); }
+        else        { Avisar(r.Mensaje!, true); }
+    }
+
+    private void Editar(Producto p)
+    {
+        enEdicion = new Producto
+        {
+            Codigo = p.Codigo, Nombre = p.Nombre,
+            Stock = p.Stock, Valorunitario = p.Valorunitario
+        };
+        editando = true;
+        aviso = null;
+    }
+
+    private void Cancelar()
+    {
+        enEdicion = new();
+        editando = false;
+    }
+
+    private void Avisar(string texto, bool esError)
+    {
+        aviso = texto;
+        avisoEsError = esError;
+    }
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicio · Comercial Los Andes S.A.</title>
+    <base href="/" />
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2317495B'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23E39B2D'>▲</text></svg>" />
+
+    <!-- ============================================================
+         BOOTSTRAP, SERVIDO DESDE ESTE REPOSITORIO. No desde un CDN.
+
+         La regla del proyecto es «sin CDN», y su razón está escrita: un front
+         que necesita internet para verse bien no arranca en un salón sin red.
+         Con el archivo dentro de `wwwroot/`, la razón se respeta entera —
+         apague el wifi y se ve igual.
+         ============================================================ -->
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- El CSS del proyecto va DESPUÉS, para poder ajustar lo de Bootstrap.
+         En CSS, a igual especificidad gana el último que se carga. -->
+    <link rel="stylesheet" href="app.css" />
+
+    <!-- Y LA MARCA DE ULTIMA, siempre: en CSS, a igual especificidad gana el
+         último que se carga. Así `marca.css` puede ajustar lo de Bootstrap y
+         lo de `app.css`, y no al revés — que es lo que hace que el manual de
+         marca sea una restricción y no una sugerencia. -->
+    <link rel="stylesheet" href="marca.css" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <!-- ============================================================
+         EL MODO DE RENDERIZADO, DECLARADO UNA VEZ PARA TODO EL ÁRBOL.
+
+         `InteractiveServer` = Blazor Server: el componente corre EN EL
+         SERVIDOR y el navegador recibe el HTML ya armado, manteniendo una
+         conexión —un «circuito»— para los eventos.
+
+         POR QUÉ AQUÍ Y NO EN CADA INTERFAZ: porque así también es interactivo
+         el LAYOUT, y con él el menú. Declarado interfaz por interfaz, el
+         layout se queda estático — y el menú nunca vería la sesión, que vive
+         en el circuito.
+
+         LA v3 ES LA QUE APAGA EL DIBUJO PREVIO, y en la v1 y la v2 estaba
+         encendido: hasta que apareció la sesión no había nada en el circuito
+         de lo que la interfaz dependiera.
+
+         `prerender: false` = NO se dibuja una primera vez antes de que el
+         circuito conecte. Ese primer dibujo ocurriría con un `EstadoSesion`
+         vacío, y la interfaz parpadearía entre «identifíquese» y los datos.
+         ============================================================ -->
+    <Routes @rendermode="@(new InteractiveServerRenderMode(prerender: false))" />
+    <!-- ============================================================
+         EL CARTEL DE RECONEXIÓN, EN CASTELLANO.
+
+         Cuando el servidor se reinicia —al guardar un archivo, por ejemplo— el
+         «circuito» de Blazor Server se cae. Por defecto Blazor muestra un
+         cartel en inglés y sin estilo: «Rejoin failed... trying again in 5
+         seconds».
+
+         Los `id` son los que Blazor BUSCA: si existen, usa estos en vez de los
+         suyos. No se pueden cambiar.
+
+         No es cosmética: un cartel en inglés que nadie entiende hace que la
+         persona cierre la pestaña creyendo que el sistema se cayó.
+         ============================================================ -->
+    <div id="components-reconnect-modal">
+        <div>
+            <div class="reconectando">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Reconectando…</span>
+                </div>
+                <h2 class="h5">Se perdió la conexión con el servidor</h2>
+                <p class="text-body-secondary mb-0">
+                    Reintentando… Esto pasa cuando el servidor se reinicia,
+                    por ejemplo al guardar un archivo del proyecto.
+                </p>
+            </div>
+
+            <div class="fallo">
+                <h2 class="h5">No se pudo reconectar</h2>
+                <p class="text-body-secondary">
+                    El servidor sigue sin responder.
+                </p>
+                <button class="primario" onclick="location.reload()">Recargar la página</button>
+            </div>
+
+            <div class="rechazado">
+                <h2 class="h5">La sesión de la página expiró</h2>
+                <p class="text-body-secondary">
+                    El servidor se reinició y ya no reconoce esta pestaña.
+                </p>
+                <button class="primario" onclick="location.reload()">Recargar la página</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="_framework/blazor.web.js"></script>
+    <!-- El JavaScript de Bootstrap: lo necesita el menú plegable del teléfono.
+         `bundle` quiere decir que ya trae Popper adentro — una dependencia
+         menos que servir. -->
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@* Sin este using estatico, `@rendermode InteractiveServer` no compila:
+   CS0103 «The name 'InteractiveServer' does not exist». *@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using System.Net.Http.Json
+@using Microsoft.JSInterop
+@using FrontFacturas
+@using FrontFacturas.Components
+@using FrontFacturas.Components.Layout
+@using FrontFacturas.Modelos
+@using FrontFacturas.Servicios

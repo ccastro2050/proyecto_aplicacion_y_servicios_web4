@@ -1,0 +1,588 @@
+{
+  "info": {
+    "name": "API Facturas v4 (C# + SQL Server + PostgreSQL)",
+    "description": "Acumulativa: v1 (producto, 13) + v2 (persona y factura, 12) + v3 (el resto de las entidades, 16). La v4 NO agrega peticiones — agrega un MOTOR: las 41 funcionan idénticas contra PostgreSQL (default) o SQL Server, según el interruptor MOTOR_BD del compose. La petición 1 (diagnóstico) muestra el motor activo. La variable {{base}} apunta al proyecto del curso (localhost:8035); para probar SU reconstrucción cámbiela a localhost:8135.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:8035"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Diagnóstico — GET /",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/",
+        "description": "Debe responder 200 con {mensaje, version: \"v4\", motor, contratos}. El campo motor (v4) dice a cuál motor le habla la API: postgres por defecto; con $env:MOTOR_BD=\"sqlserver\" y docker compose up -d api-facturas cambia SIN tocar código. Si falla, la API no está corriendo: docker compose up -d."
+      }
+    },
+    {
+      "name": "2. Listar productos — GET /api/producto",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/producto",
+        "description": "200 con el sobre {tabla, limite, total: 8, datos: [...]} — los 8 productos de ejemplo de db/bdfacturas.sql, ordenados por código."
+      }
+    },
+    {
+      "name": "3. Listar con límite — GET /api/producto?limite=3",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base}}/api/producto?limite=3",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "api",
+            "producto"
+          ],
+          "query": [
+            {
+              "key": "limite",
+              "value": "3"
+            }
+          ]
+        },
+        "description": "El query string en acción: 200 con exactamente 3 productos (total: 3). Pruebe también limite=0: responde 400 (regla del servicio)."
+      }
+    },
+    {
+      "name": "4. Obtener uno — GET /api/producto/PR001",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/producto/PR001",
+        "description": "El parámetro de ruta en acción: 200 con la Laptop Lenovo IdeaPad (el JSON del producto, sin sobre)."
+      }
+    },
+    {
+      "name": "5. Obtener inexistente — GET /api/producto/PR999 (→ 404)",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/producto/PR999",
+        "description": "404 con el sobre de error {estado, mensaje: \"Producto no encontrado.\", detalle}. La NoEncontradoExcepcion del servicio traducida por el controller."
+      }
+    },
+    {
+      "name": "6. Crear — POST /api/producto (→ 200)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/producto",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"PR009\",\n  \"nombre\": \"Webcam\",\n  \"stock\": 10,\n  \"valorunitario\": 350000\n}"
+        },
+        "description": "200 {estado, mensaje}. El body pasó por la petición ProductoCrear (todos los campos obligatorios, no negativos). Ejecútela dos veces: la segunda da 500 (PK duplicada — el error del motor viaja en detalle)."
+      }
+    },
+    {
+      "name": "7. Reemplazar completo — PUT /api/producto/PR009 (→ 200)",
+      "request": {
+        "method": "PUT",
+        "url": "{{base}}/api/producto/PR009",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Webcam HD\",\n  \"stock\": 12,\n  \"valorunitario\": 380000\n}"
+        },
+        "description": "200 {estado, mensaje, filasAfectadas: 1}. PUT = reemplazo COMPLETO: la petición ProductoReemplazo exige los 3 campos (el código va en la URL y no cambia)."
+      }
+    },
+    {
+      "name": "8. Actualizar parcial — PATCH /api/producto/PR009 (→ 200)",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base}}/api/producto/PR009",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stock\": 15\n}"
+        },
+        "description": "200 {estado, mensaje, filasAfectadas: 1}. PATCH = parcial: solo cambia lo enviado (petición ProductoActualizar, todos opcionales). Con body {} responde 400: no hay nada que actualizar."
+      }
+    },
+    {
+      "name": "9. LA PAREJA (a): PUT con body parcial (→ 422)",
+      "request": {
+        "method": "PUT",
+        "url": "{{base}}/api/producto/PR009",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stock\": 99\n}"
+        },
+        "description": "422 con errores[]: a PUT le faltan nombre y valorunitario — reemplazar el recurso entero exige TODOS los campos. Compare con la petición 10: el MISMO body."
+      }
+    },
+    {
+      "name": "10. LA PAREJA (b): PATCH con el MISMO body (→ 200)",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base}}/api/producto/PR009",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stock\": 99\n}"
+        },
+        "description": "200. El mismo body que acaba de dar 422 en PUT. Esta pareja ES la lección: cada verbo tiene su semántica y la API la hace cumplir (criterio de aceptación 4)."
+      }
+    },
+    {
+      "name": "11. Body inválido — POST (→ 422 con errores[])",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/producto",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"PR010\",\n  \"stock\": -5\n}"
+        },
+        "description": "422 {estado, mensaje: \"Datos inválidos.\", errores: [...]} — la lista dice qué falta (nombre, valorunitario) y qué viola las reglas (stock negativo). Nada llegó al servicio ni a la BD: la validación muere en la frontera."
+      }
+    },
+    {
+      "name": "12. Eliminar — DELETE /api/producto/PR009 (→ 200)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base}}/api/producto/PR009",
+        "description": "200 {estado, mensaje, filasEliminadas: 1}. Deja la tabla como estaba al inicio del recorrido."
+      }
+    },
+    {
+      "name": "13. Eliminar de nuevo — DELETE repetido (→ 404)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base}}/api/producto/PR009",
+        "description": "404: el producto ya no existe (filas eliminadas = 0 → NoEncontradoExcepcion → 404). Es la segunda mitad del criterio de aceptación 4."
+      }
+    },
+    {
+      "name": "14. (v2) Listar personas — GET /api/persona",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/persona",
+        "description": "El molde de la v1 replicado en otra entidad: 200 con {tabla, limite, total: 6, datos} — las 6 personas de ejemplo."
+      }
+    },
+    {
+      "name": "15. (v2) Obtener una — GET /api/persona/P001",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/persona/P001",
+        "description": "200 con Ana Torres. Con P999: 404 con el sobre {estado, mensaje, detalle}."
+      }
+    },
+    {
+      "name": "16. (v2) Crear persona — POST /api/persona (→ 200)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/persona",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"P007\",\n  \"nombre\": \"Prueba Postman\",\n  \"email\": \"p7@correo.com\",\n  \"telefono\": \"3007777777\"\n}"
+        },
+        "description": "200. La petición PersonaCrear exige los 4 campos (todos texto, con longitudes máximas). Sin nombre → 422 con errores[]."
+      }
+    },
+    {
+      "name": "17. (v2) LA PAREJA en persona (a): PUT solo telefono (→ 422)",
+      "request": {
+        "method": "PUT",
+        "url": "{{base}}/api/persona/P007",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"telefono\": \"3009999999\"\n}"
+        },
+        "description": "422: a PUT le faltan nombre y email — la misma lección de la v1, ahora en la entidad nueva. Compare con la 18."
+      }
+    },
+    {
+      "name": "18. (v2) LA PAREJA en persona (b): PATCH mismo body (→ 200)",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base}}/api/persona/P007",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"telefono\": \"3009999999\"\n}"
+        },
+        "description": "200 con filasAfectadas: 1. El mismo body que dio 422 en PUT."
+      }
+    },
+    {
+      "name": "19. (v2) Eliminar persona — DELETE /api/persona/P007",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base}}/api/persona/P007",
+        "description": "200. Deja la tabla como al inicio. Repetido: 404."
+      }
+    },
+    {
+      "name": "20. (v2) Integridad referencial — DELETE /api/persona/P001 (→ 500 FK)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base}}/api/persona/P001",
+        "description": "500 con el error de LLAVE FORÁNEA del motor en detalle: P001 es cliente — la BD protege sus relaciones y el error viaja completo hasta el cliente. No borra nada."
+      }
+    },
+    {
+      "name": "21. (v2) Listar facturas — GET /api/factura (SP)",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/factura",
+        "description": "200 con las 6 facturas: nombres de cliente/vendedor YA RESUELTOS y el detalle (productos) anidado — los JOINs los hizo el procedimiento almacenado, no la API."
+      }
+    },
+    {
+      "name": "22. (v2) Consultar factura — GET /api/factura/1 (SP)",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/factura/1",
+        "description": "200 con la factura 1 completa (misma forma que cada elemento del listado). Con 999: 404 — es el THROW 50003 del SP traducido por el repositorio."
+      }
+    },
+    {
+      "name": "23. (v2) Crear factura maestro-detalle — POST /api/factura (→ 200)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/factura",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fkidcliente\": 1,\n  \"fkidvendedor\": 1,\n  \"productos\": [\n    { \"codigo\": \"PR001\", \"cantidad\": 2 },\n    { \"codigo\": \"PR003\", \"cantidad\": 3 }\n  ]\n}"
+        },
+        "description": "200 con la factura creada: fecha, subtotales POR RENGLÓN y total CALCULADOS por el trigger (nadie los envió). Verifíquelo: GET /api/producto/PR001 antes y después — el stock bajó. Con productos: [] → 422; con cantidad 9999 → 500 con «Stock insuficiente…» del trigger. Anote el numero para las peticiones 24 y 25."
+      }
+    },
+    {
+      "name": "24. (v2) Anular factura — POST /api/factura/7/anular (→ 200)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/factura/7/anular",
+        "description": "Borrado LÓGICO (por eso es POST y no DELETE): 200 con el JSON del SP — estado pasa a 'anulada' y el STOCK SE RESTAURA (verifíquelo con GET /api/producto/PR001). Ajuste el 7 al numero que le dio la petición 23."
+      }
+    },
+    {
+      "name": "25. (v2) Anular de nuevo — el mismo POST repetido (→ 409)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/factura/7/anular",
+        "description": "409 Conflict — la lección nueva de la v2: la petición está bien formada y la factura existe, pero su ESTADO actual no permite la operación (ya está anulada). Ni 400 ni 404: conflicto de estado. Con 999: 404."
+      }
+    },
+    {
+      "name": "26. Listar empresas — GET /api/empresa",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/empresa",
+        "description": "200 con las 3 empresas semilla. El molde de la v1, replicado: mismo sobre {tabla, limite, total, datos}."
+      }
+    },
+    {
+      "name": "27. Crear empresa — POST /api/empresa",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/empresa",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"E100\",\n  \"nombre\": \"Empresa Nueva S.A.\"\n}"
+        },
+        "description": "200 {estado, mensaje}. Empresa es el molde más pequeño de la v3: dos campos. Las peticiones 30 y 34 la usan."
+      }
+    },
+    {
+      "name": "28. Actualizar empresa — PATCH /api/empresa/E100",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base}}/api/empresa/E100",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Empresa Nueva SAS\"\n}"
+        },
+        "description": "200. La pareja didáctica también vive aquí: pruebe el MISMO body con PUT — da 422 porque el reemplazo exige el campo completo."
+      }
+    },
+    {
+      "name": "29. Listar clientes — GET /api/cliente",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/cliente",
+        "description": "200 con 4 clientes (ids 1, 2, 3 y 5 — el 4 no existe en la semilla). Note los campos opcionales: credito y fkcodempresa pueden venir en null."
+      }
+    },
+    {
+      "name": "30. Crear cliente mínimo — POST /api/cliente",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/cliente",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fkcodpersona\": \"P001\"\n}"
+        },
+        "description": "200. Solo la persona es obligatoria: credito toma su default (0) y fkcodempresa queda NULL — los opcionales de la petición en acción. OJO: el id NO será el siguiente visible — los INSERT fallidos (como el de la petición 31) también consumen identity."
+      }
+    },
+    {
+      "name": "31. Cliente con persona inexistente — POST (→ 500 FK)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/cliente",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fkcodpersona\": \"P999\"\n}"
+        },
+        "description": "500: la persona P999 no existe y la LLAVE FORÁNEA rechaza el insert. La última defensa es de la BD, no de la API — el mensaje del motor viaja en detalle."
+      }
+    },
+    {
+      "name": "32. Ruta duplicada — POST /api/ruta (→ 500 UNIQUE)",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/ruta",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ruta\": \"/home\",\n  \"descripcion\": \"duplicada\"\n}"
+        },
+        "description": "500: /home ya existe y la restricción UNIQUE la rechaza. Igual que la PK duplicada de la petición 6, pero sobre una columna que NO es llave."
+      }
+    },
+    {
+      "name": "33. Listar usuarios — GET /api/usuario",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/usuario",
+        "description": "200 con 8 emails y NADA MÁS: el modelo Usuario no tiene propiedad contrasena, así que el hash NO PUEDE filtrarse. El secreto nunca viaja (RNF3)."
+      }
+    },
+    {
+      "name": "34. Crear usuario — POST /api/usuario",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/usuario",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"qa@test.com\",\n  \"contrasena\": \"secreto1\"\n}"
+        },
+        "description": "200. La contraseña viaja UNA vez (en el body, hacia adentro) y el repositorio guarda su hash BCrypt (costo 12). Consulte después con GET: solo vuelve el email."
+      }
+    },
+    {
+      "name": "35. Verificar contraseña — POST (→ 200)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base}}/api/usuario/verificar-contrasena?valor_usuario=qa@test.com&valor_contrasena=secreto1",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "api",
+            "usuario",
+            "verificar-contrasena"
+          ],
+          "query": [
+            {
+              "key": "valor_usuario",
+              "value": "qa@test.com"
+            },
+            {
+              "key": "valor_contrasena",
+              "value": "secreto1"
+            }
+          ]
+        },
+        "description": "200 {estado, mensaje: \"Contraseña válida.\"}. El repositorio LEE el hash, compara adentro con BCrypt y solo sale el veredicto. Este endpoint es el cimiento del login (JWT en su versión)."
+      }
+    },
+    {
+      "name": "36. Contraseña incorrecta — POST (→ 401)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base}}/api/usuario/verificar-contrasena?valor_usuario=qa@test.com&valor_contrasena=mala",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "api",
+            "usuario",
+            "verificar-contrasena"
+          ],
+          "query": [
+            {
+              "key": "valor_usuario",
+              "value": "qa@test.com"
+            },
+            {
+              "key": "valor_contrasena",
+              "value": "mala"
+            }
+          ]
+        },
+        "description": "401 No autorizado. Pruebe también con los usuarios semilla jefe@correo.com o cliente1@correo.com y su contraseña REAL: también 401 — guardaron texto plano y BCrypt no lo reconoce (la lección de por qué se hashea al crear)."
+      }
+    },
+    {
+      "name": "37. Usuario inexistente — POST (→ 404)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base}}/api/usuario/verificar-contrasena?valor_usuario=nadie@x.com&valor_contrasena=x",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "api",
+            "usuario",
+            "verificar-contrasena"
+          ],
+          "query": [
+            {
+              "key": "valor_usuario",
+              "value": "nadie@x.com"
+            },
+            {
+              "key": "valor_contrasena",
+              "value": "x"
+            }
+          ]
+        },
+        "description": "404: el usuario no existe. El trío del contrato: 200 válida · 401 incorrecta · 404 no existe."
+      }
+    },
+    {
+      "name": "38. Asignar rol — POST /api/rol-usuario",
+      "request": {
+        "method": "POST",
+        "url": "{{base}}/api/rol-usuario",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fkemail\": \"qa@test.com\",\n  \"fkidrol\": 2\n}"
+        },
+        "description": "200. La tabla puente: una FILA = una pareja (usuario, rol). Ejecútela dos veces: la segunda da 500 — la PK COMPUESTA rechaza el duplicado."
+      }
+    },
+    {
+      "name": "39. Roles de un usuario — GET /api/rol-usuario/usuario/qa@test.com",
+      "request": {
+        "method": "GET",
+        "url": "{{base}}/api/rol-usuario/usuario/qa@test.com",
+        "description": "200 con las asignaciones de ese email. Los puentes no tienen PUT ni PATCH: una pareja no se 'edita' — se borra y se crea otra."
+      }
+    },
+    {
+      "name": "40. Quitar UNA pareja — DELETE /api/rol-usuario/qa@test.com/2",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base}}/api/rol-usuario/qa@test.com/2",
+        "description": "200 borrando SOLO esa pareja exacta (las DOS columnas van en la URL). Los demás roles del usuario quedan intactos."
+      }
+    },
+    {
+      "name": "41. Limpieza — DELETE /api/usuario/qa@test.com",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base}}/api/usuario/qa@test.com",
+        "description": "200 y la BD queda como al inicio del bloque v3 (la empresa E100 y el cliente de la 30 permanecen — bórrelos si quiere el estado semilla exacto, o docker compose down -v)."
+      }
+    }
+  ]
+}

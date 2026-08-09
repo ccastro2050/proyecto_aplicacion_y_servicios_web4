@@ -1,0 +1,254 @@
+# Especificación — Versión 1: las SEIS tablas sin clave foránea, con su interfaz gráfica
+
+> **Versión 1** del desarrollo incremental ([mapa de versiones](../0_mapa_versiones.md)).
+> Rige la constitución del proyecto: [../../1_constitution.md](../../1_constitution.md).
+> En v1 el sistema completo ES esto: **no existe frontend, y la API solo conoce una entidad y un motor.** (La BD `bdfacturas`
+> sí se crea COMPLETA desde el inicio — es infraestructura dada, ver
+> [5_data_model.md](5_data_model.md); lo que crece por versiones es la API.)
+>
+> | Documento de esta versión | Contenido |
+> |---|---|
+> | **2_spec.md** (este) | QUÉ construir en v1 y sus criterios de aceptación |
+> | [3_plan.md](3_plan.md) | CÓMO: stack, estructura y diseño de las capas |
+> | [4_research.md](4_research.md) | Decisiones y alternativas *(lectura opcional)* |
+> | [5_data_model.md](5_data_model.md) | La BD completa (dada) y la tabla `producto` |
+> | [6_contracts.md](6_contracts.md) | Los 7 endpoints con formatos exactos |
+> | [7_quickstart.md](7_quickstart.md) | Arranque y smoke test |
+> | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
+
+---
+
+## 1. Propósito de la v1
+
+Construir la **primera rebanada vertical (corte vertical)** de la API de
+facturación en **C# / ASP.NET Core**: el CRUD completo de **una sola
+entidad (`producto`)** contra **un solo motor (SQL Server)** — pero con la
+**arquitectura en capas completa desde el primer día**: controlador →
+servicio → repositorio, comunicados por **interfaces de C#**.
+
+> **¿Qué es una "rebanada vertical"?** En lugar de construir el sistema por
+> capas horizontales ("primero TODOS los repositorios, luego TODOS los
+> servicios…" — donde nada funciona hasta el final), se construye un corte
+> que **atraviesa todas las capas de arriba a abajo** para UNA funcionalidad.
+> Como una rebanada de pastel: un solo corte, pero con todas las capas.
+>
+> ```
+> ┌─────────────────────────── el sistema completo ───────────────────────────┐
+> │  CONTROLLER  │ producto █ │ persona    │ factura    │ ...las demás (v2)   │
+> │  SERVICIO    │ producto █ │ persona    │ factura    │ ...                 │
+> │  REPOSITORIO │ producto █ │ persona    │ factura    │ ...                 │
+> │  BD          │ producto █ │ persona    │ factura    │ ...                 │
+> └──────────────┴─────▲──────┴────────────┴────────────┴─────────────────────┘
+>                      └── la v1 ES esta rebanada: funciona de punta a punta
+> ```
+>
+> Ventaja: algo funciona **desde la v1** y la arquitectura queda validada —
+> si las capas encajan para `producto`, las siguientes rebanadas (v2) caen
+> en surcos ya hechos.
+
+La v1 es pequeña a propósito: su valor no está en la funcionalidad sino en
+dejar el **esqueleto arquitectónico correcto** sobre el que las versiones
+siguientes agregan las tablas con clave foránea (v2), el control de acceso
+(v3) y el aplicativo completo (v4) **sin reescribir lo construido**.
+
+Y el esqueleto incluye **las dos mitades**: la API y la interfaz. Que se
+construyan en paralelo desde la v1 es lo que impide descubrir a la tercera
+versión que el contrato era incómodo de pintar.
+
+## 2. Alcance
+
+> **Qué define la v1:** **las tablas que NO tienen clave foránea.** En
+> `bdfacturas` son **seis** —`producto` · `empresa` · `persona` · `rol` · `ruta` · `usuario`—, y se pueden
+> llenar sin que exista nada más. Por eso son las primeras.
+>
+> **Y la versión entrega su API Y SU INTERFAZ GRÁFICA.** Media versión no es una
+> versión.
+
+**Incluye:**
+- **CRUD de los SEIS recursos**: listar, obtener por clave, crear, reemplazar,
+  actualizar parcialmente y eliminar. Son **seis rebanadas verticales
+  idénticas salvo los campos** — y que se repitan es el punto: con una sola
+  no aparece la pregunta de si conviene un genérico.
+- **Una INTERFAZ GRÁFICA por recurso**, con dirección propia (`/productos`,
+  `/empresas`, …), nunca una ruta con el nombre de la tabla como parámetro.
+- **Modelo entidad** (`Producto`): la clase con las 4 propiedades tipadas
+  (en C#, las propiedades `{ get; set; }` SON los getters/setters del
+  lenguaje).
+- **Una petición por verbo como frontera de entrada** (`ProductoCrear`,
+  `ProductoReemplazo`, `ProductoActualizar`): declaran sus reglas con
+  anotaciones (`[Required]`, `[Range]`, `[StringLength]`) y ASP.NET valida
+  el body contra ellas → **422 con lista de errores** antes de tocar el
+  controlador.
+- Capas con interfaces: `IRepositorioProducto` implementada por
+  `RepositorioProductoSqlServer` (Dapper: SQL a mano); el servicio depende de la
+  interfaz.
+- Configuración por `appsettings.json`, sobrescribible por variables de
+  entorno (`ConnectionStrings__SqlServer`) — la vía natural en Docker.
+- **Un solo comando** (Artículo 4): `docker-compose.yml` con SQL Server +
+  su inicializador + la API, de modo que `docker compose up -d --build`
+  deja todo funcionando.
+- Endpoint `/` de diagnóstico y **documentación interactiva Swagger** en
+  `/swagger` (Swashbuckle): los endpoints se ven y se prueban desde el
+  navegador.
+
+**No incluye (y es deliberado — ver [mapa de versiones](../0_mapa_versiones.md)):**
+- **Las SEIS tablas con clave foránea** —`cliente`, `vendedor`, `factura`,
+  `productosporfactura`, `rol_usuario`, `rutarol`—: son la **v2**. Existen en
+  la base desde la v1 (Artículo 5), pero el código de esta versión **no las
+  puede nombrar**.
+- **JWT, sesiones y control de acceso por rol**: es la **v3**. Ojo: el CRUD de
+  `usuario` y `rol` **sí es de esta versión** —no tienen FK—; lo que llega en
+  la v3 **no es su CRUD, es la puerta**.
+- Consultas multitabla, dashboard, manual de marca y publicación: la **v4**.
+- ORM de entidades (Entity Framework) — Dapper NO es ORM de entidades: es el
+  micro-ejecutor del Artículo 2.
+
+## 3. Requisitos funcionales
+
+> La v1 usa **los cinco verbos HTTP** (GET, POST, PUT, PATCH, DELETE) y las
+> **tres vías de envío de datos**: parámetro de ruta (`/{codigo}`), query
+> string (`?limite=N`) y body JSON. Es parte del objetivo didáctico.
+
+### RF1 — Listar productos (GET + query string)
+`GET /api/producto` → 200 con envoltura `{tabla, limite, total, datos:[…]}`.
+- Query param opcional `limite` (entero > 0, por defecto 1000).
+- Tabla vacía → **204** sin cuerpo.
+
+### RF2 — Obtener por código (GET + parámetro de ruta)
+`GET /api/producto/{codigo}` → 200 con el producto; inexistente → 404.
+
+### RF3 — Crear producto (POST + body)
+`POST /api/producto` con body validado por la petición **ProductoCrear**
+(`codigo` 1–10 caracteres, `nombre` no vacío, `stock` entero ≥ 0,
+`valorunitario` numérico ≥ 0 — todos obligatorios).
+Éxito → 200 `{estado, mensaje}`; body inválido → **422 con la lista de
+errores**; código duplicado → 500 con el error del motor en `detalle`.
+
+### RF4 — Reemplazar producto (PUT + body completo)
+`PUT /api/producto/{codigo}` con body de la petición **ProductoReemplazo**:
+**todos los campos obligatorios** (`nombre`, `stock`, `valorunitario`) —
+PUT reemplaza el recurso completo; omitir un campo es 422, no "dejarlo como
+estaba". Devuelve `filasAfectadas`; código inexistente → 404.
+
+### RF5 — Actualizar parcialmente (PATCH + body parcial)
+`PATCH /api/producto/{codigo}` con body de la petición **ProductoActualizar**:
+**campos opcionales** — solo se modifican los enviados (cada uno validado
+si llega). Es el contraste didáctico con PUT. Devuelve `filasAfectadas`;
+inexistente → 404; body vacío → 400.
+
+### RF6 — Eliminar producto (DELETE)
+`DELETE /api/producto/{codigo}`. Devuelve `filasEliminadas`;
+inexistente → 404.
+
+### RF7 — Diagnóstico
+`GET /` → JSON con mensaje, versión (`"v1"`) y la ruta de los contratos.
+
+## 4. Requisitos no funcionales
+
+- **RNF1 — Capas estrictas:** el controlador no toca SQL; el servicio no
+  conoce HTTP ni el motor; el repositorio no conoce HTTP. Contratos con
+  `interface` de C#.
+- **RNF2 — SQL a la vista:** el SQL se escribe a mano y Dapper solo lo
+  ejecuta y mapea (sin Entity Framework); paquetes: `Microsoft.Data.SqlClient`, `Dapper`
+  y `Swashbuckle` (Artículo 2).
+- **RNF3 — SQL SIEMPRE parametrizado** (`@parametro`); nada de concatenar
+  valores.
+- **RNF4 — Asíncrona:** todo el acceso a datos con `async/await`.
+- **RNF5 — Errores uniformes:** `{estado, mensaje, detalle}` (y
+  `errores:[…]` en el 422); ArgumentException→400 ·
+  NoEncontradoExcepcion→404 · Microsoft.Data.SqlClientException y demás→500.
+- **RNF6 — Sin anticipación:** ni fábrica multi-motor ni selección de motor
+  en v1 (los introduce la **v5** cuando exista el segundo motor).
+
+## 5. Criterios de aceptación
+
+1. **`docker compose up -d --build` — un solo comando —** deja corriendo
+   SQL Server (inicializado con el script provisto: 12 tablas), y la API;
+   `GET http://localhost:8035/` responde el JSON de diagnóstico. Guardar un
+   `.cs` recompila y reinicia solo (dotnet watch).
+2. `GET /api/producto` devuelve los 8 productos de ejemplo con
+   `{tabla:"producto", total:8, datos:[…]}`, y `GET /api/producto?limite=3`
+   devuelve exactamente 3.
+3. `GET /api/producto/PR001` devuelve la Laptop Lenovo; `/api/producto/PR999`
+   responde 404 con mensaje claro.
+4. Ciclo completo con los 5 verbos: `POST` crea `PR009` → `PUT` lo reemplaza
+   completo → `PATCH` le cambia solo el stock → `GET` lo confirma → `DELETE`
+   lo elimina, y un segundo `DELETE` responde 404. Además, un `PUT` sin el
+   campo `nombre` responde 422 (reemplazo completo) mientras el mismo body
+   en `PATCH` responde 200 (parcial) — la diferencia entre ambos verbos.
+5. La validación de la petición es la frontera: `POST` con `stock: -5` o sin
+   `nombre` → 422 con `errores:[…]`; `POST` con `stock: 7.5` o `"texto"` →
+   422 (**el tipo también es regla**: la petición declara `int?`); código
+   duplicado → 500 con el error del motor en `detalle`.
+6. **Prueba de capas:** `dotnet run --project pruebas` (o vía
+   `docker compose exec`) ejecuta el servicio con un repositorio FALSO en
+   memoria — sin SQL Server — y todas las verificaciones pasan.
+
+### Y los de LA INTERFAZ GRÁFICA, que son la otra mitad de la versión
+
+7. **`http://localhost:8099/productos` lista los 8 productos**, cada uno con
+   su código, nombre, stock y valor unitario. La dirección es **propia del
+   recurso** —`/productos`—, no una ruta con el nombre de la tabla como
+   parámetro.
+8. **Se crea un producto desde la interfaz gráfica** y aparece en la lista sin
+   recargar a mano. Y si la API lo rechaza —código duplicado, stock
+   negativo—, **el mensaje sale EN LA INTERFAZ GRÁFICA**, no en la consola del
+   navegador, y **lo que la persona había escrito NO se borra**.
+9. **Los dos botones de guardar existen y hacen cosas distintas:** «Guardar
+   la ficha completa» (el `PUT`: si falta un campo, la API responde 422) y
+   «Guardar solo lo que cambié» (el `PATCH`: el mismo cuerpo responde 200).
+   **La interfaz gráfica no le dice `PUT` ni `PATCH` ni `422` a la persona.**
+10. **Con la API apagada, la interfaz gráfica SIGUE EN PIE.** Se comprueba así:
+
+    ```powershell
+    docker compose stop api-facturas
+    ```
+
+    Recargue `http://localhost:8099/productos`: tiene que mostrar el menú y
+    un aviso de que no se pudo conectar, **y ni una sola fila**. Si siguiera
+    mostrando los productos, el front estaría leyendo de donde no debe — o no
+    maneja el caso de que la API no responda, que es el mismo problema visto
+    de otro lado.
+
+> **Una versión no está cerrada si la API responde y la interfaz gráfica no.** Los
+> criterios 7 a 10 pesan lo mismo que los seis de arriba.
+
+## 6. Clarificaciones
+
+> **Qué es esta sección:** el registro de las ambigüedades detectadas ANTES
+> de planear, con la respuesta que se acordó y su razón. Es **la compuerta
+> 1** del método (ver [SDD_SPECKIT](../../../conceptos/SDD_SPECKIT.md)): mientras
+> quede un `[NECESITA ACLARACIÓN: …]` en los requisitos de arriba, esta
+> versión no pasa a la planeación.
+>
+> Las entradas de abajo se reconstruyeron **al cerrar la versión**, a
+> partir de las decisiones que sus propios contratos ya dejaban fijadas.
+> De aquí en adelante esta sección se llena **en vivo**, antes del
+> `3_plan.md` — que es como debe ser.
+
+| # | La pregunta | La respuesta acordada, con su razón | Dónde quedó |
+|---|---|---|---|
+| C1 | El listado sin filas, ¿es un error o un resultado? | Un resultado: **204 sin cuerpo**. Vacío no es error. | RF de listar · contrato del `GET` |
+| C2 | `?limite=0` o negativo, ¿422 o 400? | **400**: la FORMA del dato es correcta (sí es un entero); lo que se rompe es una regla de negocio. El 422 se reserva para el body mal formado. | Contrato del `GET` · convenciones |
+| C3 | Un número con decimales o texto donde va un entero, ¿lo rechaza la API o lo deja llegar a la BD? | Lo rechaza la **petición** con 422: el TIPO también es regla, y el valor nunca llega a la BD. | Criterios de aceptación · contrato del `POST` |
+| C4 | Crear con una llave que ya existe, ¿409 o 500? | **500**, con el error del motor en `detalle`: la llave la defiende la BD, no la API. Convertirlo en 409 sería lógica de negocio que esta versión no pide. | Convenciones de error · contrato del `POST` |
+| C5 | `PATCH` con el body vacío, ¿200 sin hacer nada, o error? | **400**: pedir una actualización sin decir qué actualizar es una regla de negocio rota. | Contrato del `PATCH` |
+
+**Cómo se escribe una entrada nueva:** la pregunta tal como se hizo (no
+"revisar el borrado", sino "¿físico o lógico?"), la respuesta **con su
+razón**, y el documento donde quedó plasmada. Si la respuesta cambia un
+requisito, se corrige el requisito allá arriba: esta sección lo registra,
+no lo reemplaza.
+
+## 7. Definición de TERMINADA
+
+Esta versión está terminada — y solo entonces se escribe la spec de la
+siguiente — cuando:
+
+1. Todos los **criterios de aceptación** pasan, verificados con el smoke
+   test de [7_quickstart.md](7_quickstart.md), **corrido por una persona**.
+   "Me funciona" no es evidencia.
+2. La lista de [9_checklist.md](9_checklist.md) está en verde y firmada.
+3. No queda ningún `[NECESITA ACLARACIÓN: …]` en este documento.
+4. Se hace commit y **tag** de la versión, según la
+   [constitución](../../1_constitution.md).

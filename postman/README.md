@@ -12,8 +12,9 @@ proyectos gemelos del curso (Python y PHP tienen la misma colección).
 1. Instale **Postman** (postman.com/downloads). Si le pide cuenta, puede
    usar la opción de cliente ligero sin registrarse.
 2. **Import** (botón arriba a la izquierda) → arrastre el archivo
-   `coleccion_v3.postman_collection.json` de esta carpeta (acumulativa:
-   trae la v1, la v2 y la v3 — igual que el proyecto).
+   `coleccion_v4.postman_collection.json` de esta carpeta (acumulativa:
+   trae v1, v2 y v3 — la v4 no agrega peticiones: agrega un MOTOR, y
+   las 41 corren idénticas contra PostgreSQL o SQL Server).
 3. Con el proyecto corriendo (`docker compose up -d`), abra cualquier
    petición y dele **Send**.
 
@@ -39,7 +40,7 @@ Cada petición trae su explicación en la pestaña de descripción.
 
 La colección usa la variable `base` = `http://localhost:8032` (el proyecto
 del curso). Si está probando **SU reconstrucción** (la de la
-[GUIA_IA](../docs/spec_kit/versiones/v3_resto_entidades/GUIA_IA3.md), que corre en el puerto 8132): clic en la
+[GUIA_IA](../docs/spec_kit/versiones/v4_postgresql/GUIA_IA4.md), que corre en el puerto 8132): clic en la
 colección → pestaña **Variables** → cambie `base` a
 `http://localhost:8132`. Una sola edición y las 41 peticiones apuntan a su
 proyecto.

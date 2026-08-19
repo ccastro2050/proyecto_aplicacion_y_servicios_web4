@@ -10,6 +10,7 @@
 // ============================================================
 
 // "using" trae tipos de otros espacios de nombres para poder usarlos:
+using ApiFacturas.Fabricas;
 using ApiFacturas.Repositorios;
 using ApiFacturas.Servicios;
 using Microsoft.AspNetCore.Mvc;
@@ -27,53 +28,59 @@ var builder = WebApplication.CreateBuilder(args);
 //   - pide IServicioProducto    → recibe ServicioProducto
 // El controlador y el servicio JAMÁS hacen "new" de clases concretas:
 // las reciben por constructor (inyección de dependencias).
-// Cuando la v3 agregue otro motor, SOLO estas líneas cambiarán.
+// v4: llegó el segundo motor y la promesa se cumplió — SOLO estas
+// líneas cambiaron. El motor se decide en UN switch y los
+// repositorios los entrega la FÁBRICA (Fabricas/).
 
-// La cadena de conexión: viene de appsettings.json, y en Docker la
-// sobreescribe la variable de entorno ConnectionStrings__SqlServer.
-var cadenaConexion = builder.Configuration.GetConnectionString("SqlServer")
+// Las cadenas de conexión: vienen de appsettings.json, y en Docker las
+// sobreescriben las variables ConnectionStrings__SqlServer / __Postgres.
+var cadenaSqlServer = builder.Configuration.GetConnectionString("SqlServer")
     ?? throw new InvalidOperationException("Falta la cadena de conexión 'SqlServer'.");
+var cadenaPostgres = builder.Configuration.GetConnectionString("Postgres")
+    ?? throw new InvalidOperationException("Falta la cadena de conexión 'Postgres'.");
+
+// v4 — EL ÚNICO PUNTO DEL CÓDIGO QUE DECIDE EL MOTOR. La clave 'Motor'
+// la fija el compose (interruptor MOTOR_BD, default postgres); corriendo
+// local sin Docker sale de appsettings.json (sqlserver):
+var motor = builder.Configuration["Motor"] ?? "sqlserver";
+IFabricaRepositorios fabrica = motor switch
+{
+    "sqlserver" => new FabricaSqlServer(cadenaSqlServer),
+    "postgres" => new FabricaPostgres(cadenaPostgres),
+    _ => throw new InvalidOperationException(
+        $"Motor desconocido: '{motor}' (use sqlserver o postgres)."),
+};
 
 // AddScoped = "una instancia por petición HTTP" (cada request estrena la suya):
-builder.Services.AddScoped<IRepositorioProducto>(
-    _ => new RepositorioProductoSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioProducto>(_ => fabrica.CrearRepositorioProducto());
 builder.Services.AddScoped<IServicioProducto, ServicioProducto>();
 
 // v2 — el ensamblador CRECE (y es lo único de la v1 que crece):
 // las rebanadas nuevas se registran igual que la primera.
-builder.Services.AddScoped<IRepositorioPersona>(
-    _ => new RepositorioPersonaSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioPersona>(_ => fabrica.CrearRepositorioPersona());
 builder.Services.AddScoped<IServicioPersona, ServicioPersona>();
-builder.Services.AddScoped<IRepositorioFactura>(
-    _ => new RepositorioFacturaSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioFactura>(_ => fabrica.CrearRepositorioFactura());
 builder.Services.AddScoped<IServicioFactura, ServicioFactura>();
 
-// v3 — las 8 rebanadas que completan la BD: el ensamblador crece por
-// última vez "a mano". Nota didáctica: esta lista YA duele — ese dolor
-// es el argumento de la fábrica real que introducirá la v4.
-builder.Services.AddScoped<IRepositorioEmpresa>(
-    _ => new RepositorioEmpresaSqlServer(cadenaConexion));
+// v3 — las 8 rebanadas que completan la BD. (En la v3 esta lista
+// "dolía": cada línea repetía el motor. La v4 curó el dolor: la lista
+// sigue — una rebanada es una rebanada — pero el motor ya no aparece
+// en ninguna: lo decide la fábrica, en un solo lugar.)
+builder.Services.AddScoped<IRepositorioEmpresa>(_ => fabrica.CrearRepositorioEmpresa());
 builder.Services.AddScoped<IServicioEmpresa, ServicioEmpresa>();
-builder.Services.AddScoped<IRepositorioCliente>(
-    _ => new RepositorioClienteSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioCliente>(_ => fabrica.CrearRepositorioCliente());
 builder.Services.AddScoped<IServicioCliente, ServicioCliente>();
-builder.Services.AddScoped<IRepositorioVendedor>(
-    _ => new RepositorioVendedorSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioVendedor>(_ => fabrica.CrearRepositorioVendedor());
 builder.Services.AddScoped<IServicioVendedor, ServicioVendedor>();
-builder.Services.AddScoped<IRepositorioUsuario>(
-    _ => new RepositorioUsuarioSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioUsuario>(_ => fabrica.CrearRepositorioUsuario());
 builder.Services.AddScoped<IServicioUsuario, ServicioUsuario>();
-builder.Services.AddScoped<IRepositorioRol>(
-    _ => new RepositorioRolSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioRol>(_ => fabrica.CrearRepositorioRol());
 builder.Services.AddScoped<IServicioRol, ServicioRol>();
-builder.Services.AddScoped<IRepositorioRuta>(
-    _ => new RepositorioRutaSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioRuta>(_ => fabrica.CrearRepositorioRuta());
 builder.Services.AddScoped<IServicioRuta, ServicioRuta>();
-builder.Services.AddScoped<IRepositorioRolUsuario>(
-    _ => new RepositorioRolUsuarioSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioRolUsuario>(_ => fabrica.CrearRepositorioRolUsuario());
 builder.Services.AddScoped<IServicioRolUsuario, ServicioRolUsuario>();
-builder.Services.AddScoped<IRepositorioRutaRol>(
-    _ => new RepositorioRutaRolSqlServer(cadenaConexion));
+builder.Services.AddScoped<IRepositorioRutaRol>(_ => fabrica.CrearRepositorioRutaRol());
 builder.Services.AddScoped<IServicioRutaRol, ServicioRutaRol>();
 
 // ------------------------------------------------------------
@@ -134,8 +141,9 @@ app.UseSwaggerUI();
 app.MapGet("/", () => Results.Json(new
 {
     mensaje = "API Facturas funcionando",
-    version = "v3",
-    contratos = "docs/spec_kit/versiones/v3_resto_entidades/6_contracts.md"
+    version = "v4",
+    motor,      // v4: a cuál motor le está hablando la API (el interruptor)
+    contratos = "docs/spec_kit/versiones/v4_postgresql/6_contracts.md"
 }));
 
 // MapControllers enciende las rutas declaradas con atributos en los

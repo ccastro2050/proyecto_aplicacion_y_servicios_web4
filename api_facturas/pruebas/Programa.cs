@@ -16,6 +16,7 @@
 // ============================================================
 
 using ApiFacturas.Excepciones;
+using ApiFacturas.Fabricas;
 using ApiFacturas.Modelos;
 using ApiFacturas.Repositorios;
 using ApiFacturas.Servicios;
@@ -83,6 +84,24 @@ try { await servicioEmpresa.ObtenerAsync("NOEXISTE"); Verificar(false, "empresa:
 catch (NoEncontradoExcepcion) { /* esperado */ }
 
 Console.WriteLine("CRITERIO 6 OK: producto, persona y empresa funcionan con repositorios falsos, sin SQL Server");
+
+// ------------------------------------------------------------
+// v4 — la fábrica elige el motor SIN abrir conexiones (criterio 5
+// de la v4). Construir un repositorio solo guarda la cadena; por
+// eso se puede verificar el patrón con cadenas de mentira.
+// ------------------------------------------------------------
+
+IFabricaRepositorios fabricaSql = new FabricaSqlServer("Server=inexistente");
+IFabricaRepositorios fabricaPg = new FabricaPostgres("Host=inexistente");
+
+Verificar(fabricaSql.CrearRepositorioProducto() is RepositorioProductoSqlServer, "fábrica sqlserver: producto del dialecto correcto");
+Verificar(fabricaSql.CrearRepositorioFactura() is RepositorioFacturaSqlServer, "fábrica sqlserver: factura del dialecto correcto");
+Verificar(fabricaSql.CrearRepositorioUsuario() is RepositorioUsuarioSqlServer, "fábrica sqlserver: usuario del dialecto correcto");
+Verificar(fabricaPg.CrearRepositorioProducto() is RepositorioProductoPostgres, "fábrica postgres: producto del dialecto correcto");
+Verificar(fabricaPg.CrearRepositorioFactura() is RepositorioFacturaPostgres, "fábrica postgres: factura del dialecto correcto");
+Verificar(fabricaPg.CrearRepositorioUsuario() is RepositorioUsuarioPostgres, "fábrica postgres: usuario del dialecto correcto");
+
+Console.WriteLine("CRITERIO 5 OK: cada fábrica entrega los repositorios de su motor, sin abrir conexiones");
 
 // Mini-verificador (función local): si la condición es falsa, reporta
 // y sale con error (terminar con 0 = pasó; con 1 = falló).

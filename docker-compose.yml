@@ -1,14 +1,19 @@
 # ==============================================================
-# Proyecto Aplicación y Servicios Web — versión 1:
-# api_facturas (C#/ASP.NET Core) + SQL Server
+# Proyecto Aplicación y Servicios Web — versión 4:
+# api_facturas (C#/ASP.NET Core) + DOS motores con la misma BD
 #
-#   Navegador → API FACTURAS (C#, :8032) → SQL Server (bdfacturas)
+#                                 ┌→ SQL Server (bdfacturas, :11463)
+#   Navegador → API (C#, :8032) ─┤      el interruptor MOTOR_BD
+#                                 └→ PostgreSQL (bdfacturas, :15462)
 #
 # Uso: docker compose up -d --build     (UN solo comando)
-# Reset de la BD: docker compose down -v && docker compose up -d
+#   La API habla con PostgreSQL por defecto; para cambiar de motor
+#   SIN tocar código:  $env:MOTOR_BD="sqlserver"
+#                      docker compose up -d api-facturas
+# Reset de las BD: docker compose down -v && docker compose up -d
 #
-# Este archivo CRECE por versiones: v3 suma un segundo motor,
-# v5 la API genérica, v6 el front Blazor.
+# Este archivo CRECE por versiones: v5 sumará MariaDB,
+# v6 la API genérica, v7 el front Blazor.
 # ==============================================================
 services:
 
@@ -47,7 +52,27 @@ services:
     entrypoint: ["/bin/bash", "/scripts/init.sh"]
     restart: "no"                      # corre una vez; no revive
 
-  # --- API Facturas v1 — C# / ASP.NET Core ---
+  # --- PostgreSQL 16 — el SEGUNDO motor (v4) ---
+  # El contraste didáctico con sqlserver-init: PostgreSQL SÍ ejecuta
+  # los scripts montados en /docker-entrypoint-initdb.d/ la primera
+  # vez (volumen vacío) — no necesita contenedor inicializador.
+  postgres:
+    image: postgres:16-alpine                # ~50 MB (SQL Server pide ~2 GB)
+    environment:
+      POSTGRES_PASSWORD: "Paradigmas123!"    # clave del superusuario 'postgres'
+      POSTGRES_DB: bdfacturas_postgres_local # la BD que crea al nacer
+    volumes:
+      - pgdata:/var/lib/postgresql/data      # los datos sobreviven a `down`
+      - ./db/bdfacturas_postgres.sql:/docker-entrypoint-initdb.d/bdfacturas_postgres.sql:ro
+    ports:
+      - "15462:5432"     # puerto en su PC (para psql/pgAdmin opcional)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bdfacturas_postgres_local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # --- API Facturas — C# / ASP.NET Core ---
   api-facturas:
     build: ./api_facturas
     volumes:
@@ -63,11 +88,22 @@ services:
       # se resuelven por nombre. Esta variable SOBREESCRIBE el valor de
       # appsettings.json (ASP.NET lee "ConnectionStrings__X" así).
       ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=bdfacturas_sqlserver_local;User Id=sa;Password=Paradigmas123!;TrustServerCertificate=True;"
+      # v4 — la cadena del SEGUNDO motor (host interno postgres:5432):
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=bdfacturas_postgres_local;Username=postgres;Password=Paradigmas123!"
+      # v4 — EL INTERRUPTOR: a qué motor le habla la API. Lee la
+      # variable MOTOR_BD de su terminal; si no existe, postgres.
+      # Cambiar de motor = recrear SOLO este contenedor (segundos):
+      #   $env:MOTOR_BD="sqlserver"; docker compose up -d api-facturas
+      Motor: ${MOTOR_BD:-postgres}
     depends_on:
       sqlserver-init:
         condition: service_completed_successfully
         # ↑ la API arranca cuando el inicializador TERMINÓ BIEN:
         #   la BD ya existe con sus 12 tablas y datos.
+      postgres:
+        condition: service_healthy
+        # ↑ …y cuando el motor nuevo ya responde (él se inicializa solo).
 
 volumes:
   mssqldata:      # declaración del volumen nombrado (la "memoria" de la BD)
+  pgdata:         # v4: la "memoria" del segundo motor

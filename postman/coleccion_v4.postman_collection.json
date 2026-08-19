@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "API Facturas v3 (C# + SQL Server)",
-    "description": "Acumulativa: las 13 peticiones de la v1 (producto) + las 12 de la v2 (persona y factura maestro-detalle) + las 16 de la v3 (las 8 entidades que completan la BD: moldes, usuario con BCrypt y tablas puente). Orden didáctico; cada petición explica en su descripción qué esperar. La variable {{base}} apunta al proyecto del curso (localhost:8032); para probar SU reconstrucción cámbiela a localhost:8132.",
+    "name": "API Facturas v4 (C# + SQL Server + PostgreSQL)",
+    "description": "Acumulativa: v1 (producto, 13) + v2 (persona y factura, 12) + v3 (el resto de las entidades, 16). La v4 NO agrega peticiones — agrega un MOTOR: las 41 funcionan idénticas contra PostgreSQL (default) o SQL Server, según el interruptor MOTOR_BD del compose. La petición 1 (diagnóstico) muestra el motor activo. La variable {{base}} apunta al proyecto del curso (localhost:8032); para probar SU reconstrucción cámbiela a localhost:8132.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -16,7 +16,7 @@
       "request": {
         "method": "GET",
         "url": "{{base}}/",
-        "description": "Debe responder 200 con {mensaje, version: \"v1\", contratos}. Si falla, la API no está corriendo: docker compose up -d."
+        "description": "Debe responder 200 con {mensaje, version: \"v4\", motor, contratos}. El campo motor (v4) dice a cuál motor le habla la API: postgres por defecto; con $env:MOTOR_BD=\"sqlserver\" y docker compose up -d api-facturas cambia SIN tocar código. Si falla, la API no está corriendo: docker compose up -d."
       }
     },
     {

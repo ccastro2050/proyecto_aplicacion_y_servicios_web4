@@ -31,6 +31,9 @@
     <!-- v3: BCrypt.Net-Next — el hash de la contraseña de usuario
          (costo 12). Lo usa SOLO el repositorio de usuario. -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- v4: Npgsql — el proveedor ADO.NET oficial de PostgreSQL
+         (las mismas ideas de SqlClient: Connection/Command/Reader). -->
+    <PackageReference Include="Npgsql" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -148,8 +148,8 @@ proyecto_aplicacion_y_servicios_web4/
 │   ├── FLUJO_DE_UNA_PETICION.md # Dónde "está" el GET, dónde se captura el POST
 │   ├── TUTORIAL_SSMS.md         # Administrar la BD con SQL Server Management Studio
 │   ├── TUTORIAL_VSCODE_SQLTOOLS.md # Administrar la BD desde VS Code (SQLTools)
-│   ├── PARADIGMA_POO.md         # Material conceptual: POO, SOLID+capas, ACID,
-│   ├── SOLID_Y_CAPAS.md         #   Docker y SDD (un .md por tema)
+│   ├── PARADIGMA_POO.md         # Material conceptual: POO, SOLID+capas+patrones,
+│   ├── SOLID_Y_CAPAS.md         #   ACID, Docker y SDD (un .md por tema)
 │   ├── PRINCIPIOS_ACID.md       #
 │   ├── CONCEPTOS_DOCKER.md      #
 │   └── SDD_SPECKIT.md           #

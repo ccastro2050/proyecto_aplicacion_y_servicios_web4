@@ -149,7 +149,7 @@ proyecto_aplicacion_y_servicios_web4/
 │   ├── TUTORIAL_SSMS.md         # Administrar la BD con SQL Server Management Studio
 │   ├── TUTORIAL_VSCODE_SQLTOOLS.md # Administrar la BD desde VS Code (SQLTools)
 │   ├── PARADIGMA_POO.md         # Material conceptual: POO, SOLID+capas+patrones,
-│   ├── SOLID_Y_CAPAS.md         #   ACID, Docker y SDD (un .md por tema)
+│   ├── SOLID_CAPAS_PATRONES.md  #   ACID, Docker y SDD (un .md por tema)
 │   ├── PRINCIPIOS_ACID.md       #
 │   ├── CONCEPTOS_DOCKER.md      #
 │   └── SDD_SPECKIT.md           #
@@ -204,7 +204,7 @@ de aceptación (commit + tag). Mapa completo:
 | [Colección de Postman](postman/README.md) | Las 25 peticiones de v1 + v2 listas para importar y probar con clics — la pareja PUT/PATCH, el error de FK, el trigger calculando y el 409 del doble anular |
 | [SDD y Spec Kit](docs/SDD_SPECKIT.md) | La metodología con la que se trabaja este curso: la spec manda sobre el código |
 | [El paradigma P.O.O. en C#](docs/PARADIGMA_POO.md) | Qué es un paradigma, los 4 pilares, y las propiedades e interfaces de C# |
-| [SOLID y programación por capas](docs/SOLID_Y_CAPAS.md) | Los 5 principios y las capas — y en qué versión se demuestra cada uno |
+| [SOLID, capas y patrones de diseño](docs/SOLID_CAPAS_PATRONES.md) | Los 5 principios, las capas y los patrones que este código usa (repositorio, DI, fábrica, DTO) — y en qué versión se demuestra cada uno |
 | [Principios ACID](docs/PRINCIPIOS_ACID.md) | Las 4 garantías transaccionales, por qué una facturación las exige |
 | [Conceptos de Docker](docs/CONCEPTOS_DOCKER.md) | Imagen, contenedor, volumen, compose (con el del proyecto explicado línea por línea) y por qué NO se necesita Kubernetes |
 

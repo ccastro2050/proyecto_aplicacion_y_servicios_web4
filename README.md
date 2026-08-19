@@ -26,15 +26,16 @@ curso, funcionando** — usted la ejecuta, la estudia y luego la
 En la terminal integrada de VS Code (*Terminal → New Terminal*, PowerShell):
 
 ```powershell
-git clone https://github.com/ccastro2050/proyecto_aplicacion_y_servicios_web3.git
-cd proyecto_aplicacion_y_servicios_web3
+git clone https://github.com/ccastro2050/proyecto_aplicacion_y_servicios_web4.git
+cd proyecto_aplicacion_y_servicios_web4
 docker compose up -d --build
 ```
 
 **Eso es todo.** La primera vez tarda varios minutos (descarga imágenes,
 el inicializador crea la BD, y la primera compilación de la API toma
-~1 minuto más). Al terminar quedan corriendo la base de datos (bdfacturas
-completa en SQL Server) y la API:
+~1 minuto más). Al terminar quedan corriendo los DOS motores (bdfacturas
+completa en SQL Server Y en PostgreSQL — la v4) y la API, que por defecto
+habla con PostgreSQL:
 
 | Qué | Dónde |
 |---|---|
@@ -42,12 +43,13 @@ completa en SQL Server) y la API:
 | **Swagger** (documentación interactiva: ver y probar los endpoints) | http://localhost:8032/swagger |
 | Listar productos | http://localhost:8032/api/producto |
 | SQL Server (para SQLTools/SSMS, opcional) | `localhost,11463` · `sa`/`Paradigmas123!` |
+| PostgreSQL (para psql/pgAdmin, opcional — v4) | `localhost:15462` · `postgres`/`Paradigmas123!` |
 
 Pruebe la joya didáctica de la v1: PUT con solo `{"stock": 99}` → 422; el
 mismo body en PATCH → 200. Esa diferencia es parte de lo que enseña la
 versión (contratos exactos en el spec kit).
 
-> ℹ️ Este proyecto usa los puertos 8032 y 11463: si alguno ya está ocupado
+> ℹ️ Este proyecto usa los puertos 8032, 11463 y 15462: si alguno ya está ocupado
 > en su máquina, cámbielo en `docker-compose.yml` (el lado izquierdo del
 > `"puerto:puerto"`).
 >
@@ -76,7 +78,7 @@ es **reconstruirla usted mismo, en una carpeta propia (fuera del clon)**,
 siguiendo las especificaciones — con o sin ayuda de IA:
 
 > 🤖 ¿Va a trabajar con IA? Siga la **[Guía para construir la versión con
-> IA](docs/spec_kit/versiones/v3_resto_entidades/GUIA_IA3.md)** — cubre los dos caminos con su prompt exacto listo
+> IA](docs/spec_kit/versiones/v4_postgresql/GUIA_IA4.md)** — cubre los dos caminos con su prompt exacto listo
 > para copiar: **chat web** (Gemini, DeepSeek, ChatGPT: qué archivos
 > subirle) e **IDE agéntico** (Antigravity, Cursor, Claude Code: cómo
 > supervisar al agente).
@@ -102,12 +104,14 @@ siguiendo las especificaciones — con o sin ayuda de IA:
 Qué es cada carpeta y cada archivo, y para qué sirve:
 
 ```
-proyecto_aplicacion_y_servicios_web3/
+proyecto_aplicacion_y_servicios_web4/
 ├── docker-compose.yml           # TODO el sistema declarado: SQL Server + inicializador
-│                                #   + API (el "un solo comando" del proyecto)
+│                                #   + PostgreSQL (v4) + API — y el interruptor MOTOR_BD
 ├── db/
 │   ├── bdfacturas.sql           # Crea bdfacturas COMPLETA (12 tablas, triggers, SPs,
 │   │                            #   datos) — dialecto SQL Server
+│   ├── bdfacturas_postgres.sql  # La MISMA bdfacturas en dialecto PostgreSQL (v4) —
+│   │                            #   postgres SÍ la auto-ejecuta (sin inicializador)
 │   └── init.sh                  # El inicializador: SQL Server no auto-ejecuta scripts;
 │                                #   este contenedor los corre UNA vez y termina
 │
@@ -128,8 +132,11 @@ proyecto_aplicacion_y_servicios_web3/
 │   ├── Peticiones/              # Los body por verbo → 422; FacturaCrear (v2) valida
 │   │                            #   una LISTA anidada de renglones
 │   ├── Servicios/               # Capa 2 — negocio: interfaces + reglas por entidad
-│   ├── Repositorios/            # Capa 3 — datos: ADO.NET; el de factura (v2) llama
-│   │                            #   PROCEDIMIENTOS ALMACENADOS y traduce sus THROW
+│   ├── Repositorios/            # Capa 3 — datos: ADO.NET, un dialecto por motor
+│   │                            #   (*SqlServer.cs y *Postgres.cs — v4); el de factura
+│   │                            #   llama PROCEDIMIENTOS ALMACENADOS y traduce sus errores
+│   ├── Fabricas/                # v4: la FÁBRICA de repositorios — el único punto
+│   │                            #   que decide el motor (IFabrica + una por motor)
 │   ├── Excepciones/             # NoEncontradoExcepcion → 404 · ConflictoExcepcion → 409 (v2)
 │   └── pruebas/                 # Proyecto de consola: producto Y persona con
 │                                #   repositorios FALSOS (criterio 6, corre sin BD)
@@ -162,8 +169,9 @@ más carpetas de componentes (y el compose crecerá con ellas).
 v1  api_facturas (C#/ASP.NET Core): CRUD de producto, solo SQL Server   (cerrada: tag v1)
 v2  persona (el molde replicado) + factura maestro-detalle con SPs   (cerrada: tag v2)
 v3  el RESTO de las entidades: toda la bdfacturas cubierta con
-    UN motor (usuario con BCrypt, tablas puente)   ← USTED ESTÁ AQUÍ
-v4  segundo motor (PostgreSQL) — nace la fábrica de repositorios
+    UN motor (usuario con BCrypt, tablas puente)   (cerrada: tag v3)
+v4  segundo motor (PostgreSQL) — nace la fábrica de
+    repositorios y el interruptor MOTOR_BD   ← USTED ESTÁ AQUÍ
 v5  tercer motor (MariaDB) + compose completo
 v6  API GENÉRICA de plataforma: /api/{tabla} multi-motor + JWT +
     consultas parametrizadas + procedimientos almacenados
@@ -175,18 +183,18 @@ su propia spec, y una versión está TERMINADA solo cuando pasa sus criterios
 de aceptación (commit + tag). Mapa completo:
 [docs/spec_kit/versiones/0_mapa_versiones.md](docs/spec_kit/versiones/0_mapa_versiones.md).
 
-## 4. Las especificaciones de la versión actual (v3)
+## 4. Las especificaciones de la versión actual (v4)
 
 | Documento | Contenido |
 |---|---|
 | [1_constitution.md](docs/spec_kit/1_constitution.md) | Las reglas permanentes del proyecto |
-| [2_spec.md](docs/spec_kit/versiones/v3_resto_entidades/2_spec.md) | QUÉ construir y los criterios de aceptación |
-| [3_plan.md](docs/spec_kit/versiones/v3_resto_entidades/3_plan.md) | CÓMO: stack, estructura y diseño de las capas |
-| [4_research.md](docs/spec_kit/versiones/v3_resto_entidades/4_research.md) | Decisiones y alternativas (el porqué) |
-| [5_data_model.md](docs/spec_kit/versiones/v3_resto_entidades/5_data_model.md) | Las 8 tablas que faltaban (moldes, usuario con secreto y puentes) |
-| [6_contracts.md](docs/spec_kit/versiones/v3_resto_entidades/6_contracts.md) | Los 36 endpoints nuevos con formatos exactos (v1 y v2 siguen igual) |
-| [7_quickstart.md](docs/spec_kit/versiones/v3_resto_entidades/7_quickstart.md) | Arranque y smoke test |
-| [8_tasks.md](docs/spec_kit/versiones/v3_resto_entidades/8_tasks.md) | Orden de construcción por fases verificables |
+| [2_spec.md](docs/spec_kit/versiones/v4_postgresql/2_spec.md) | QUÉ construir y los criterios de aceptación |
+| [3_plan.md](docs/spec_kit/versiones/v4_postgresql/3_plan.md) | CÓMO: stack, estructura y diseño de las capas |
+| [4_research.md](docs/spec_kit/versiones/v4_postgresql/4_research.md) | Decisiones y alternativas (el porqué) |
+| [5_data_model.md](docs/spec_kit/versiones/v4_postgresql/5_data_model.md) | La MISMA bdfacturas en dialecto PostgreSQL (equivalencias y semillas) |
+| [6_contracts.md](docs/spec_kit/versiones/v4_postgresql/6_contracts.md) | CERO endpoints nuevos: el mismo contrato con ambos motores | |
+| [7_quickstart.md](docs/spec_kit/versiones/v4_postgresql/7_quickstart.md) | Arranque y la regresión DOBLE (ambos motores) |
+| [8_tasks.md](docs/spec_kit/versiones/v4_postgresql/8_tasks.md) | Orden de construcción por fases verificables |
 
 ## 5. Material conceptual del curso
 

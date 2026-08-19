@@ -1,0 +1,298 @@
+@page "/facturas/nueva"
+@inject ServicioFactura Servicio
+@inject ServicioCliente ServicioClientes
+@inject ServicioVendedor ServicioVendedores
+@inject ServicioPersona ServicioPersonas
+@inject ServicioProducto ServicioProductos
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+
+@*
+   ============================================================
+   EMITIR UNA FACTURA — la misma pantalla que en el front de Flask del otro
+   curso.
+
+   Cuatro cosas que no son de adorno:
+
+   1. LOS RENGLONES SE AGREGAN DE A UNO. No hay un número fijo de casillas,
+      porque nadie sabe de antemano cuántas cosas va a vender.
+
+   2. EL TOTAL NO SE ENVIA. Lo que se ve abajo es un cálculo para que la
+      persona sepa cuánto va — pero lo que queda guardado lo pone el TRIGGER
+      trg_actualizar_totales_y_stock. Si el front lo enviara habría dos fuentes
+      de verdad, y el día que no coincidan gana la que nadie revisó.
+
+   3. UN SOLO ENVIO con el maestro y el detalle juntos. Una factura con tres
+      renglones no son cuatro peticiones: si la tercera fallara quedaría media
+      factura en la base, y «media factura» no es un estado que el negocio
+      reconozca.
+
+   4. AQUI EL BORRADOR VIVE EN EL CIRCUITO y no hay viaje al servidor por
+      renglón; en el front de Flask vive en la sesión y cada botón es una
+      petición. Esa es la única diferencia entre los dos: lo que se ve y lo que
+      se puede hacer es lo mismo.
+   ============================================================
+*@
+
+<h1 class="h2 mb-3">Facturas</h1>
+
+@if (aviso is not null)
+{
+    <div class="alert @(avisoEsError ? "alert-danger" : "alert-success")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="card mb-4">
+    <div class="card-body">
+        <h2 class="h5 card-title mb-3">Emitir una factura</h2>
+
+        @* --- EL MAESTRO: a quién y quién vende --- *@
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <label class="form-label" for="cliente">Cliente</label>
+                <select class="form-select" id="cliente" @bind="idCliente">
+                    <option value="0">— elija un cliente —</option>
+                    @foreach (var c in clientes)
+                    {
+                        <option value="@c.Id">@NombrePersona(c.Fkcodpersona) (cliente @c.Id)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label" for="vendedor">Vendedor</label>
+                <select class="form-select" id="vendedor" @bind="idVendedor">
+                    <option value="0">— elija un vendedor —</option>
+                    @foreach (var v in vendedores)
+                    {
+                        <option value="@v.Id">@NombrePersona(v.Fkcodpersona) (carnet @v.Carnet)</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <hr />
+
+        @* --- EL DETALLE: los renglones, que se arman AQUI sin tocar la API --- *@
+        <h2 class="h5">Los renglones</h2>
+
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-7">
+                <label class="form-label" for="producto">Producto</label>
+                <select class="form-select" id="producto" @bind="codigoProducto">
+                    <option value="">— elija un producto —</option>
+                    @foreach (var p in productos)
+                    {
+                        <option value="@p.Codigo">@p.Nombre — @p.Valorunitario.ToString("N0") (stock @p.Stock)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label" for="cantidad">Cantidad</label>
+                <input class="form-control" type="number" min="1" id="cantidad" @bind="cantidad" />
+            </div>
+            <div class="col-6 col-md-2">
+                @* Este boton NO habla con la API. Agrega a la tabla de abajo. *@
+                <button class="btn btn-outline-primary w-100" @onclick="AgregarRenglon">Agregar al detalle</button>
+            </div>
+        </div>
+
+        @if (renglones.Count == 0)
+        {
+            <div class="alert alert-secondary mt-3 text-center">Agregue al menos un renglón.</div>
+        }
+        else
+        {
+            <div class="table-responsive mt-3">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-end">Cantidad</th>
+                            <th class="text-end">Valor unitario</th>
+                            <th class="text-end">Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in renglones)
+                        {
+                            <tr>
+                                <td>@r.NombreParaMostrar</td>
+                                <td class="text-end font-monospace">@r.Cantidad</td>
+                                <td class="text-end font-monospace">@r.PrecioParaMostrar.ToString("N0")</td>
+                                <td class="text-end font-monospace">@((r.Cantidad * r.PrecioParaMostrar).ToString("N0"))</td>
+                                <td class="text-end">
+                                    @* Quitar un renglon de ESTA lista tampoco llama a
+                                       la API: todavia no se ha enviado nada. *@
+                                    <button class="btn btn-sm btn-danger" @onclick="() => QuitarRenglon(r)">Quitar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total estimado</strong></td>
+                            <td class="text-end font-monospace"><strong>@TotalEstimado().ToString("N0")</strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <p class="small text-body-secondary">
+                Este total es un cálculo para que usted sepa cuánto va.
+                <strong>No se envía:</strong> el total que queda guardado lo calcula
+                el disparador de la base de datos, y es el que manda.
+            </p>
+        }
+
+        <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+            @* UN SOLO ENVIO con el maestro y el detalle juntos. *@
+            <button class="btn btn-primary" disabled="@enviando" @onclick="Emitir">
+                @(enviando ? "Emitiendo…" : "Emitir la factura")
+            </button>
+            <button class="btn btn-link" @onclick="LimpiarFormulario">Empezar de nuevo</button>
+            <a class="btn btn-link" href="facturas">Volver a las facturas</a>
+        </div>
+
+        @if (clientes.Count == 0 || vendedores.Count == 0 || productos.Count == 0)
+        {
+            <p class="small text-body-secondary mt-3 mb-0">
+                Para emitir una factura hacen falta un <a href="clientes">cliente</a>,
+                un <a href="vendedores">vendedor</a> y al menos un
+                <a href="productos">producto</a>.
+            </p>
+        }
+    </div>
+</section>
+
+@code {
+    private List<Cliente> clientes = [];
+    private List<Vendedor> vendedores = [];
+    private List<Persona> personas = [];
+    private List<Producto> productos = [];
+    private int idCliente;
+    private int idVendedor;
+    private string codigoProducto = "";
+    private int cantidad = 1;
+    private readonly List<RenglonNuevo> renglones = [];
+    private bool enviando;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        await CargarDesplegables();
+    }
+
+    private async Task CargarDesplegables()
+    {
+        // LAS CUATRO A LA VEZ. En fila serian cuatro viajes encadenados, y con
+        // la API lenta la pagina tardaria cuatro veces mas en abrir.
+        var tareaClientes = ServicioClientes.ListarAsync();
+        var tareaVendedores = ServicioVendedores.ListarAsync();
+        var tareaPersonas = ServicioPersonas.ListarAsync();
+        var tareaProductos = ServicioProductos.ListarAsync();
+
+        await Task.WhenAll(tareaClientes, tareaVendedores, tareaPersonas, tareaProductos);
+
+        var rc = tareaClientes.Result;
+        var rv = tareaVendedores.Result;
+        var rp = tareaPersonas.Result;
+        var rpr = tareaProductos.Result;
+
+        if (rc.Bien) { clientes = rc.Dato!; }
+        if (rv.Bien) { vendedores = rv.Dato!; }
+        if (rp.Bien) { personas = rp.Dato!; }
+        if (rpr.Bien) { productos = rpr.Dato!; }
+
+        if (!rc.Bien || !rv.Bien || !rp.Bien || !rpr.Bien)
+            Avisar("No se pudieron cargar todas las listas. Algunos desplegables "
+                 + "van a estar vacios.", true);
+    }
+
+    private void AgregarRenglon()
+    {
+        var p = productos.FirstOrDefault(x => x.Codigo == codigoProducto);
+        if (p is null) { Avisar("Elija un producto.", true); return; }
+        if (cantidad < 1) { Avisar("La cantidad tiene que ser 1 o mas.", true); return; }
+
+        // El mismo producto dos veces SUMA, no repite el renglon.
+        var yaEsta = renglones.FirstOrDefault(x => x.Codigo == p.Codigo);
+        if (yaEsta is not null)
+        {
+            yaEsta.Cantidad += cantidad;
+        }
+        else
+        {
+            renglones.Add(new RenglonNuevo
+            {
+                Codigo = p.Codigo!,
+                Cantidad = cantidad,
+                NombreParaMostrar = p.Nombre ?? p.Codigo!,
+                PrecioParaMostrar = p.Valorunitario,
+            });
+        }
+
+        codigoProducto = "";
+        cantidad = 1;
+        aviso = null;
+    }
+
+    private void QuitarRenglon(RenglonNuevo r) => renglones.Remove(r);
+
+    private decimal TotalEstimado() =>
+        renglones.Sum(r => r.Cantidad * r.PrecioParaMostrar);
+
+    /// <summary>UN SOLO POST con el maestro y el detalle.</summary>
+    private async Task Emitir()
+    {
+        if (idCliente == 0) { Avisar("Elija el cliente.", true); return; }
+        if (idVendedor == 0) { Avisar("Elija el vendedor.", true); return; }
+        if (renglones.Count == 0) { Avisar("Agregue al menos un renglón.", true); return; }
+
+        enviando = true;
+        var r = await Servicio.CrearAsync(new FacturaNueva
+        {
+            Fkidcliente = idCliente,
+            Fkidvendedor = idVendedor,
+            Productos = renglones.ToList(),
+        });
+        enviando = false;
+
+        if (r.Bien)
+        {
+            LimpiarFormulario();
+            // A la tabla, que es donde se ve la factura recien emitida.
+            Navegador.NavigateTo("/facturas");
+        }
+        else
+        {
+            // Aqui cae el stock insuficiente. Lo que la persona escribio SE
+            // QUEDA: puede bajar la cantidad y volver a intentar.
+            Avisar(r.Mensaje!, true);
+        }
+    }
+
+    private void LimpiarFormulario()
+    {
+        idCliente = 0;
+        idVendedor = 0;
+        codigoProducto = "";
+        cantidad = 1;
+        renglones.Clear();
+        aviso = null;
+    }
+
+    private string NombrePersona(string? codigo) =>
+        personas.FirstOrDefault(p => p.Codigo == codigo)?.Nombre ?? codigo ?? "—";
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

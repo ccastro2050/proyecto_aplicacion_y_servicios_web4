@@ -1,0 +1,139 @@
+@page "/facturas"
+@inject ServicioFactura Servicio
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+
+@*
+   ============================================================
+   LA TABLA DE FACTURAS. El formulario de emisión vive en
+   /facturas/nueva, y el detalle de una factura en /facturas/{numero}.
+
+   SON TRES PANTALLAS Y NO UNA, y es la misma división que en el front de Flask
+   del otro curso: la lista se mira, el formulario se llena, el detalle se
+   consulta. Antes todo estaba junto, y con ocho facturas la página era
+   larguísima y no dejaba comparar nada.
+
+   Dos cosas que no son de adorno:
+
+   1. NO HAY BOTÓN DE ELIMINAR. Hay ANULAR. Una factura emitida es un
+      documento: no desaparece, cambia de estado — y el procedimiento devuelve
+      el stock de cada renglón.
+
+   2. NO HAY EDITAR. Una factura no se corrige: se anula y se hace otra.
+   ============================================================
+*@
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h2 mb-0">Facturas</h1>
+    <a class="btn btn-primary" href="facturas/nueva">Nueva factura</a>
+</div>
+
+@if (aviso is not null)
+{
+    <div class="alert @(avisoEsError ? "alert-danger" : "alert-success")" role="alert">
+        @aviso
+    </div>
+}
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    @* Vacío NO es error: es un recuadro que lo dice. *@
+    <div class="alert alert-secondary">Todavía no hay facturas.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>No.</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th>
+                    <th class="text-end">Total</th><th>Estado</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var f in lista)
+                {
+                    <tr>
+                        <td class="font-monospace">@f.Numero</td>
+                        <td>@FechaCorta(f.Fecha)</td>
+                        @* Estos nombres NO los buscó el front: vienen resueltos
+                           porque el JOIN lo hizo el procedimiento almacenado. *@
+                        <td>@f.NombreCliente</td>
+                        <td>@f.NombreVendedor</td>
+                        <td class="text-end font-monospace">@f.Total.ToString("N0")</td>
+                        <td>
+                            @* El estado con la marca: activa Verde Páramo,
+                               anulada Rojo Anulada. *@
+                            <span class="badge @(f.Estado == "activa" ? "bg-success" : "bg-danger")">
+                                @f.Estado
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" href="@($"facturas/{f.Numero}")">Ver</a>
+                            @if (f.Estado == "activa")
+                            {
+                                @* ANULAR, no eliminar. Y el texto lo dice. *@
+                                <button class="btn btn-sm btn-danger" @onclick="() => Anular(f.Numero)">Anular</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Factura> lista = [];
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Anular(int numero)
+    {
+        var r = await Servicio.AnularAsync(numero);
+        if (r.Bien)
+        {
+            Avisar($"Factura {numero} anulada — el stock se restauró.", false);
+            await Cargar();
+        }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    /// <summary>La fecha llega como texto ISO del procedimiento. Si no se puede
+    /// leer, se muestra tal cual: romper la interfaz por una fecha no.</summary>
+    private static string FechaCorta(string? iso) =>
+        DateTime.TryParse(iso, out var d) ? d.ToString("yyyy-MM-dd") : (iso ?? "—");
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

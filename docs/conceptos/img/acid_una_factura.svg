@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 540" width="980" height="540" font-family="Segoe UI, system-ui, sans-serif">
+  <title>ACID explicado con una factura de tres renglones</title>
+  <desc>Emitir una factura toca cuatro tablas. O se hacen todas o ninguna: eso es la atomicidad, y las otras tres propiedades se ven en el mismo caso.</desc>
+  <defs>
+    <marker id="a2" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#17495B"/>
+    </marker>
+  </defs>
+  <rect width="980" height="540" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">ACID, con una factura de tres renglones</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">Emitir UNA factura escribe en cuatro sitios. La pregunta de ACID es: ¿qué pasa si el tercero falla?</text>
+
+  <!-- la transaccion -->
+  <rect x="36" y="94" width="600" height="206" rx="10" fill="#fff" stroke="#17495B" stroke-width="2.5"/>
+  <text x="56" y="120" font-size="13" font-weight="600" fill="#17495B">BEGIN TRANSACTION</text>
+
+  <rect x="56" y="134" width="256" height="40" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="70" y="159" font-size="12" fill="#4A4A4A">1 · INSERT en <tspan font-weight="600">factura</tspan></text>
+
+  <rect x="56" y="182" width="268" height="40" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="70" y="201" font-size="12" fill="#4A4A4A">2 · INSERT ×3 en</text>
+  <text x="70" y="216" font-size="12" font-weight="600" fill="#4A4A4A">productosporfactura</text>
+
+  <rect x="344" y="134" width="272" height="40" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="358" y="159" font-size="12" fill="#4A4A4A">3 · el trigger baja el <tspan font-weight="600">stock</tspan></text>
+
+  <rect x="344" y="182" width="272" height="40" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="358" y="207" font-size="12" fill="#4A4A4A">4 · el trigger suma el <tspan font-weight="600">total</tspan></text>
+
+  <text x="56" y="252" font-size="13" font-weight="600" fill="#2F7D5C">COMMIT  →  las cuatro quedaron</text>
+  <text x="56" y="278" font-size="13" font-weight="600" fill="#B4402F">ROLLBACK →  NINGUNA quedó</text>
+
+  <!-- el caso que lo explica -->
+  <rect x="664" y="94" width="280" height="206" rx="10" fill="#B4402F"/>
+  <text x="684" y="122" font-size="14" font-weight="600" fill="#fff">El caso que lo explica</text>
+  <text x="684" y="150" font-size="12" fill="#F4F2EC">El tercer renglón pide 50 unidades</text>
+  <text x="684" y="169" font-size="12" fill="#F4F2EC">y solo hay 8. El trigger rechaza.</text>
+  <text x="684" y="199" font-size="12" font-weight="600" fill="#fff">Sin transacción quedaría:</text>
+  <text x="684" y="219" font-size="12" fill="#F4F2EC">· la factura creada</text>
+  <text x="684" y="237" font-size="12" fill="#F4F2EC">· con dos renglones de tres</text>
+  <text x="684" y="255" font-size="12" fill="#F4F2EC">· y el stock de dos productos bajado</text>
+  <text x="684" y="283" font-size="12" font-weight="600" fill="#fff">«Media factura» no existe.</text>
+
+  <!-- las cuatro letras -->
+  <rect x="36" y="330" width="218" height="104" rx="8" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="56" y="356" font-size="15" font-weight="600" fill="#17495B">A · Atomicidad</text>
+  <text x="56" y="379" font-size="11.5" fill="#4A4A4A">Todo o nada. Es lo del dibujo</text>
+  <text x="56" y="396" font-size="11.5" fill="#4A4A4A">de arriba: las cuatro escrituras</text>
+  <text x="56" y="413" font-size="11.5" fill="#4A4A4A">son UNA sola operación.</text>
+
+  <rect x="272" y="330" width="218" height="104" rx="8" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="292" y="356" font-size="15" font-weight="600" fill="#17495B">C · Consistencia</text>
+  <text x="292" y="379" font-size="11.5" fill="#4A4A4A">Las reglas se cumplen antes</text>
+  <text x="292" y="396" font-size="11.5" fill="#4A4A4A">y después: no hay stock</text>
+  <text x="292" y="413" font-size="11.5" fill="#4A4A4A">negativo ni factura sin cliente.</text>
+
+  <rect x="508" y="330" width="218" height="104" rx="8" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="528" y="356" font-size="15" font-weight="600" fill="#17495B">I · Aislamiento</text>
+  <text x="528" y="379" font-size="11.5" fill="#4A4A4A">Dos vendedores a la vez no</text>
+  <text x="528" y="396" font-size="11.5" fill="#4A4A4A">se llevan la misma unidad:</text>
+  <text x="528" y="413" font-size="11.5" fill="#4A4A4A">uno espera, el otro recibe no.</text>
+
+  <rect x="744" y="330" width="200" height="104" rx="8" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="764" y="356" font-size="15" font-weight="600" fill="#17495B">D · Durabilidad</text>
+  <text x="764" y="379" font-size="11.5" fill="#4A4A4A">Si el COMMIT respondió,</text>
+  <text x="764" y="396" font-size="11.5" fill="#4A4A4A">está guardado — aunque</text>
+  <text x="764" y="413" font-size="11.5" fill="#4A4A4A">se vaya la luz enseguida.</text>
+
+  <!-- donde vive esto -->
+  <rect x="36" y="456" width="908" height="60" rx="8" fill="#fff" stroke="#E39B2D" stroke-width="2"/>
+  <text x="56" y="479" font-size="12.5" font-weight="600" fill="#17495B">Dónde vive esto en el proyecto</text>
+  <text x="56" y="500" font-size="12" fill="#4A4A4A">En <tspan font-family="Consolas, monospace">sp_insertar_factura_y_productosporfactura</tspan>: la transacción está DENTRO del procedimiento, no en C#. Por eso la API hace UN viaje y no cuatro.</text>
+</svg>

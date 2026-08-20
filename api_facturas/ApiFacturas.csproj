@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- ============================================================
+       ApiFacturas.csproj — la "cédula" del proyecto .NET.
+
+       Este archivo XML le dice al SDK de .NET qué es este proyecto
+       y qué necesita para compilar. No se escribe código aquí:
+       solo configuración.
+       ============================================================ -->
+
+  <PropertyGroup>
+    <!-- La versión de .NET con la que se compila y ejecuta: -->
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Nullable habilita las advertencias de "esto puede ser null"
+         (el compilador nos cuida de los NullReferenceException): -->
+    <Nullable>enable</Nullable>
+    <!-- ImplicitUsings agrega solos los using más comunes
+         (System, System.Linq, etc.) para no repetirlos en cada archivo: -->
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Los paquetes externos de la v1 (y ninguno más):
+         - Microsoft.Data.SqlClient: el cliente oficial de SQL Server
+           para .NET (ADO.NET). Sin ORM: el SQL se escribe a mano y
+           queda visible — decisión de la constitución.
+         - Swashbuckle.AspNetCore: genera la documentación interactiva
+           Swagger (/swagger) leyendo los controladores y sus clases de datos. -->
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <!-- Dapper: el MICRO-ejecutor — el SQL se sigue escribiendo a mano
+         y parametrizado; Dapper solo mapea fila→objeto (sin Entity
+         Framework: nada genera SQL por nosotros). -->
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <!-- v3: BCrypt.Net-Next — el hash de la contraseña de usuario
+         (costo 12). Lo usa SOLO el repositorio de usuario. -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- v3: el token. La version se copio de
+         proyecto_construccion1/api_generica_csharp, que ya corre sobre
+         net10.0 con esta misma. No se adivino. -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
+    <!-- v4: Npgsql — el proveedor ADO.NET oficial de PostgreSQL
+         (las mismas ideas de SqlClient: Connection/Command/Reader). -->
+    <PackageReference Include="Npgsql" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- La carpeta pruebas/ tiene SU PROPIO proyecto (la prueba de
+         capas): se excluye de la compilación de la API para que no
+         se mezclen los dos programas. -->
+    <Compile Remove="pruebas/**" />
+    <Content Remove="pruebas/**" />
+    <None Remove="pruebas/**" />
+  </ItemGroup>
+
+</Project>

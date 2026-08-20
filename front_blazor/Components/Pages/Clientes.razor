@@ -1,0 +1,295 @@
+@page "/clientes"
+@inject ServicioCliente Servicio
+@inject ServicioPersona ServicioPersonas
+@inject ServicioEmpresa ServicioEmpresas
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+@*
+   LA PRIMERA INTERFAZ GRAFICA CON CLAVE FORANEA, y de ahi sale la regla de la v2:
+
+     Fkcodpersona y Fkcodempresa NO se escriben a mano. Se ELIGEN de un
+     desplegable que trae los valores de la API.
+
+   Por que: un campo de texto obliga a la persona a adivinar que codigos
+   existen. Escribe «P001», la API responde 409 -la clave foranea no existe- y
+   no hay forma de saber cual era el bueno. En la v1 no habia nada que elegir
+   porque ninguna de las seis tablas tenia clave foranea: el problema aparece
+   aqui.
+
+   FIJESE EN QUE SE INYECTAN TRES SERVICIOS. El de cliente, y uno por cada
+   desplegable. Esa es la consecuencia directa de tener un servicio POR
+   RECURSO en vez de uno genérico: se ve de un golpe de qué depende esta
+   interfaz.
+*@
+
+<h1>Clientes</h1>
+
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="tarjeta">
+    <h2>@(editando ? $"Editar el cliente {enEdicion.Id}" : "Agregar cliente")</h2>
+
+    <div class="campos">
+        <label>
+            Credito
+            <input type="number" step="0.01" @bind="enEdicion.Credito" />
+        </label>
+
+        @* El desplegable muestra el NOMBRE y manda el CODIGO. Es la regla: la
+           persona reconoce nombres, la base necesita claves. *@
+        <label>
+            Persona
+            <select @bind="enEdicion.Fkcodpersona">
+                <option value="">— elija una persona —</option>
+                @foreach (var p in personas)
+                {
+                    <option value="@p.Codigo">@p.Nombre (@p.Codigo)</option>
+                }
+            </select>
+        </label>
+
+        @* Fkcodempresa es NULLABLE en la base: un cliente puede ser persona
+           natural. Por eso este desplegable SI lleva opcion vacia con texto
+           -«(ninguna)»-, y la de arriba la lleva solo como invitacion a
+           elegir. *@
+        <label>
+            Empresa (opcional)
+            <select @bind="codigoEmpresa">
+                <option value="">(ninguna)</option>
+                @foreach (var e in empresas)
+                {
+                    <option value="@e.Codigo">@e.Nombre (@e.Codigo)</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <div class="botones">
+        @if (editando)
+        {
+            <button class="primario" @onclick="GuardarCompleta">Guardar la ficha completa</button>
+            <button @onclick="GuardarSoloCambios">Guardar solo lo que cambie</button>
+            <button class="plano" @onclick="Cancelar">Cancelar</button>
+        }
+        else
+        {
+            <button class="primario" @onclick="Crear">Agregar</button>
+        }
+    </div>
+
+    @if (personas.Count == 0)
+    {
+        @* Si no hay personas, no se puede crear un cliente. Decirlo ANTES es
+           mejor que dejar que lo intente y reciba un 409. *@
+        <p class="nota">No hay personas registradas todavia. Agregue una en
+           <a href="personas">Personas</a> antes de crear un cliente.</p>
+    }
+</section>
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    <div class="vacio">Todavia no hay registros.</div>
+}
+else
+{
+    <table>
+        <thead>
+            <tr><th>Id</th><th>Credito</th><th>Persona</th><th>Empresa</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var c in lista)
+            {
+                <tr>
+                    <td>@c.Id</td>
+                    <td>@c.Credito.ToString("N2")</td>
+                    @* Se muestra el NOMBRE, no el codigo pelado: el codigo no
+                       le dice nada a nadie. El nombre lo resuelve el front
+                       contra la lista que ya tiene en memoria —aqui si, porque
+                       este endpoint devuelve la fila cruda—. *@
+                    <td>@NombrePersona(c.Fkcodpersona)</td>
+                    <td>@NombreEmpresa(c.Fkcodempresa)</td>
+                    <td class="acciones">
+                        <button @onclick="() => Editar(c)">Editar</button>
+                        <button class="peligro" @onclick="() => Eliminar(c.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Cliente> lista = [];
+    private List<Persona> personas = [];
+    private List<Empresa> empresas = [];
+    private Cliente enEdicion = new();
+    private bool editando;
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    /// <summary>El desplegable de empresa se enlaza a un string NO nulo porque
+    /// un &lt;select&gt; no sabe de null: la opcion vacia es "". La conversion
+    /// a null se hace al enviar, en ClienteParaEnviar().</summary>
+    private string codigoEmpresa = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        // Los desplegables se cargan UNA vez al entrar. No se recargan con
+        // cada tecla: son listas de referencia, no resultados de busqueda.
+        //
+        // Y LA LISTA SE PIDE A LA VEZ QUE ELLOS, no despues. En fila eran dos
+        // esperas -primero los desplegables, luego la lista- y con la API
+        // apagada eso es el doble de timeout antes de que la interfaz diga
+        // nada. Asi el peor caso es el de UNA peticion.
+        await Task.WhenAll(CargarDesplegables(), Cargar());
+    }
+
+    private async Task CargarDesplegables()
+    {
+        // ============================================================
+        // LOS DOS A LA VEZ, no uno despues del otro.
+        //
+        // Se arrancan las dos peticiones y DESPUES se esperan las dos. Escrito
+        // en fila -`await` y `await`- la segunda no empieza hasta que la
+        // primera termina, y con la API apagada eso son 10 segundos de timeout
+        // MAS otros 10.
+        //
+        // Lo encontro el criterio 18, midiendo: /facturas, que carga cuatro
+        // listas, tardaba 50 segundos en mostrar su aviso. Seguia en pie —eso
+        // estaba bien— pero casi un minuto en blanco es, para quien lo usa, lo
+        // mismo que estar roto.
+        // ============================================================
+        var tareaPersonas = ServicioPersonas.ListarAsync();
+        var tareaEmpresas = ServicioEmpresas.ListarAsync();
+        await Task.WhenAll(tareaPersonas, tareaEmpresas);
+
+        var rp = tareaPersonas.Result;
+        var re = tareaEmpresas.Result;
+        if (rp.Bien) { personas = rp.Dato!; }
+        if (re.Bien) { empresas = re.Dato!; }
+
+        // Si los desplegables no cargan, la interfaz SIGUE EN PIE y lo dice.
+        // No se queda en blanco esperando.
+        if (!rp.Bien || !re.Bien)
+            Avisar("No se pudieron cargar las listas de personas o empresas. "
+                 + "Los desplegables van a estar vacios.", true);
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    /// <summary>"" del desplegable vuelve a ser null antes de viajar: la
+    /// columna es NULLABLE, y mandar cadena vacia crearia una empresa con
+    /// codigo "" que no existe.</summary>
+    private Cliente ClienteParaEnviar() => new()
+    {
+        Id = enEdicion.Id,
+        Credito = enEdicion.Credito,
+        Fkcodpersona = enEdicion.Fkcodpersona,
+        Fkcodempresa = string.IsNullOrWhiteSpace(codigoEmpresa) ? null : codigoEmpresa,
+    };
+
+    private async Task Crear()
+    {
+        if (string.IsNullOrWhiteSpace(enEdicion.Fkcodpersona))
+        {
+            Avisar("Elija la persona del cliente.", true);
+            return;
+        }
+
+        var r = await Servicio.CrearAsync(ClienteParaEnviar());
+        if (r.Bien)
+        {
+            Avisar("Registro agregado.", false);
+            enEdicion = new(); codigoEmpresa = "";
+            await Cargar();
+        }
+        else
+        {
+            // El error NO borra lo que la persona eligio.
+            Avisar(r.Mensaje!, true);
+        }
+    }
+
+    private async Task GuardarCompleta()
+    {
+        var r = await Servicio.ReemplazarAsync(enEdicion.Id, ClienteParaEnviar());
+        if (r.Bien) { Avisar("Ficha completa guardada.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task GuardarSoloCambios()
+    {
+        var parcial = new { credito = enEdicion.Credito };
+        var r = await Servicio.ActualizarAsync(enEdicion.Id, parcial);
+        if (r.Bien) { Avisar("Cambios guardados.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var r = await Servicio.EliminarAsync(id);
+        if (r.Bien) { Avisar("Registro quitado.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private void Editar(Cliente c)
+    {
+        enEdicion = new Cliente
+        {
+            Id = c.Id, Credito = c.Credito,
+            Fkcodpersona = c.Fkcodpersona, Fkcodempresa = c.Fkcodempresa,
+        };
+        codigoEmpresa = c.Fkcodempresa ?? "";
+        editando = true;
+        aviso = null;
+    }
+
+    private void Cancelar() { enEdicion = new(); codigoEmpresa = ""; editando = false; }
+
+    private string NombrePersona(string? codigo) =>
+        personas.FirstOrDefault(p => p.Codigo == codigo)?.Nombre ?? codigo ?? "—";
+
+    private string NombreEmpresa(string? codigo) =>
+        string.IsNullOrWhiteSpace(codigo)
+            ? "—"
+            : empresas.FirstOrDefault(e => e.Codigo == codigo)?.Nombre ?? codigo;
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

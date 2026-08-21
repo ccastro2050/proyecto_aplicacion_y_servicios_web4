@@ -1,8 +1,14 @@
-// RepositorioRolUsuarioSqlServer — la capa de DATOS del puente rol_usuario (v3).
+// ============================================================
+// RepositorioRolUsuarioSqlServer — la capa de DATOS del puente rol_usuario.
+//
+// SQL a mano + DAPPER como micro-ejecutor (constitución, Art. 2).
 // El DELETE filtra por LAS DOS columnas: borra una pareja exacta,
-// nunca "todo lo del usuario/la ruta" (regla dura de la spec).
+// nunca "todo lo del lado A o B" (regla dura de la spec).
+// Dialecto SQL Server: TOP (@limite) al PRINCIPIO del SELECT (T-SQL no tiene LIMIT).
+// ============================================================
 
 using ApiFacturas.Modelos;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace ApiFacturas.Repositorios;
@@ -16,73 +22,42 @@ public class RepositorioRolUsuarioSqlServer : IRepositorioRolUsuario
         _cadenaConexion = cadenaConexion;
     }
 
-    private async Task<SqlConnection> AbrirConexionAsync()
+    private SqlConnection CrearConexion() => new(_cadenaConexion);
+
+    public async Task<List<RolUsuario>> ObtenerTodosAsync(int limite)
     {
-        var conexion = new SqlConnection(_cadenaConexion);
-        await conexion.OpenAsync();
-        return conexion;
+        const string sql = @"SELECT TOP (@limite) fkemail, fkidrol FROM rol_usuario ORDER BY fkemail, fkidrol";
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<RolUsuario>(sql, new { limite })).ToList();
     }
 
-    private static RolUsuario Armar(SqlDataReader lector)
+    public async Task<List<RolUsuario>> ObtenerPorUsuarioAsync(string fkemail)
     {
-        return new RolUsuario
-        {
-            Fkemail = lector.GetString(0),
-            Fkidrol = lector.GetInt32(1),
-        };
+        const string sql = @"SELECT fkemail, fkidrol FROM rol_usuario WHERE fkemail = @fkemail";
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<RolUsuario>(sql, new { fkemail })).ToList();
     }
 
-    private async Task<List<RolUsuario>> ConsultarAsync(string sql, Action<SqlParameterCollection> configurar)
+    public async Task<List<RolUsuario>> ObtenerPorRolAsync(int fkidrol)
     {
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        configurar(comando.Parameters);
-        await using var lector = await comando.ExecuteReaderAsync();
-        var lista = new List<RolUsuario>();
-        while (await lector.ReadAsync()) { lista.Add(Armar(lector)); }
-        return lista;
-    }
-
-    public Task<List<RolUsuario>> ObtenerTodosAsync(int limite)
-    {
-        return ConsultarAsync(
-            @"SELECT TOP (@limite) fkemail, fkidrol FROM rol_usuario ORDER BY fkemail, fkidrol",
-            p => p.AddWithValue("@limite", limite));
-    }
-
-    public Task<List<RolUsuario>> ObtenerPorUsuarioAsync(string fkemail)
-    {
-        return ConsultarAsync(
-            @"SELECT fkemail, fkidrol FROM rol_usuario WHERE fkemail = @a",
-            p => p.AddWithValue("@a", fkemail));
-    }
-
-    public Task<List<RolUsuario>> ObtenerPorRolAsync(int fkidrol)
-    {
-        return ConsultarAsync(
-            @"SELECT fkemail, fkidrol FROM rol_usuario WHERE fkidrol = @b",
-            p => p.AddWithValue("@b", fkidrol));
+        const string sql = @"SELECT fkemail, fkidrol FROM rol_usuario WHERE fkidrol = @fkidrol";
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<RolUsuario>(sql, new { fkidrol })).ToList();
     }
 
     public async Task CrearAsync(RolUsuario asignacion)
     {
-        const string sql = @"INSERT INTO rol_usuario (fkemail, fkidrol) VALUES (@a, @b)";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@a", asignacion.Fkemail);
-        comando.Parameters.AddWithValue("@b", asignacion.Fkidrol);
-        // Duplicado → viola la PK compuesta → SqlException → 500:
-        await comando.ExecuteNonQueryAsync();
+        // Duplicado → viola la PK compuesta → excepción del motor → 500:
+        const string sql = @"INSERT INTO rol_usuario (fkemail, fkidrol) VALUES (@Fkemail, @Fkidrol)";
+        await using var conexion = CrearConexion();
+        await conexion.ExecuteAsync(sql, asignacion);
     }
 
     public async Task<int> EliminarAsync(string fkemail, int fkidrol)
     {
         // LA PAREJA EXACTA: las dos columnas en el WHERE.
-        const string sql = @"DELETE FROM rol_usuario WHERE fkemail = @a AND fkidrol = @b";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@a", fkemail);
-        comando.Parameters.AddWithValue("@b", fkidrol);
-        return await comando.ExecuteNonQueryAsync();
+        const string sql = @"DELETE FROM rol_usuario WHERE fkemail = @fkemail AND fkidrol = @fkidrol";
+        await using var conexion = CrearConexion();
+        return await conexion.ExecuteAsync(sql, new { fkemail, fkidrol });
     }
 }

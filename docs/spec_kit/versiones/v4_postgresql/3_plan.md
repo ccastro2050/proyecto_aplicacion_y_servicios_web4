@@ -1,5 +1,13 @@
 # Plan — Versión 4: el segundo motor (PostgreSQL) y la fábrica
 
+> **Nota (agosto de 2026):** el curso adoptó **Dapper** como
+> micro-ejecutor en TODOS los repositorios: el SQL sigue escrito a mano
+> y parametrizado; cambió el mapeo (`QueryAsync`/`ExecuteAsync` en vez
+> del ciclo DataReader) y los SPs se llaman con `DynamicParameters`.
+> Las tablas de "calco" entre dialectos siguen valiendo para los
+> PROVEEDORES (Npgsql/SqlClient/MySqlConnector) que Dapper usa por debajo.
+
+
 > Cómo se construye lo especificado en [2_spec.md](2_spec.md). El stack es
 > el mismo de siempre (C#/ASP.NET Core, ADO.NET, sin ORM); lo nuevo es el
 > proveedor **Npgsql** y el patrón **fábrica abstracta**.

@@ -1,25 +1,20 @@
 // ============================================================
-// RepositorioFacturaPostgres — la capa de DATOS de factura (v4).
+// RepositorioFacturaPostgres — la capa de DATOS de factura.
 //
-// El mismo papel que RepositorioFacturaSqlServer (la API como
-// TRADUCTORA de SPs), con las dos diferencias del dialecto:
-//
-//   1. Invocación: los SPs de PostgreSQL son PROCEDURE con un
-//      parámetro INOUT p_resultado JSON. Se invocan con un CALL
-//      de texto, y el CALL devuelve los INOUT como UNA FILA de
-//      resultado → ExecuteScalarAsync() la lee (en SQL Server
-//      era un parámetro OUTPUT).
-//   2. Errores de negocio: PostgreSQL no numera los RAISE
-//      EXCEPTION como los THROW 50003/50010 — todos salen con
-//      SQLSTATE 'P0001'. La traducción filtra por P0001 + el
-//      patrón del mensaje. Menos elegante, misma frontera: arriba
-//      de aquí nadie conoce PostgresException.
+// La API como TRADUCTORA: no escribe SQL de tablas — llama los
+// PROCEDIMIENTOS ALMACENADOS de la BD (CALL de texto; el INOUT
+// p_resultado vuelve como fila y Dapper lo lee con
+// ExecuteScalarAsync), deserializa su JSON a los modelos y traduce
+// los RAISE EXCEPTION (SQLSTATE P0001, sin número) por PATRÓN del
+// mensaje: "no existe" → 404 · "ya está anulada" → 409.
+// Arriba de aquí nadie conoce PostgresException.
 // ============================================================
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ApiFacturas.Excepciones;
 using ApiFacturas.Modelos;
+using Dapper;
 using Npgsql;
 
 namespace ApiFacturas.Repositorios;
@@ -38,31 +33,20 @@ public class RepositorioFacturaPostgres : IRepositorioFactura
         _cadenaConexion = cadenaConexion;
     }
 
-    // ------------------------------------------------------------
-    // El ayudante central: ejecutar un CALL y devolver su JSON
-    // ------------------------------------------------------------
+    private NpgsqlConnection CrearConexion() => new(_cadenaConexion);
 
-    /// <summary>Ejecuta el CALL indicado (texto SQL con sus @parámetros;
-    /// el último argumento del CALL es NULL: el INOUT p_resultado) y
-    /// devuelve el JSON que el SP dejó ahí. Traduce los RAISE EXCEPTION
-    /// (P0001) a excepciones de negocio; el resto sube tal cual (500).</summary>
-    private async Task<string> EjecutarSpAsync(string sqlCall, Action<NpgsqlParameterCollection> configurar)
+    /// <summary>Ejecuta el CALL (el último argumento NULL es el INOUT
+    /// p_resultado) y devuelve el JSON que el SP dejó ahí.</summary>
+    private async Task<string> EjecutarSpAsync(string sqlCall, object parametros)
     {
-        await using var conexion = new NpgsqlConnection(_cadenaConexion);
-        await using var comando = new NpgsqlCommand(sqlCall, conexion);
-        configurar(comando.Parameters);
-
+        await using var conexion = CrearConexion();
         try
         {
-            await conexion.OpenAsync();
-            // El CALL devuelve una fila con los INOUT; la única columna
-            // es p_resultado (el JSON del SP):
-            var resultado = await comando.ExecuteScalarAsync();
-            return resultado is null or DBNull ? "null" : (string)resultado;
+            // El CALL devuelve una fila con los INOUT; su única columna
+            // es p_resultado — ExecuteScalar la lee:
+            var resultado = await conexion.ExecuteScalarAsync<string?>(sqlCall, parametros);
+            return resultado ?? "null";
         }
-        // 'P0001' = raise_exception (los errores DE NEGOCIO de los SPs).
-        // El patrón del mensaje decide cuál excepción — mismos textos
-        // que valida el quickstart: "no existe" y "ya está anulada":
         catch (PostgresException e) when (e.SqlState == "P0001"
                                           && e.MessageText.Contains("no existe"))
         {
@@ -73,12 +57,12 @@ public class RepositorioFacturaPostgres : IRepositorioFactura
         {
             throw new ConflictoExcepcion(e.MessageText);     // → 409
         }
-        // Lo demás (stock insuficiente del trigger, FK inexistente, el
-        // mínimo de renglones) sube tal cual → 500.
+        // Lo demás (stock insuficiente del trigger, FK) sube tal cual → 500.
     }
 
-    // El mismo sobre {"factura":{…},"productos":[…]} que en SQL Server
-    // (los SPs de ambos motores devuelven el MISMO JSON — a propósito):
+    // El SP de consultar/crear responde {"factura":{…},"productos":[…]}.
+    // Esta clase privada calza ese sobre para deserializarlo y devolver
+    // UNA Factura con su detalle adentro:
     private class RespuestaFacturaSp
     {
         [JsonPropertyName("factura")]
@@ -96,15 +80,10 @@ public class RepositorioFacturaPostgres : IRepositorioFactura
         return factura;
     }
 
-    // ------------------------------------------------------------
-    // Los 4 métodos del contrato (mismos SPs, mismo JSON)
-    // ------------------------------------------------------------
-
     public async Task<List<Factura>> ListarAsync()
     {
-        // El NULL es el INOUT p_resultado (PostgreSQL exige pasarlo):
         var json = await EjecutarSpAsync(
-            "CALL sp_listar_facturas_y_productosporfactura(NULL)", _ => { });
+            "CALL sp_listar_facturas_y_productosporfactura(NULL)", new { });
         return JsonSerializer.Deserialize<List<Factura>>(json, _opcionesJson) ?? new List<Factura>();
     }
 
@@ -112,29 +91,25 @@ public class RepositorioFacturaPostgres : IRepositorioFactura
     {
         var json = await EjecutarSpAsync(
             "CALL sp_consultar_factura_y_productosporfactura(@p_numero, NULL)",
-            parametros => parametros.AddWithValue("@p_numero", numero));
+            new { p_numero = numero });
         return ArmarFactura(json);
     }
 
     public async Task<Factura> CrearAsync(int fkidcliente, int fkidvendedor, string productosJson)
     {
-        // El detalle viaja como texto y el ::json lo tipa para el SP —
-        // el mismo "un solo viaje, UNA transacción" de siempre:
+        // El detalle viaja como JSON en UN solo viaje — UNA transacción
+        // de la BD (la lección ACID). El ::json tipa el texto:
         var json = await EjecutarSpAsync(
-            "CALL sp_insertar_factura_y_productosporfactura(@p_fkidcliente, @p_fkidvendedor, @p_productos::json, 1, NULL)",
-            parametros =>
-            {
-                parametros.AddWithValue("@p_fkidcliente", fkidcliente);
-                parametros.AddWithValue("@p_fkidvendedor", fkidvendedor);
-                parametros.AddWithValue("@p_productos", productosJson);
-            });
+            "CALL sp_insertar_factura_y_productosporfactura("
+            + "@p_fkidcliente, @p_fkidvendedor, @p_productos::json, 1, NULL)",
+            new { p_fkidcliente = fkidcliente, p_fkidvendedor = fkidvendedor,
+                  p_productos = productosJson });
         return ArmarFactura(json);
     }
 
     public async Task<string> AnularAsync(int numero)
     {
         return await EjecutarSpAsync(
-            "CALL sp_anular_factura(@p_numero, NULL)",
-            parametros => parametros.AddWithValue("@p_numero", numero));
+            "CALL sp_anular_factura(@p_numero, NULL)", new { p_numero = numero });
     }
 }

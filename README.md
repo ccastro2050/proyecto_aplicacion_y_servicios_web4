@@ -122,7 +122,7 @@ proyecto_aplicacion_y_servicios_web4/
 │                                #   los endpoints de v1 + v2 en orden didáctico
 │
 ├── api_facturas/                # LA API (v1 + v2) — C#/ASP.NET Core (puerto 8032)
-│   ├── ApiFacturas.csproj       # El proyecto .NET (paquetes: SqlClient y Swashbuckle)
+│   ├── ApiFacturas.csproj       # El proyecto .NET (paquetes: SqlClient, Dapper y Swashbuckle)
 │   ├── Program.cs               # Punto de entrada: ENSAMBLADOR (DI) + 422 + rutas
 │   ├── appsettings.json         # Cadena de conexión (default localhost,11463)
 │   ├── Dockerfile               # Imagen sdk:10.0 + dotnet watch
@@ -132,7 +132,7 @@ proyecto_aplicacion_y_servicios_web4/
 │   ├── Peticiones/              # Los body por verbo → 422; FacturaCrear (v2) valida
 │   │                            #   una LISTA anidada de renglones
 │   ├── Servicios/               # Capa 2 — negocio: interfaces + reglas por entidad
-│   ├── Repositorios/            # Capa 3 — datos: ADO.NET, un dialecto por motor
+│   ├── Repositorios/            # Capa 3 — datos: Dapper (SQL a mano), un dialecto por motor
 │   │                            #   (*SqlServer.cs y *Postgres.cs — v4); el de factura
 │   │                            #   llama PROCEDIMIENTOS ALMACENADOS y traduce sus errores
 │   ├── Fabricas/                # v4: la FÁBRICA de repositorios — el único punto

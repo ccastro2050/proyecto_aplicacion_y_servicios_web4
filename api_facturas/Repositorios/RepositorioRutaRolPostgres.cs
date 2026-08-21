@@ -1,10 +1,14 @@
-// RepositorioRutaRolPostgres — la capa de DATOS del puente rutarol (v4).
-// Dialecto PostgreSQL: Npgsql en vez de SqlClient y LIMIT en vez de
-// TOP — TODO lo demás es idéntico al gemelo *SqlServer (esa es la gracia).
+// ============================================================
+// RepositorioRutaRolPostgres — la capa de DATOS del puente rutarol.
+//
+// SQL a mano + DAPPER como micro-ejecutor (constitución, Art. 2).
 // El DELETE filtra por LAS DOS columnas: borra una pareja exacta,
-// nunca "todo lo del usuario/la ruta" (regla dura de la spec).
+// nunca "todo lo del lado A o B" (regla dura de la spec).
+// Dialecto PostgreSQL: LIMIT @limite al final del SELECT.
+// ============================================================
 
 using ApiFacturas.Modelos;
+using Dapper;
 using Npgsql;
 
 namespace ApiFacturas.Repositorios;
@@ -18,73 +22,42 @@ public class RepositorioRutaRolPostgres : IRepositorioRutaRol
         _cadenaConexion = cadenaConexion;
     }
 
-    private async Task<NpgsqlConnection> AbrirConexionAsync()
+    private NpgsqlConnection CrearConexion() => new(_cadenaConexion);
+
+    public async Task<List<RutaRol>> ObtenerTodosAsync(int limite)
     {
-        var conexion = new NpgsqlConnection(_cadenaConexion);
-        await conexion.OpenAsync();
-        return conexion;
+        const string sql = @"SELECT fkidruta, fkidrol FROM rutarol ORDER BY fkidruta, fkidrol LIMIT @limite";
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<RutaRol>(sql, new { limite })).ToList();
     }
 
-    private static RutaRol Armar(NpgsqlDataReader lector)
+    public async Task<List<RutaRol>> ObtenerPorRutaAsync(int fkidruta)
     {
-        return new RutaRol
-        {
-            Fkidruta = lector.GetInt32(0),
-            Fkidrol = lector.GetInt32(1),
-        };
+        const string sql = @"SELECT fkidruta, fkidrol FROM rutarol WHERE fkidruta = @fkidruta";
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<RutaRol>(sql, new { fkidruta })).ToList();
     }
 
-    private async Task<List<RutaRol>> ConsultarAsync(string sql, Action<NpgsqlParameterCollection> configurar)
+    public async Task<List<RutaRol>> ObtenerPorRolAsync(int fkidrol)
     {
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new NpgsqlCommand(sql, conexion);
-        configurar(comando.Parameters);
-        await using var lector = await comando.ExecuteReaderAsync();
-        var lista = new List<RutaRol>();
-        while (await lector.ReadAsync()) { lista.Add(Armar(lector)); }
-        return lista;
-    }
-
-    public Task<List<RutaRol>> ObtenerTodosAsync(int limite)
-    {
-        return ConsultarAsync(
-            @"SELECT fkidruta, fkidrol FROM rutarol ORDER BY fkidruta, fkidrol LIMIT @limite",
-            p => p.AddWithValue("@limite", limite));
-    }
-
-    public Task<List<RutaRol>> ObtenerPorRutaAsync(int fkidruta)
-    {
-        return ConsultarAsync(
-            @"SELECT fkidruta, fkidrol FROM rutarol WHERE fkidruta = @a",
-            p => p.AddWithValue("@a", fkidruta));
-    }
-
-    public Task<List<RutaRol>> ObtenerPorRolAsync(int fkidrol)
-    {
-        return ConsultarAsync(
-            @"SELECT fkidruta, fkidrol FROM rutarol WHERE fkidrol = @b",
-            p => p.AddWithValue("@b", fkidrol));
+        const string sql = @"SELECT fkidruta, fkidrol FROM rutarol WHERE fkidrol = @fkidrol";
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<RutaRol>(sql, new { fkidrol })).ToList();
     }
 
     public async Task CrearAsync(RutaRol asignacion)
     {
-        const string sql = @"INSERT INTO rutarol (fkidruta, fkidrol) VALUES (@a, @b)";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new NpgsqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@a", asignacion.Fkidruta);
-        comando.Parameters.AddWithValue("@b", asignacion.Fkidrol);
-        // Duplicado → viola la PK compuesta → PostgresException → 500:
-        await comando.ExecuteNonQueryAsync();
+        // Duplicado → viola la PK compuesta → excepción del motor → 500:
+        const string sql = @"INSERT INTO rutarol (fkidruta, fkidrol) VALUES (@Fkidruta, @Fkidrol)";
+        await using var conexion = CrearConexion();
+        await conexion.ExecuteAsync(sql, asignacion);
     }
 
     public async Task<int> EliminarAsync(int fkidruta, int fkidrol)
     {
         // LA PAREJA EXACTA: las dos columnas en el WHERE.
-        const string sql = @"DELETE FROM rutarol WHERE fkidruta = @a AND fkidrol = @b";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new NpgsqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@a", fkidruta);
-        comando.Parameters.AddWithValue("@b", fkidrol);
-        return await comando.ExecuteNonQueryAsync();
+        const string sql = @"DELETE FROM rutarol WHERE fkidruta = @fkidruta AND fkidrol = @fkidrol";
+        await using var conexion = CrearConexion();
+        return await conexion.ExecuteAsync(sql, new { fkidruta, fkidrol });
     }
 }

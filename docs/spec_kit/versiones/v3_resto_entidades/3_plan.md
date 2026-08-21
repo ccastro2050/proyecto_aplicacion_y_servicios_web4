@@ -1,5 +1,13 @@
 # Plan técnico — Versión 3: el resto de las entidades
 
+> **Nota (agosto de 2026):** el curso adoptó **Dapper** como
+> micro-ejecutor en TODOS los repositorios: el SQL sigue escrito a mano
+> y parametrizado; cambió el mapeo (`QueryAsync`/`ExecuteAsync` en vez
+> del ciclo DataReader) y los SPs se llaman con `DynamicParameters`.
+> Las tablas de "calco" entre dialectos siguen valiendo para los
+> PROVEEDORES (Npgsql/SqlClient/MySqlConnector) que Dapper usa por debajo.
+
+
 > **Versión 3** · CÓMO construir lo especificado en [2_spec.md](2_spec.md).
 > El porqué de cada decisión: [4_research.md](4_research.md) · contratos:
 > [6_contracts.md](6_contracts.md) · orden: [8_tasks.md](8_tasks.md).

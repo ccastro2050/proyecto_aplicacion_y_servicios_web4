@@ -1,14 +1,15 @@
 // ============================================================
-// RepositorioUsuarioSqlServer — la capa de DATOS de usuario (v3).
+// RepositorioUsuarioSqlServer — la capa de DATOS de usuario.
 //
-// AQUÍ (y solo aquí) vive el hash: cómo se persiste un secreto es
-// un detalle de la capa de datos — servicio y controller no saben
-// qué algoritmo es. Dos reglas:
-//   1. Se guarda BCrypt (costo 12), jamás texto plano.
-//   2. Ningún SELECT proyecta la columna contrasena hacia afuera.
+// AQUÍ (y solo aquí) vive el hash: cómo se persiste un secreto es un
+// detalle de la capa de datos. Dos reglas: (1) se guarda BCrypt
+// (costo 12), jamás texto plano; (2) ningún SELECT proyecta la
+// columna contrasena hacia afuera. SQL a mano + Dapper (Art. 2).
+// Dialecto SQL Server.
 // ============================================================
 
 using ApiFacturas.Modelos;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using BC = BCrypt.Net.BCrypt;   // el paquete BCrypt.Net-Next
 
@@ -23,87 +24,54 @@ public class RepositorioUsuarioSqlServer : IRepositorioUsuario
         _cadenaConexion = cadenaConexion;
     }
 
-    private async Task<SqlConnection> AbrirConexionAsync()
-    {
-        var conexion = new SqlConnection(_cadenaConexion);
-        await conexion.OpenAsync();
-        return conexion;
-    }
+    private SqlConnection CrearConexion() => new(_cadenaConexion);
 
     public async Task<List<Usuario>> ObtenerTodosAsync(int limite)
     {
-        // SOLO email: la contraseña no sale ni en hash (RNF3).
+        // SOLO email: la contraseña no sale ni en hash (RNF del secreto).
         const string sql = @"SELECT TOP (@limite) email FROM usuario ORDER BY email";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@limite", limite);
-        await using var lector = await comando.ExecuteReaderAsync();
-        var usuarios = new List<Usuario>();
-        while (await lector.ReadAsync())
-        {
-            usuarios.Add(new Usuario { Email = lector.GetString(0) });
-        }
-        return usuarios;
+        await using var conexion = CrearConexion();
+        return (await conexion.QueryAsync<Usuario>(sql, new { limite })).ToList();
     }
 
     public async Task<Usuario?> ObtenerPorEmailAsync(string email)
     {
         const string sql = @"SELECT email FROM usuario WHERE email = @email";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@email", email);
-        await using var lector = await comando.ExecuteReaderAsync();
-        if (await lector.ReadAsync())
-        {
-            return new Usuario { Email = lector.GetString(0) };
-        }
-        return null;
+        await using var conexion = CrearConexion();
+        return await conexion.QueryFirstOrDefaultAsync<Usuario>(sql, new { email });
     }
 
     public async Task CrearAsync(string email, string contrasena)
     {
         // El hash se calcula AQUÍ, justo antes de persistir:
         var hash = BC.HashPassword(contrasena, workFactor: 12);
-
         const string sql = @"INSERT INTO usuario (email, contrasena) VALUES (@email, @hash)";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@email", email);
-        comando.Parameters.AddWithValue("@hash", hash);
-        await comando.ExecuteNonQueryAsync();
+        await using var conexion = CrearConexion();
+        await conexion.ExecuteAsync(sql, new { email, hash });
     }
 
     public async Task<int> ActualizarContrasenaAsync(string email, string contrasena)
     {
         var hash = BC.HashPassword(contrasena, workFactor: 12);
-
         const string sql = @"UPDATE usuario SET contrasena = @hash WHERE email = @email";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@hash", hash);
-        comando.Parameters.AddWithValue("@email", email);
-        return await comando.ExecuteNonQueryAsync();
+        await using var conexion = CrearConexion();
+        return await conexion.ExecuteAsync(sql, new { hash, email });
     }
 
     public async Task<int> EliminarAsync(string email)
     {
+        // Si el usuario tiene roles asignados, la FK rechaza → 500:
         const string sql = "DELETE FROM usuario WHERE email = @email";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@email", email);
-        // Si el usuario tiene roles asignados, la FK de rol_usuario
-        // rechaza el DELETE → SqlException → 500 (integridad referencial):
-        return await comando.ExecuteNonQueryAsync();
+        await using var conexion = CrearConexion();
+        return await conexion.ExecuteAsync(sql, new { email });
     }
 
     public async Task<bool?> VerificarContrasenaAsync(string email, string contrasena)
     {
         // El hash SE LEE pero no sale del repositorio: se compara aquí.
         const string sql = @"SELECT contrasena FROM usuario WHERE email = @email";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@email", email);
-        var hash = (string?)await comando.ExecuteScalarAsync();
+        await using var conexion = CrearConexion();
+        var hash = await conexion.QueryFirstOrDefaultAsync<string>(sql, new { email });
 
         if (hash == null) { return null; }          // el usuario no existe → 404
 

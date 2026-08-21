@@ -1,7 +1,15 @@
-// RepositorioVendedorSqlServer — la capa de DATOS de vendedor (v3).
-// CALCADO de RepositorioProductoSqlServer: ADO.NET, SQL parametrizado, async.
+// ============================================================
+// RepositorioVendedorSqlServer — la capa de DATOS de el vendedor.
+//
+// SQL escrito A MANO y SIEMPRE parametrizado; DAPPER como
+// micro-ejecutor: QueryAsync<T> mapea columna→propiedad por nombre
+// y ExecuteAsync devuelve filas afectadas — sin Entity Framework:
+// nada genera SQL por nosotros (constitución, Art. 2).
+// Dialecto SQL Server: TOP (@limite) al PRINCIPIO del SELECT (T-SQL no tiene LIMIT).
+// ============================================================
 
 using ApiFacturas.Modelos;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace ApiFacturas.Repositorios;
@@ -15,79 +23,57 @@ public class RepositorioVendedorSqlServer : IRepositorioVendedor
         _cadenaConexion = cadenaConexion;
     }
 
-    private async Task<SqlConnection> AbrirConexionAsync()
-    {
-        var conexion = new SqlConnection(_cadenaConexion);
-        await conexion.OpenAsync();
-        return conexion;
-    }
-
-    private static Vendedor Armar(SqlDataReader lector)
-    {
-        return new Vendedor
-        {
-            Id = lector.GetInt32(0),
-            Carnet = lector.GetInt32(1),
-            Direccion = lector.GetString(2),
-            Fkcodpersona = lector.GetString(3),
-        };
-    }
+    /// <summary>Conexión cerrada: Dapper la abre y cierra por operación;
+    /// el "await using" del llamador la libera aunque haya error.</summary>
+    private SqlConnection CrearConexion() => new(_cadenaConexion);
 
     public async Task<List<Vendedor>> ObtenerTodosAsync(int limite)
     {
         const string sql = @"SELECT TOP (@limite) id, carnet, direccion, fkcodpersona
                              FROM vendedor ORDER BY id";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@limite", limite);
-        await using var lector = await comando.ExecuteReaderAsync();
-        var lista = new List<Vendedor>();
-        while (await lector.ReadAsync()) { lista.Add(Armar(lector)); }
-        return lista;
+        await using var conexion = CrearConexion();
+        var filas = await conexion.QueryAsync<Vendedor>(sql, new { limite });
+        return filas.ToList();
     }
 
     public async Task<Vendedor?> ObtenerPorIdAsync(int id)
     {
-        const string sql = @"SELECT id, carnet, direccion, fkcodpersona FROM vendedor WHERE id = @id";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@id", id);
-        await using var lector = await comando.ExecuteReaderAsync();
-        if (await lector.ReadAsync()) { return Armar(lector); }
-        return null;
+        const string sql = @"SELECT id, carnet, direccion, fkcodpersona
+                             FROM vendedor WHERE id = @id";
+        await using var conexion = CrearConexion();
+        // Una fila → el modelo; cero filas → null (el SERVICIO decide qué
+        // significa ese null — aquí solo hay hechos):
+        return await conexion.QueryFirstOrDefaultAsync<Vendedor>(sql, new { id });
     }
 
     public async Task CrearAsync(Vendedor entidad)
     {
         const string sql = @"INSERT INTO vendedor (carnet, direccion, fkcodpersona)
-                             VALUES (@carnet, @direccion, @fkcodpersona)";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@carnet", entidad.Carnet);
-        comando.Parameters.AddWithValue("@direccion", entidad.Direccion);
-        comando.Parameters.AddWithValue("@fkcodpersona", entidad.Fkcodpersona);
-        await comando.ExecuteNonQueryAsync();
+                             VALUES (@Carnet, @Direccion, @Fkcodpersona)";
+        await using var conexion = CrearConexion();
+        // El OBJETO del modelo como fuente de parámetros (@Propiedad):
+        await conexion.ExecuteAsync(sql, entidad);
     }
 
     public async Task<int> ActualizarAsync(int id, Dictionary<string, object> datos)
     {
-        // SET dinámico con lista blanca (los nombres salen de las PETICIONES):
-        var asignaciones = new List<string>();
-        foreach (var columna in datos.Keys) { asignaciones.Add($"{columna} = @{columna}"); }
-        var sql = $"UPDATE vendedor SET {string.Join(", ", asignaciones)} WHERE id = @pk_clave";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        foreach (var (columna, valor) in datos) { comando.Parameters.AddWithValue($"@{columna}", valor); }
-        comando.Parameters.AddWithValue("@pk_clave", id);
-        return await comando.ExecuteNonQueryAsync();
+        // SET dinámico SOLO con las columnas que llegaron (PUT manda todas,
+        // PATCH un subconjunto). Los NOMBRES salen de las PETICIONES (lista
+        // blanca) — jamás del cliente; los VALORES van parametrizados:
+        var asignaciones = string.Join(", ", datos.Keys.Select(c => $"{c} = @{c}"));
+        var sql = $"UPDATE vendedor SET {asignaciones} WHERE id = @pk_clave";
+        var parametros = new DynamicParameters(datos);
+        parametros.Add("pk_clave", id);
+        await using var conexion = CrearConexion();
+        // ExecuteAsync devuelve las FILAS AFECTADAS (0 = no existía):
+        return await conexion.ExecuteAsync(sql, parametros);
     }
 
     public async Task<int> EliminarAsync(int id)
     {
+        // Si otras tablas lo referencian, la FK del motor rechaza → 500:
         const string sql = "DELETE FROM vendedor WHERE id = @id";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@id", id);
-        return await comando.ExecuteNonQueryAsync();
+        await using var conexion = CrearConexion();
+        return await conexion.ExecuteAsync(sql, new { id });
     }
 }

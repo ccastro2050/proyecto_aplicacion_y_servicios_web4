@@ -1,7 +1,15 @@
-// RepositorioEmpresaSqlServer — la capa de DATOS de empresa (v3).
-// CALCADO de RepositorioProductoSqlServer: ADO.NET, SQL parametrizado, async.
+// ============================================================
+// RepositorioEmpresaSqlServer — la capa de DATOS de la empresa.
+//
+// SQL escrito A MANO y SIEMPRE parametrizado; DAPPER como
+// micro-ejecutor: QueryAsync<T> mapea columna→propiedad por nombre
+// y ExecuteAsync devuelve filas afectadas — sin Entity Framework:
+// nada genera SQL por nosotros (constitución, Art. 2).
+// Dialecto SQL Server: TOP (@limite) al PRINCIPIO del SELECT (T-SQL no tiene LIMIT).
+// ============================================================
 
 using ApiFacturas.Modelos;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace ApiFacturas.Repositorios;
@@ -15,76 +23,57 @@ public class RepositorioEmpresaSqlServer : IRepositorioEmpresa
         _cadenaConexion = cadenaConexion;
     }
 
-    private async Task<SqlConnection> AbrirConexionAsync()
-    {
-        var conexion = new SqlConnection(_cadenaConexion);
-        await conexion.OpenAsync();
-        return conexion;
-    }
-
-    private static Empresa Armar(SqlDataReader lector)
-    {
-        return new Empresa
-        {
-            Codigo = lector.GetString(0),
-            Nombre = lector.GetString(1),
-        };
-    }
+    /// <summary>Conexión cerrada: Dapper la abre y cierra por operación;
+    /// el "await using" del llamador la libera aunque haya error.</summary>
+    private SqlConnection CrearConexion() => new(_cadenaConexion);
 
     public async Task<List<Empresa>> ObtenerTodasAsync(int limite)
     {
         const string sql = @"SELECT TOP (@limite) codigo, nombre
                              FROM empresa ORDER BY codigo";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@limite", limite);
-        await using var lector = await comando.ExecuteReaderAsync();
-        var lista = new List<Empresa>();
-        while (await lector.ReadAsync()) { lista.Add(Armar(lector)); }
-        return lista;
+        await using var conexion = CrearConexion();
+        var filas = await conexion.QueryAsync<Empresa>(sql, new { limite });
+        return filas.ToList();
     }
 
     public async Task<Empresa?> ObtenerPorCodigoAsync(string codigo)
     {
-        const string sql = @"SELECT codigo, nombre FROM empresa WHERE codigo = @codigo";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@codigo", codigo);
-        await using var lector = await comando.ExecuteReaderAsync();
-        if (await lector.ReadAsync()) { return Armar(lector); }
-        return null;
+        const string sql = @"SELECT codigo, nombre
+                             FROM empresa WHERE codigo = @codigo";
+        await using var conexion = CrearConexion();
+        // Una fila → el modelo; cero filas → null (el SERVICIO decide qué
+        // significa ese null — aquí solo hay hechos):
+        return await conexion.QueryFirstOrDefaultAsync<Empresa>(sql, new { codigo });
     }
 
     public async Task CrearAsync(Empresa entidad)
     {
         const string sql = @"INSERT INTO empresa (codigo, nombre)
-                             VALUES (@codigo, @nombre)";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@codigo", entidad.Codigo);
-        comando.Parameters.AddWithValue("@nombre", entidad.Nombre);
-        await comando.ExecuteNonQueryAsync();
+                             VALUES (@Codigo, @Nombre)";
+        await using var conexion = CrearConexion();
+        // El OBJETO del modelo como fuente de parámetros (@Propiedad):
+        await conexion.ExecuteAsync(sql, entidad);
     }
 
     public async Task<int> ActualizarAsync(string codigo, Dictionary<string, object> datos)
     {
-        // SET dinámico con lista blanca (los nombres salen de las PETICIONES):
-        var asignaciones = new List<string>();
-        foreach (var columna in datos.Keys) { asignaciones.Add($"{columna} = @{columna}"); }
-        var sql = $"UPDATE empresa SET {string.Join(", ", asignaciones)} WHERE codigo = @pk_clave";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        foreach (var (columna, valor) in datos) { comando.Parameters.AddWithValue($"@{columna}", valor); }
-        comando.Parameters.AddWithValue("@pk_clave", codigo);
-        return await comando.ExecuteNonQueryAsync();
+        // SET dinámico SOLO con las columnas que llegaron (PUT manda todas,
+        // PATCH un subconjunto). Los NOMBRES salen de las PETICIONES (lista
+        // blanca) — jamás del cliente; los VALORES van parametrizados:
+        var asignaciones = string.Join(", ", datos.Keys.Select(c => $"{c} = @{c}"));
+        var sql = $"UPDATE empresa SET {asignaciones} WHERE codigo = @pk_clave";
+        var parametros = new DynamicParameters(datos);
+        parametros.Add("pk_clave", codigo);
+        await using var conexion = CrearConexion();
+        // ExecuteAsync devuelve las FILAS AFECTADAS (0 = no existía):
+        return await conexion.ExecuteAsync(sql, parametros);
     }
 
     public async Task<int> EliminarAsync(string codigo)
     {
+        // Si otras tablas lo referencian, la FK del motor rechaza → 500:
         const string sql = "DELETE FROM empresa WHERE codigo = @codigo";
-        await using var conexion = await AbrirConexionAsync();
-        await using var comando = new SqlCommand(sql, conexion);
-        comando.Parameters.AddWithValue("@codigo", codigo);
-        return await comando.ExecuteNonQueryAsync();
+        await using var conexion = CrearConexion();
+        return await conexion.ExecuteAsync(sql, new { codigo });
     }
 }

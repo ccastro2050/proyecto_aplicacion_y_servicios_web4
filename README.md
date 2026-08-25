@@ -39,17 +39,17 @@ habla con PostgreSQL:
 
 | Qué | Dónde |
 |---|---|
-| **API Facturas** — diagnóstico | http://localhost:8032/ |
-| **Swagger** (documentación interactiva: ver y probar los endpoints) | http://localhost:8032/swagger |
-| Listar productos | http://localhost:8032/api/producto |
-| SQL Server (para SQLTools/SSMS, opcional) | `localhost,11463` · `sa`/`Paradigmas123!` |
+| **API Facturas** — diagnóstico | http://localhost:8035/ |
+| **Swagger** (documentación interactiva: ver y probar los endpoints) | http://localhost:8035/swagger |
+| Listar productos | http://localhost:8035/api/producto |
+| SQL Server (para SQLTools/SSMS, opcional) | `localhost,11466` · `sa`/`Paradigmas123!` |
 | PostgreSQL (para psql/pgAdmin, opcional — v4) | `localhost:15462` · `postgres`/`Paradigmas123!` |
 
 Pruebe la joya didáctica de la v1: PUT con solo `{"stock": 99}` → 422; el
 mismo body en PATCH → 200. Esa diferencia es parte de lo que enseña la
 versión (contratos exactos en el spec kit).
 
-> ℹ️ Este proyecto usa los puertos 8032, 11463 y 15462: si alguno ya está ocupado
+> ℹ️ Este proyecto usa los puertos 8035, 11466 y 15462: si alguno ya está ocupado
 > en su máquina, cámbielo en `docker-compose.yml` (el lado izquierdo del
 > `"puerto:puerto"`).
 >
@@ -121,10 +121,10 @@ proyecto_aplicacion_y_servicios_web4/
 ├── postman/                     # La colección de Postman lista para importar:
 │                                #   los endpoints de v1 + v2 en orden didáctico
 │
-├── api_facturas/                # LA API (v1 + v2) — C#/ASP.NET Core (puerto 8032)
+├── api_facturas/                # LA API (v1 + v2) — C#/ASP.NET Core (puerto 8035)
 │   ├── ApiFacturas.csproj       # El proyecto .NET (paquetes: SqlClient, Dapper y Swashbuckle)
 │   ├── Program.cs               # Punto de entrada: ENSAMBLADOR (DI) + 422 + rutas
-│   ├── appsettings.json         # Cadena de conexión (default localhost,11463)
+│   ├── appsettings.json         # Cadena de conexión (default localhost,11466)
 │   ├── Dockerfile               # Imagen sdk:10.0 + dotnet watch
 │   ├── Controllers/             # Capa 1 — HTTP: Producto, Persona y Factura (v2)
 │   ├── Modelos/                 # Los MODELOS: Producto, Persona (v2) y Factura +

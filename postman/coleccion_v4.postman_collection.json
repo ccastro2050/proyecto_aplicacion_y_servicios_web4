@@ -1,13 +1,13 @@
 {
   "info": {
     "name": "API Facturas v4 (C# + SQL Server + PostgreSQL)",
-    "description": "Acumulativa: v1 (producto, 13) + v2 (persona y factura, 12) + v3 (el resto de las entidades, 16). La v4 NO agrega peticiones — agrega un MOTOR: las 41 funcionan idénticas contra PostgreSQL (default) o SQL Server, según el interruptor MOTOR_BD del compose. La petición 1 (diagnóstico) muestra el motor activo. La variable {{base}} apunta al proyecto del curso (localhost:8032); para probar SU reconstrucción cámbiela a localhost:8132.",
+    "description": "Acumulativa: v1 (producto, 13) + v2 (persona y factura, 12) + v3 (el resto de las entidades, 16). La v4 NO agrega peticiones — agrega un MOTOR: las 41 funcionan idénticas contra PostgreSQL (default) o SQL Server, según el interruptor MOTOR_BD del compose. La petición 1 (diagnóstico) muestra el motor activo. La variable {{base}} apunta al proyecto del curso (localhost:8035); para probar SU reconstrucción cámbiela a localhost:8135.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "base",
-      "value": "http://localhost:8032"
+      "value": "http://localhost:8035"
     }
   ],
   "item": [

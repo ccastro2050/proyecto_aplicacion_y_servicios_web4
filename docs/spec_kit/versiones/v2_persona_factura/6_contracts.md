@@ -1,6 +1,6 @@
 # Contratos HTTP — Versión 2: los 10 endpoints nuevos
 
-> **Versión 2** · Base: `http://localhost:8032` · Swagger: `/swagger`.
+> **Versión 2** · Base: `http://localhost:8035` · Swagger: `/swagger`.
 > **Los 7 contratos de la v1 siguen vigentes sin cambios**
 > ([6_contracts de v1](../v1_producto_sqlserver/6_contracts.md)) — aquí
 > solo lo NUEVO. Convenciones idénticas: envoltura en listados, errores

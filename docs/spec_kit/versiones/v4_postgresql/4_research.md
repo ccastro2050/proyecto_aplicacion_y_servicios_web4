@@ -67,7 +67,7 @@ comportamiento local de siempre.
 ## D7 — Puerto 15462
 
 Mapa de puertos del curso: front 8030 · API genérica 8031 · API facturas
-8032 · MariaDB 13336 · **PostgreSQL 15462** · SQL Server 11463. La
+8035 · MariaDB 13336 · **PostgreSQL 15462** · SQL Server 11466. La
 reconstrucción del estudiante suma 100 (15562).
 
 ## D8 — Semillas idénticas, ids idénticos

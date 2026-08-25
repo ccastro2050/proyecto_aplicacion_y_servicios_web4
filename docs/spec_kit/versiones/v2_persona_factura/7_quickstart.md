@@ -25,54 +25,54 @@ Si algo de producto cambió, la v2 está mal — las versiones son acumulativas.
 
 ```powershell
 # ── 2. PERSONA: el molde replicado ────────────────────────────────────
-curl.exe http://localhost:8032/api/persona                    # 6 personas
-curl.exe "http://localhost:8032/api/persona?limite=2"         # exactamente 2
-curl.exe http://localhost:8032/api/persona/P001               # Ana Torres
-curl.exe -X POST http://localhost:8032/api/persona -H "Content-Type: application/json" -d "{\"codigo\":\"P007\",\"nombre\":\"Prueba V2\",\"email\":\"p7@correo.com\",\"telefono\":\"3007777777\"}"
-curl.exe -X PUT http://localhost:8032/api/persona/P007 -H "Content-Type: application/json" -d "{\"nombre\":\"Prueba V2 Editada\",\"email\":\"p7b@correo.com\",\"telefono\":\"3008888888\"}"
-curl.exe -X PATCH http://localhost:8032/api/persona/P007 -H "Content-Type: application/json" -d "{\"telefono\":\"3009999999\"}"
-curl.exe http://localhost:8032/api/persona/P007
-curl.exe -X DELETE http://localhost:8032/api/persona/P007
-curl.exe -i -X DELETE http://localhost:8032/api/persona/P007          # → 404
+curl.exe http://localhost:8035/api/persona                    # 6 personas
+curl.exe "http://localhost:8035/api/persona?limite=2"         # exactamente 2
+curl.exe http://localhost:8035/api/persona/P001               # Ana Torres
+curl.exe -X POST http://localhost:8035/api/persona -H "Content-Type: application/json" -d "{\"codigo\":\"P007\",\"nombre\":\"Prueba V2\",\"email\":\"p7@correo.com\",\"telefono\":\"3007777777\"}"
+curl.exe -X PUT http://localhost:8035/api/persona/P007 -H "Content-Type: application/json" -d "{\"nombre\":\"Prueba V2 Editada\",\"email\":\"p7b@correo.com\",\"telefono\":\"3008888888\"}"
+curl.exe -X PATCH http://localhost:8035/api/persona/P007 -H "Content-Type: application/json" -d "{\"telefono\":\"3009999999\"}"
+curl.exe http://localhost:8035/api/persona/P007
+curl.exe -X DELETE http://localhost:8035/api/persona/P007
+curl.exe -i -X DELETE http://localhost:8035/api/persona/P007          # → 404
 
 # 2b. La pareja didáctica, ahora en persona (MISMO body)
-curl.exe -i -X PUT http://localhost:8032/api/persona/P001 -H "Content-Type: application/json" -d "{\"telefono\":\"3009999999\"}"    # → 422
-curl.exe -i -X PATCH http://localhost:8032/api/persona/P001 -H "Content-Type: application/json" -d "{\"telefono\":\"3011111111\"}"  # → 200
+curl.exe -i -X PUT http://localhost:8035/api/persona/P001 -H "Content-Type: application/json" -d "{\"telefono\":\"3009999999\"}"    # → 422
+curl.exe -i -X PATCH http://localhost:8035/api/persona/P001 -H "Content-Type: application/json" -d "{\"telefono\":\"3011111111\"}"  # → 200
 
 # 2c. Integridad referencial: P001 es cliente
-curl.exe -i -X DELETE http://localhost:8032/api/persona/P001          # → 500 con el error de FK
+curl.exe -i -X DELETE http://localhost:8035/api/persona/P001          # → 500 con el error de FK
 
 # ── 3. FACTURA: lecturas maestro-detalle (SPs) ────────────────────────
-curl.exe http://localhost:8032/api/factura                    # 6 facturas con nombres y detalle
-curl.exe http://localhost:8032/api/factura/1                  # la factura con nombres y productos:[...] adentro
-curl.exe -i http://localhost:8032/api/factura/999             # → 404
+curl.exe http://localhost:8035/api/factura                    # 6 facturas con nombres y detalle
+curl.exe http://localhost:8035/api/factura/1                  # la factura con nombres y productos:[...] adentro
+curl.exe -i http://localhost:8035/api/factura/999             # → 404
 
 # ── 4. CREAR FACTURA: el trigger trabaja ──────────────────────────────
 # Anote el stock ANTES:
-curl.exe http://localhost:8032/api/producto/PR001             # stock: 17
-curl.exe http://localhost:8032/api/producto/PR003             # stock: 42
+curl.exe http://localhost:8035/api/producto/PR001             # stock: 17
+curl.exe http://localhost:8035/api/producto/PR003             # stock: 42
 # Cree la factura (2 renglones — nadie envía subtotales):
-curl.exe -X POST http://localhost:8032/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[{\"codigo\":\"PR001\",\"cantidad\":2},{\"codigo\":\"PR003\",\"cantidad\":3}]}"
+curl.exe -X POST http://localhost:8035/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[{\"codigo\":\"PR001\",\"cantidad\":2},{\"codigo\":\"PR003\",\"cantidad\":3}]}"
 # ← la respuesta trae subtotales y total CALCULADOS; anote el "numero" (será 7)
 # El stock DESPUÉS bajó (15 y 39):
-curl.exe http://localhost:8032/api/producto/PR001
-curl.exe http://localhost:8032/api/producto/PR003
+curl.exe http://localhost:8035/api/producto/PR001
+curl.exe http://localhost:8035/api/producto/PR003
 
 # ── 5. ERRORES DE NEGOCIO DE LA BD ────────────────────────────────────
-curl.exe -i -X POST http://localhost:8032/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[]}"                                    # → 422 (la petición)
-curl.exe -i -X POST http://localhost:8032/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[{\"codigo\":\"PR001\",\"cantidad\":9999}]}"  # → 500 "Stock insuficiente…"
+curl.exe -i -X POST http://localhost:8035/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[]}"                                    # → 422 (la petición)
+curl.exe -i -X POST http://localhost:8035/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[{\"codigo\":\"PR001\",\"cantidad\":9999}]}"  # → 500 "Stock insuficiente…"
 # Anular la factura creada (el 7): restaura stock y estado='anulada'
-curl.exe -X POST http://localhost:8032/api/factura/7/anular            # → 200
-curl.exe http://localhost:8032/api/producto/PR001                      # stock volvió a 17
-curl.exe -i -X POST http://localhost:8032/api/factura/7/anular         # → 409 ya está anulada
-curl.exe -i -X POST http://localhost:8032/api/factura/999/anular       # → 404
+curl.exe -X POST http://localhost:8035/api/factura/7/anular            # → 200
+curl.exe http://localhost:8035/api/producto/PR001                      # stock volvió a 17
+curl.exe -i -X POST http://localhost:8035/api/factura/7/anular         # → 409 ya está anulada
+curl.exe -i -X POST http://localhost:8035/api/factura/999/anular       # → 404
 
 # ── 6. LA PRUEBA DE CAPAS (sin SQL Server) ────────────────────────────
 docker compose exec api-facturas dotnet run --project pruebas
 # → CRITERIO 6 OK: … (ahora ejercita producto Y persona con repos falsos)
 ```
 
-También todo con clics en **http://localhost:8032/swagger** (los endpoints
+También todo con clics en **http://localhost:8035/swagger** (los endpoints
 nuevos aparecen bajo Persona y Factura).
 
 > **Nota para dejar la BD como al inicio:** la factura 7 queda anulada (no

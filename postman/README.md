@@ -1,7 +1,7 @@
 # postman — la colección de la API, lista para importar
 
 Esta API ya trae documentación interactiva propia: **Swagger en
-http://localhost:8032/swagger** (ASP.NET Core la genera con Swashbuckle).
+http://localhost:8035/swagger** (ASP.NET Core la genera con Swashbuckle).
 Esta colección es el **camino alternativo**: los mismos endpoints como un
 recorrido guiado y numerado, útil para quien prefiere Postman/Thunder
 Client, para presentar la API sin abrir el código, y para comparar con los
@@ -38,9 +38,9 @@ Cada petición trae su explicación en la pestaña de descripción.
 
 ## La variable {{base}}
 
-La colección usa la variable `base` = `http://localhost:8032` (el proyecto
+La colección usa la variable `base` = `http://localhost:8035` (el proyecto
 del curso). Si está probando **SU reconstrucción** (la de la
-[GUIA_IA](../docs/spec_kit/versiones/v4_postgresql/GUIA_IA4.md), que corre en el puerto 8132): clic en la
+[GUIA_IA](../docs/spec_kit/versiones/v4_postgresql/GUIA_IA4.md), que corre en el puerto 8135): clic en la
 colección → pestaña **Variables** → cambie `base` a
-`http://localhost:8132`. Una sola edición y las 41 peticiones apuntan a su
+`http://localhost:8135`. Una sola edición y las 41 peticiones apuntan a su
 proyecto.

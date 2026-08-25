@@ -141,9 +141,9 @@ REGLAS DE TRABAJO (no negociables):
 6. Yo trabajo en Windows con VS Code (terminal PowerShell) y Docker
    Desktop. Dame los comandos para ese entorno.
 7. Mi proyecto corre con los puertos de la v1 desplazados +100 (convivo
-   con el clon del curso): API en 8132 y SQL Server en 11563, con
+   con el clon del curso): API en 8135 y SQL Server en 11566, con
    name: mi_v1_producto en el compose. Cuando me des URLs o comandos de
-   prueba, usa localhost:8132 y localhost,11563.
+   prueba, usa localhost:8135 y localhost,11566.
 
 Al final, la versión 2 está TERMINADA solo cuando: (a) el smoke test de la
 V1 sigue pasando completo (regresión — no rompimos nada), y (b) los 6
@@ -169,7 +169,7 @@ pierde contexto). Además, para la v2:
    los necesita para calcar el estilo y para entregar los que crecen).
 3. **El cierre es doble**: primero la REGRESIÓN de la v1 (su smoke test
    completo) y luego el smoke test de la v2 — en ese orden. Con sus
-   puertos: donde el quickstart diga `8032` use `8132`.
+   puertos: donde el quickstart diga `8035` use `8135`.
 
 ## B. Camino del IDE agéntico
 

@@ -16,7 +16,7 @@ con sus puertos +100). Novedad de esta versión: por primera vez cambia
 la INFRAESTRUCTURA (un motor nuevo en el compose) y NO el contrato (cero
 endpoints nuevos).
 
-**Sus puertos:** API 8132 · SQL Server 11563 · **PostgreSQL 15562**
+**Sus puertos:** API 8135 · SQL Server 11566 · **PostgreSQL 15562**
 (la regla +100 de siempre).
 
 ## A.1 Qué subirle al chat (los 9 de la v4)

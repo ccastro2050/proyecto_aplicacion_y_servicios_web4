@@ -1,6 +1,6 @@
 # Contratos HTTP — Versión 3: los 36 endpoints nuevos
 
-> **Versión 3** · Base: `http://localhost:8032` · Swagger: `/swagger`.
+> **Versión 3** · Base: `http://localhost:8035` · Swagger: `/swagger`.
 > **Los contratos de v1 y v2 siguen vigentes sin cambios.** Convenciones
 > idénticas: envoltura `{tabla, limite, total, datos}` en listados · 204
 > lista vacía · errores `{estado, mensaje, detalle}` · 422 con `errores[]`

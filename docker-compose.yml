@@ -2,8 +2,8 @@
 # Proyecto Aplicación y Servicios Web — versión 4:
 # api_facturas (C#/ASP.NET Core) + DOS motores con la misma BD
 #
-#                                 ┌→ SQL Server (bdfacturas, :11463)
-#   Navegador → API (C#, :8032) ─┤      el interruptor MOTOR_BD
+#                                 ┌→ SQL Server (bdfacturas, :11466)
+#   Navegador → API (C#, :8035) ─┤      el interruptor MOTOR_BD
 #                                 └→ PostgreSQL (bdfacturas, :15462)
 #
 # Uso: docker compose up -d --build     (UN solo comando)
@@ -27,7 +27,7 @@ services:
     volumes:
       - mssqldata:/var/opt/mssql             # los datos sobreviven a `down`
     ports:
-      - "11463:1433"     # puerto en su PC (para SQLTools/SSMS opcional)
+      - "11466:1433"     # puerto en su PC (para SQLTools/SSMS opcional)
     healthcheck:
       # ¿La BD ya RESPONDE consultas? (no solo "el contenedor existe")
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b"]
@@ -81,7 +81,7 @@ services:
       - /app/obj                 #   sin mezclarse con los compilados de Windows
     restart: unless-stopped
     ports:
-      - "8032:8032"              # http://localhost:8032
+      - "8035:8035"              # http://localhost:8035
     environment:
       # La cadena usa el NOMBRE del servicio como host (sqlserver,1433),
       # no localhost: dentro de la red interna de compose los servicios

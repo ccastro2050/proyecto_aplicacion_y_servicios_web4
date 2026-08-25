@@ -121,7 +121,7 @@ builder.Services.AddControllers()
 // ------------------------------------------------------------
 // Swashbuckle lee los controladores y sus clases de datos y genera una página
 // donde se ven TODOS los endpoints y se pueden probar desde el
-// navegador (http://localhost:8032/swagger).
+// navegador (http://localhost:8035/swagger).
 builder.Services.AddEndpointsApiExplorer();   // descubre los endpoints
 builder.Services.AddSwaggerGen();             // arma el documento OpenAPI
 
@@ -151,5 +151,5 @@ app.MapGet("/", () => Results.Json(new
 app.MapControllers();
 
 // Arrancar y quedarse escuchando (el puerto lo fija ASPNETCORE_URLS
-// en el Dockerfile: 8032):
+// en el Dockerfile: 8035):
 app.Run();

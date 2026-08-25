@@ -20,7 +20,7 @@ montados)** y `api-facturas` arriba. Primera compilación: ~30-60 s.
 ### 2a. TODO contra PostgreSQL (el motor por defecto)
 
 ```powershell
-curl.exe http://localhost:8032/     # → "version":"v4", "motor":"postgres"
+curl.exe http://localhost:8035/     # → "version":"v4", "motor":"postgres"
 ```
 
 Correr COMPLETOS los smoke tests de la
@@ -36,7 +36,7 @@ inserts fallidos).
 ```powershell
 $env:MOTOR_BD = "sqlserver"
 docker compose up -d api-facturas       # recrea SOLO la API (segundos)
-curl.exe http://localhost:8032/         # → "motor":"sqlserver"
+curl.exe http://localhost:8035/         # → "motor":"sqlserver"
 ```
 
 Correr la MISMA regresión completa. Pasa igual. **Eso** — ninguna línea
@@ -61,8 +61,8 @@ Con `motor=postgres` (ya cubiertos por la regresión — aquí los tres
 emblemáticos, para verlos de cerca):
 
 ```powershell
-curl.exe -i http://localhost:8032/api/factura/999                 # → 404 "Factura 999 no existe"
-curl.exe -i -X POST http://localhost:8032/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[{\"codigo\":\"PR001\",\"cantidad\":9999}]}"   # → 500 "Stock insuficiente…"
+curl.exe -i http://localhost:8035/api/factura/999                 # → 404 "Factura 999 no existe"
+curl.exe -i -X POST http://localhost:8035/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[{\"codigo\":\"PR001\",\"cantidad\":9999}]}"   # → 500 "Stock insuficiente…"
 # (anule dos veces cualquier factura creada por usted: la segunda → 409)
 ```
 

@@ -8,7 +8,7 @@
 >
 > **Prerrequisitos:** VS Code en Windows y el proyecto corriendo
 > (`docker compose up -d --build` desde la raíz — ver el
-> [README](../README.md)). SQL Server queda publicado en `localhost,11463`.
+> [README](../README.md)). SQL Server queda publicado en `localhost,11466`.
 
 ---
 
@@ -73,7 +73,7 @@ Llene el formulario con los datos del `docker-compose.yml`:
 | Connection name | `bdfacturas (csharp)` | Libre — cómo se verá en el panel |
 | Connect using | `Server and Port` | Conexión directa por red |
 | Server Address | `localhost` | El puerto está publicado hacia SU PC |
-| Port | `11463` | El puerto del host del compose (`11463:1433`) |
+| Port | `11466` | El puerto del host del compose (`11466:1433`) |
 | Database | `bdfacturas_sqlserver_local` | La BD que crea el inicializador |
 | Username | `sa` | Usuario administrador del contenedor |
 | Use password | `Save password` | Didáctico: credenciales de juguete |
@@ -89,8 +89,8 @@ opciones específicas del driver, visibles en la captura):
 | `encrypt` | ✅ (viene marcado) | La conexión viaja cifrada |
 | `trustServerCertificate` | ✅ **márquelo usted** | El mismo *Trust Server Certificate* de SSMS: el contenedor usa certificado autofirmado — sin esto el test falla |
 
-> El puerto es la clave: **11463, no 1433**. Dentro de la red de Docker
-> la BD escucha en 1433, pero hacia su PC el compose la publica en 11463
+> El puerto es la clave: **11466, no 1433**. Dentro de la red de Docker
+> la BD escucha en 1433, pero hacia su PC el compose la publica en 11466
 > (las "dos direcciones" que explica
 > [CONCEPTOS_DOCKER.md](CONCEPTOS_DOCKER.md)). La API usa la interna;
 > usted, desde Windows, la publicada.
@@ -106,7 +106,7 @@ connected!"* en verde; luego **SAVE CONNECTION** y **CONNECT NOW**.
 > **Si le sale este error al conectar o al hacer TEST:**
 >
 > ```
-> Error opening connection Failed to connect to localhost:11463
+> Error opening connection Failed to connect to localhost:11466
 > - self signed certificate; if the root CA is installed locally,
 > try running Node.js with --use-system-ca
 > ```
@@ -130,7 +130,7 @@ connected!"* en verde; luego **SAVE CONNECTION** y **CONNECT NOW**.
 >        "name": "bdfacturas (csharp)",
 >        "driver": "MSSQL",
 >        "server": "localhost",
->        "port": 11463,
+>        "port": 11466,
 >        "database": "bdfacturas_sqlserver_local",
 >        "username": "sa",
 >        "password": "Paradigmas123!",
@@ -267,7 +267,7 @@ del editor.
 
 > El mismo respeto que en SSMS: DELETE **siempre con WHERE**. Y la misma
 > moraleja: entre el paso 1 y el 3, PR009 también existía para la API
-> (`http://localhost:8032/api/producto/PR009`) — un solo dato, muchos
+> (`http://localhost:8035/api/producto/PR009`) — un solo dato, muchos
 > clientes.
 
 ---
@@ -293,7 +293,7 @@ Server del compose.
 | Paso | Qué aprendió |
 |---|---|
 | 0 | Instalar SQLTools + driver de SQL Server (y el tropiezo del driver faltante) |
-| 1 | Crear la conexión (localhost,11463) con test y guardarla |
+| 1 | Crear la conexión (localhost,11466) con test y guardarla |
 | 2 | Explorar el árbol: tablas, columnas, PK; la lupa |
 | 3 | SQL propio con `Ctrl+E Ctrl+E`: el JOIN de 3 tablas |
 | 4 | Ciclo de escritura: INSERT → verificar → DELETE con WHERE |

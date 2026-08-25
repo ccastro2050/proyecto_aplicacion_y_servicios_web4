@@ -16,7 +16,7 @@
 - [ ] `docker compose up -d` (la BD ya tiene TODO desde la v1).
 
 **Verificar:** `SELECT count(*) FROM empresa` da 3; `usuario` da 8;
-`rutarol` da 25 (cliente SQL a `localhost:11463`).
+`rutarol` da 25 (cliente SQL a `localhost:11466`).
 
 ## Fase 1 — Los moldes simples: empresa y rol
 - [ ] Empresa: modelo, 3 peticiones, interfaces, repo, servicio,

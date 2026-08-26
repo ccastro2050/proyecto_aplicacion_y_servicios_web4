@@ -90,6 +90,38 @@ Dockerfile   →  IMAGEN      →  CONTENEDOR   →  VOLUMEN
 > Para una demo con las semillas exactas:
 > `docker compose down -v` y luego `docker compose up -d --build`.
 
+### El despliegue de ESTE proyecto, dibujado (Mermaid)
+
+Todo lo anterior, junto: lo que `docker compose up -d` levanta aquí es un
+**sistema de servidores en miniatura** — cada contenedor es un servidor
+con su propio hostname, unidos por la red interna del compose:
+
+```mermaid
+flowchart LR
+    NAV["Navegador / curl / Swagger"]
+    subgraph PC["Su PC — Docker Desktop (el 'centro de datos')"]
+        subgraph RED["red interna del compose (LAN virtual, con DNS propio)"]
+            APIFACTURAS["SERVIDOR DE APLICACIONES<br/>contenedor api-facturas<br/>hostname: api-facturas · escucha en 8035"]
+            SQLSERVER[("SERVIDOR DE BASE DE DATOS<br/>SQL Server · contenedor sqlserver<br/>hostname: sqlserver · escucha en 1433")]
+            POSTGRES[("SERVIDOR DE BASE DE DATOS<br/>PostgreSQL · contenedor postgres<br/>hostname: postgres · escucha en 5432")]
+            SQLSERVERINIT["sqlserver-init<br/>siembra la BD UNA vez<br/>y muere: Exited(0) = éxito"]
+        end
+    end
+    NAV -->|"localhost:8035"| APIFACTURAS
+    APIFACTURAS -->|"sqlserver:1433 (DNS de Docker)"| SQLSERVER
+    APIFACTURAS -->|"postgres:5432 (DNS de Docker)"| POSTGRES
+    SQLSERVERINIT -->|"espera el healthcheck,<br/>siembra y termina"| SQLSERVER
+    NAV -.->|"opcional (diagnóstico):<br/>localhost:11466"| SQLSERVER
+    NAV -.->|"opcional (diagnóstico):<br/>localhost:15462"| POSTGRES
+```
+
+**Guía de lectura:** los servicios se hablan entre sí **por nombre**
+(el DNS interno de Docker resuelve `postgres`, `api-facturas`, etc. a la
+IP del contenedor — jamás `localhost`, que dentro de un contenedor es él
+mismo). Hacia su PC solo existen las puertas `localhost:PUERTO` que el
+compose publica. Por eso este mismo diseño se despliega igual en un
+servidor real: cambiar de máquina no cambia la arquitectura.
+
 ## 5. Docker Compose (el "un solo comando" del proyecto)
 
 **Compose** es la respuesta **declarativa** a "¿cómo levanto varios

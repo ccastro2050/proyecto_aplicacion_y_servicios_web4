@@ -19,6 +19,7 @@ services:
 
   # --- SQL Server 2022 (requiere ~2 GB de RAM) ---
   sqlserver:
+    restart: unless-stopped   # si el PC se reinicia, este servicio revive con Docker
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"                       # aceptar la licencia (obligatorio)
@@ -57,6 +58,7 @@ services:
   # los scripts montados en /docker-entrypoint-initdb.d/ la primera
   # vez (volumen vacío) — no necesita contenedor inicializador.
   postgres:
+    restart: unless-stopped   # si el PC se reinicia, este servicio revive con Docker
     image: postgres:16-alpine                # ~50 MB (SQL Server pide ~2 GB)
     environment:
       POSTGRES_PASSWORD: "Paradigmas123!"    # clave del superusuario 'postgres'

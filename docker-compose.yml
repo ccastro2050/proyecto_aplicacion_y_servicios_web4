@@ -13,7 +13,7 @@
 # Reset de las BD: docker compose down -v && docker compose up -d
 #
 # Este archivo CRECE por versiones: v5 sumará MariaDB,
-# v6 la API genérica, v7 el front Blazor.
+# v6 el front Blazor.
 # ==============================================================
 services:
 

@@ -43,7 +43,7 @@ estructura y nombre. Los modelos C# no notan la diferencia.
 - **Los SPs de usuarios/roles/permisos** (`crear_usuario_con_roles`,
   `verificar_acceso_ruta`, `listar_rutarol`, …) también viajan en el
   script: la v4 no los llama, pero mantienen la BD en paridad con el
-  gemelo de Python — y son el terreno que pisará la API genérica (v6).
+  gemelo de Python — y quedan listos para el login del front (v6).
 
 ## 3. Los mensajes que la API traduce (paridad de negocio)
 

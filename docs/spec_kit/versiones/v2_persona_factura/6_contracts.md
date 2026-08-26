@@ -131,6 +131,6 @@ GET /  → 200 {"mensaje":"API Facturas funcionando","version":"v2","contratos":
 
 ## E. Estabilidad
 
-Estos contratos se congelan al cerrar la v2 (tag `v2`): la v3 cambia el
-MOTOR por configuración — si estos endpoints respondieran distinto contra
-PostgreSQL, la v3 está mal.
+Estos contratos se congelan al cerrar la v2 (tag `v2`): las versiones de motor (v4/v5)
+cambian el MOTOR por configuración — si estos endpoints respondieran
+distinto contra PostgreSQL, esas versiones están mal.

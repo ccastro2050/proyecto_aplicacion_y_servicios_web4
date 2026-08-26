@@ -12,7 +12,7 @@ estaba mal); factura demuestra que no todo es CRUD — hay lógica que
 **pertenece a la BD**. Una versión solo-persona sería trivial; una
 solo-factura dejaría sin practicar la replicación.
 **Alternativa descartada:** agregar también cliente/vendedor/empresa — puro
-volumen sin lección nueva; su gestión llegará gratis con la API genérica (v5).
+volumen sin lección nueva; su gestión llega en la v3 (el resto de las entidades).
 
 ## D2 — Factura SOLO por procedimientos almacenados
 **Decisión:** el repositorio de factura no escribe SQL de tablas: llama 4

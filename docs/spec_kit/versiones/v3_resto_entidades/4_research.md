@@ -31,7 +31,7 @@ costo, no es un hash de contraseñas.
 
 ## D4 — verificar-contrasena SIN JWT todavía
 La v3 entrega el cimiento (credenciales verificables); el token, el
-middleware y el control de acceso son de la API genérica (v6). Separarlos
+middleware y el control de acceso llegan con el front. Separarlos
 deja ver que **autenticar** (¿eres quien dices?) y **autorizar** (¿puedes
 hacer esto?) son problemas distintos.
 

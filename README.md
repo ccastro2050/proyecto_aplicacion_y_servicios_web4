@@ -173,9 +173,7 @@ v3  el RESTO de las entidades: toda la bdfacturas cubierta con
 v4  segundo motor (PostgreSQL) — nace la fábrica de
     repositorios y el interruptor MOTOR_BD   ← USTED ESTÁ AQUÍ
 v5  tercer motor (MariaDB) + compose completo
-v6  API GENÉRICA de plataforma: /api/{tabla} multi-motor + JWT +
-    consultas parametrizadas + procedimientos almacenados
-v7  frontend BLAZOR: CRUD de las 12 entidades + login + facturación
+v6  frontend BLAZOR: CRUD de las 12 entidades + login + facturación
 ```
 
 La regla del juego: la **constitución** es permanente, cada versión tiene

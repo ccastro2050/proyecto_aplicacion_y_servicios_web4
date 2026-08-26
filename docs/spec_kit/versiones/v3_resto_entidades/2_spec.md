@@ -44,8 +44,7 @@ diagnóstico pasa a `"version": "v3"` · la prueba de capas crece con
 empresa (el molde una vez más, sin BD).
 
 **No incluye (deliberado — [mapa](../0_mapa_versiones.md)):**
-- **JWT, login con token y control de acceso**: eso es de la API genérica
-  (v6). En v3, usuario/rol/ruta/rutarol son DATOS con CRUD — la
+- **JWT, login con token y control de acceso**: eso llega con el front (v6). En v3, usuario/rol/ruta/rutarol son DATOS con CRUD — la
   infraestructura RBAC se llena, todavía no protege endpoints.
 - Otros motores ni fábrica multi-motor (v4).
 - CRUD directo de `productosporfactura`: sus renglones se gestionan a

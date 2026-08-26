@@ -62,11 +62,11 @@ Dos lecciones nuevas, una por rebanada:
 **No incluye (deliberado — [mapa](../0_mapa_versiones.md)):**
 - CRUD de `cliente`, `vendedor` ni las demás tablas: la factura los
   referencia **por id** usando los datos semilla (clientes 1–3, vendedores
-  1–3). Su gestión llega con la API genérica (v5).
+  1–3). Su gestión llega en la v3 (el resto de las entidades).
 - Editar (PUT/PATCH) o borrar físicamente facturas: `sp_actualizar_…` y
   `sp_borrar_…` existen en la BD pero la v2 no los expone — anular ES la
   operación de negocio; el borrado físico queda para el administrador.
-- Usuarios, roles, JWT (v5) · otros motores (v3/v4) · frontend (v6).
+- Usuarios y roles (v3) · otros motores (v4/v5) · JWT y frontend (v6).
 
 ## 3. Requisitos funcionales
 

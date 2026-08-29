@@ -164,3 +164,43 @@ inexistente → 404.
 6. **Prueba de capas:** `dotnet run --project pruebas` (o vía
    `docker compose exec`) ejecuta el servicio con un repositorio FALSO en
    memoria — sin SQL Server — y todas las verificaciones pasan.
+
+## 6. Clarificaciones
+
+> **Qué es esta sección:** el registro de las ambigüedades detectadas ANTES
+> de planear, con la respuesta que se acordó y su razón. Es **la compuerta
+> 1** del método (ver [SDD_SPECKIT](../../../SDD_SPECKIT.md)): mientras
+> quede un `[NECESITA ACLARACIÓN: …]` en los requisitos de arriba, esta
+> versión no pasa a la planeación.
+>
+> Las entradas de abajo se reconstruyeron **al cerrar la versión**, a
+> partir de las decisiones que sus propios contratos ya dejaban fijadas.
+> De aquí en adelante esta sección se llena **en vivo**, antes del
+> `3_plan.md` — que es como debe ser.
+
+| # | La pregunta | La respuesta acordada, con su razón | Dónde quedó |
+|---|---|---|---|
+| C1 | El listado sin filas, ¿es un error o un resultado? | Un resultado: **204 sin cuerpo**. Vacío no es error. | RF de listar · contrato del `GET` |
+| C2 | `?limite=0` o negativo, ¿422 o 400? | **400**: la FORMA del dato es correcta (sí es un entero); lo que se rompe es una regla de negocio. El 422 se reserva para el body mal formado. | Contrato del `GET` · convenciones |
+| C3 | Un número con decimales o texto donde va un entero, ¿lo rechaza la API o lo deja llegar a la BD? | Lo rechaza la **petición** con 422: el TIPO también es regla, y el valor nunca llega a la BD. | Criterios de aceptación · contrato del `POST` |
+| C4 | Crear con una llave que ya existe, ¿409 o 500? | **500**, con el error del motor en `detalle`: la llave la defiende la BD, no la API. Convertirlo en 409 sería lógica de negocio que esta versión no pide. | Convenciones de error · contrato del `POST` |
+| C5 | `PATCH` con el body vacío, ¿200 sin hacer nada, o error? | **400**: pedir una actualización sin decir qué actualizar es una regla de negocio rota. | Contrato del `PATCH` |
+
+**Cómo se escribe una entrada nueva:** la pregunta tal como se hizo (no
+"revisar el borrado", sino "¿físico o lógico?"), la respuesta **con su
+razón**, y el documento donde quedó plasmada. Si la respuesta cambia un
+requisito, se corrige el requisito allá arriba: esta sección lo registra,
+no lo reemplaza.
+
+## 7. Definición de TERMINADA
+
+Esta versión está terminada — y solo entonces se escribe la spec de la
+siguiente — cuando:
+
+1. Todos los **criterios de aceptación** pasan, verificados con el smoke
+   test de [7_quickstart.md](7_quickstart.md), **corrido por una persona**.
+   "Me funciona" no es evidencia.
+2. La lista de [9_checklist.md](9_checklist.md) está en verde y firmada.
+3. No queda ningún `[NECESITA ACLARACIÓN: …]` en este documento.
+4. Se hace commit y **tag** de la versión, según la
+   [constitución](../../1_constitution.md).

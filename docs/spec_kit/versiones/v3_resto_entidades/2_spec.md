@@ -132,3 +132,28 @@ endpoint de la v3.
 
 Los 6 criterios pasan → commit + tag `v3` → la API cubre las 12 tablas →
 recién entonces se especifica la v4 (el segundo motor).
+
+## 7. Clarificaciones
+
+> **Qué es esta sección:** el registro de las ambigüedades detectadas ANTES
+> de planear, con la respuesta que se acordó y su razón. Es **la compuerta
+> 1** del método (ver [SDD_SPECKIT](../../../SDD_SPECKIT.md)): mientras
+> quede un `[NECESITA ACLARACIÓN: …]` en los requisitos de arriba, esta
+> versión no pasa a la planeación.
+>
+> Las entradas de abajo se reconstruyeron **al cerrar la versión**, a
+> partir de las decisiones que sus propios contratos ya dejaban fijadas.
+> De aquí en adelante esta sección se llena **en vivo**, antes del
+> `3_plan.md` — que es como debe ser.
+
+| # | La pregunta | La respuesta acordada, con su razón | Dónde quedó |
+|---|---|---|---|
+| C1 | El listado sin filas, ¿es un error o un resultado? | Un resultado: **204 sin cuerpo**. Vacío no es error. | RF de listar · contrato del `GET` |
+| C2 | Una factura equivocada, ¿se borra o se anula? | Se **anula**: borrado lógico que restaura el stock. La factura es un hecho contable; borrarla perdería la trazabilidad. | RF de anulación · contrato de anular |
+| C3 | La contraseña, ¿viaja y se guarda en claro? | Nunca: se guarda **hasheada con BCrypt** y la comparación se hace con un endpoint de verificación. La API jamás devuelve el hash. | RF de usuario · modelo de datos |
+
+**Cómo se escribe una entrada nueva:** la pregunta tal como se hizo (no
+"revisar el borrado", sino "¿físico o lógico?"), la respuesta **con su
+razón**, y el documento donde quedó plasmada. Si la respuesta cambia un
+requisito, se corrige el requisito allá arriba: esta sección lo registra,
+no lo reemplaza.

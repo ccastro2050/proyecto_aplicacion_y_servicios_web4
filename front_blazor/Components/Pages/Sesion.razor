@@ -1,0 +1,197 @@
+@page "/sesion"
+@inject ServicioSesion Servicio
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+
+@*
+   ============================================================
+   LA INTERFAZ DE IDENTIFICACIÓN.
+
+   Usa los componentes de Bootstrap directamente -card, form-control, alert-
+   porque es una pagina suelta, sin tablas ni formularios de CRUD. Las otras
+   doce usan las clases del dominio -tarjeta, campos, botones- que el app.css
+   mapea sobre ese mismo aspecto.
+
+   Tres detalles que no son de adorno:
+
+   1. EL CAMPO DE CONTRASENA ES type="password". No para que se vea bonito:
+      para que no quede en la pantalla de alguien que pase por detras, y para
+      que el navegador no lo ofrezca en el autocompletado como texto.
+
+   2. EL MENSAJE DE ERROR ES UNO SOLO. No dice «ese correo no existe» ni «la
+      contrasena esta mal»: dice las dos cosas juntas. Distinguirlos le
+      confirma a un desconocido CUALES correos si existen, y con una lista de
+      correos validos, probar contrasenas vale la pena.
+
+   3. role="alert" EN EL AVISO. No es decoracion: es lo que hace que un lector
+      de pantalla ANUNCIE el mensaje en vez de dejarlo pasar.
+   ============================================================
+*@
+
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+
+        @if (Estado.Identificado)
+        {
+            <div class="card shadow-sm mt-4">
+                <div class="card-body text-center p-4">
+                    <h1 class="h4 card-title mb-3">Ya tiene una sesión abierta</h1>
+                    <p class="text-body-secondary mb-1">Está identificado como</p>
+                    <p class="fs-5 fw-semibold mb-2">@Estado.Email</p>
+                    <p class="mb-4">
+                        @foreach (var r in Estado.Roles)
+                        {
+                            <span class="badge text-bg-secondary me-1">@r</span>
+                        }
+                    </p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" @onclick="AlInicio">Ir al inicio</button>
+                        <button class="btn btn-outline-danger" @onclick="Salir">Salir</button>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow-sm mt-4">
+                <div class="card-body p-4">
+                    <h1 class="h4 card-title mb-1">Iniciar sesión</h1>
+                    <p class="text-body-secondary small mb-4">
+                        Facturas &middot; versión 4
+                    </p>
+
+                    @if (aviso is not null)
+                    {
+                        <div class="alert alert-danger py-2" role="alert">
+                            @aviso
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label" for="correo">Correo</label>
+                        <input id="correo" type="email" class="form-control"
+                               @bind="email" @bind:event="oninput"
+                               placeholder="admin@@correo.com" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="clave">Contraseña</label>
+                        @* type="password": no se muestra en pantalla *@
+                        <input id="clave" type="password" class="form-control"
+                               @bind="contrasena" @bind:event="oninput"
+                               @onkeyup="PorSiLeDioEnter" />
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-primary" disabled="@entrando" @onclick="Entrar">
+                            @if (entrando)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"
+                                      aria-hidden="true"></span>
+                                <span>Entrando…</span>
+                            }
+                            else
+                            {
+                                <span>Entrar</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Para probar el control de acceso</h2>
+                    <p class="small text-body-secondary">
+                        Hacen falta <strong>dos sesiones distintas</strong>: con una sola
+                        no se nota la diferencia. Las contraseñas están en el
+                        <code>7_quickstart.md</code> de esta version.
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr><th>Correo</th><th>Contraseña</th><th>Entra a</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>admin@@correo.com</code></td>
+                                    <td><code>admin123</code></td>
+                                    <td class="small">todo</td>
+                                </tr>
+                                <tr>
+                                    <td><code>vendedor1@@correo.com</code></td>
+                                    <td><code>vendedor123</code></td>
+                                    <td class="small">facturas, clientes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>cliente1@@correo.com</code></td>
+                                    <td><code>cliente123</code></td>
+                                    <td class="small">productos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="small text-body-secondary mt-3 mb-0">
+                        <strong>La prueba que importa:</strong> entre como
+                        <code>vendedor1</code> y escriba <code>/usuarios</code> en la barra
+                        de direcciones. La interfaz se abre y tiene que decir que no tiene
+                        permiso — porque quien protege es la API, no el menú.
+                    </p>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@code {
+    private string email = "";
+    private string contrasena = "";
+    private bool entrando;
+    private string? aviso;
+
+    private void AlInicio() => Navegador.NavigateTo("/");
+
+    private async Task PorSiLeDioEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") { await Entrar(); }
+    }
+
+    private async Task Entrar()
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(contrasena))
+        {
+            aviso = "Escriba el correo y la contrasena.";
+            return;
+        }
+
+        entrando = true;
+        aviso = null;
+        var r = await Servicio.IniciarAsync(email.Trim(), contrasena);
+
+        if (!r.Bien)
+        {
+            entrando = false;
+            // La contrasena SI se borra al fallar -a diferencia del resto de
+            // los formularios, donde lo escrito se conserva-. Una contrasena
+            // equivocada en pantalla no le sirve a nadie.
+            contrasena = "";
+            aviso = r.Mensaje;
+            return;
+        }
+
+        // Los permisos se piden EN SEGUIDA, con el token recien recibido: son
+        // los que arman el menu.
+        var rutas = await Servicio.MisRutasAsync(r.Dato!.Token);
+        Estado.Entrar(r.Dato.Token, r.Dato.Email, r.Dato.Roles, rutas);
+        entrando = false;
+
+        Navegador.NavigateTo("/");
+    }
+
+    private void Salir()
+    {
+        Estado.Salir();
+        contrasena = "";
+    }
+}

@@ -1,0 +1,92 @@
+@inject MenuApp Menu
+@inject EstadoSesion Estado
+@implements IDisposable
+
+@*
+   ============================================================
+   EL MENÚ, ARMADO CON LOS PERMISOS DE QUIEN ESTÁ IDENTIFICADO.
+
+   ES EL MISMO ARCHIVO en la v3 y la v4 —byte a byte—: las entradas salen de
+   `MenuApp`, que el `Program.cs` registra con las de su versión. La única
+   diferencia con el de la v1 y la v2 es el `@@if (Estado.PuedeVer(...))`.
+
+   Y AQUÍ VA LA ADVERTENCIA MÁS IMPORTANTE DE LA v3:
+
+       ESCONDER UNA ENTRADA DEL MENÚ NO ES CONTROL DE ACCESO.
+
+   Es la trampa en la que cae casi todo el mundo, porque PARECE que funciona:
+   el vendedor entra, no ve «Usuarios», y se va tranquilo.
+
+   Pero este menú es HTML que ya está en su navegador. Quien escriba la
+   dirección a mano llega igual a la interfaz. Lo que lo para es que la API
+   responda 403, y eso lo hace [ExigePermiso], no este archivo.
+
+   ENTONCES PARA QUÉ SIRVE: para no mostrarle a alguien lo que no va a poder
+   usar. Es comodidad. La protección está en el servicio.
+
+   SE COMPRUEBA ASÍ (criterio 9): identifíquese como `vendedor1` —que no tiene
+   `interfaz.usuarios`— y escriba `/usuarios` en la barra de direcciones. La
+   interfaz se abre y tiene que mostrar el 403 que respondió la API.
+   ============================================================
+*@
+<nav class="navbar navbar-expand-lg navbar-dark navbar-marca sticky-top">
+    <div class="container">
+        @* LA MARCA, en sus tres piezas con el nombre que les da el manual:
+           el LOGOTIPO -la palabra, en serifa y versalitas-, el ISOTIPO -el
+           simbolo- y el DESCRIPTOR -lo que la empresa es-.
+
+           Va como enlace al inicio porque es lo que un navegante espera de
+           una marca arriba a la izquierda. *@
+        <a class="navbar-brand logosimbolo mb-0" href="/">
+            <span class="logotipo">Los Andes</span> <span class="isotipo">▲</span>
+            <small class="descriptor">comercial s.a.</small>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#menuPrincipal" aria-controls="menuPrincipal"
+                aria-expanded="false" aria-label="Abrir el menú">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menuPrincipal">
+            @if (!Estado.Identificado)
+            {
+                @* Sin sesión el menú tiene UNA entrada. No se esconde el resto
+                   por seguridad —ya se dijo que eso no protege— sino porque no
+                   hay nada que mostrar: todas responderían 401. *@
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="sesion">Iniciar sesión</NavLink>
+                    </li>
+                </ul>
+            }
+            else
+            {
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Inicio</NavLink>
+                    </li>
+                    @foreach (var e in Menu.Entradas)
+                    {
+                        @if (Estado.PuedeVer(e.Permiso))
+                        {
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="@e.Ruta">@e.Texto</NavLink>
+                            </li>
+                        }
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</nav>
+
+@code {
+    // El menú se vuelve a dibujar cuando alguien entra o sale, sin que nadie
+    // recargue la página.
+    protected override void OnInitialized() => Estado.Cambio += Redibujar;
+
+    private void Redibujar() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Estado.Cambio -= Redibujar;
+}

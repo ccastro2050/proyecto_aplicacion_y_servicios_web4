@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 534" width="980" height="534" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Síncrono contra asíncrono: qué hace el hilo mientras la base responde</title>
+  <desc>Con await el hilo queda libre para atender a otra persona mientras la base trabaja. Sin await, se queda parado esperando.</desc>
+  <rect width="980" height="534" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">`await` no acelera la consulta: libera al mesero</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">La base tarda lo mismo. Lo que cambia es qué hace el hilo mientras tanto — y de eso depende a cuánta gente se puede atender.</text>
+
+  <!-- SIN await -->
+  <rect x="36" y="96" width="908" height="150" rx="10" fill="#fff" stroke="#B4402F" stroke-width="2"/>
+  <text x="56" y="122" font-size="14" font-weight="600" fill="#B4402F">SIN await — el hilo se queda parado</text>
+
+  <text x="56" y="152" font-size="12" fill="#4A4A4A">hilo 1</text>
+  <rect x="110" y="138" width="104" height="24" rx="4" fill="#17495B"/>
+  <text x="162" y="155" font-size="11" text-anchor="middle" fill="#fff">recibe</text>
+  <rect x="218" y="138" width="500" height="24" rx="4" fill="#B4402F"/>
+  <text x="468" y="155" font-size="11" text-anchor="middle" fill="#fff">ESPERANDO a la base — sin hacer nada, pero ocupado</text>
+  <rect x="722" y="138" width="104" height="24" rx="4" fill="#17495B"/>
+  <text x="774" y="155" font-size="11" text-anchor="middle" fill="#fff">responde</text>
+
+  <text x="56" y="196" font-size="12" fill="#4A4A4A">Ana</text>
+  <rect x="110" y="182" width="716" height="24" rx="4" fill="#F4F2EC" stroke="#B4402F" stroke-dasharray="5 3"/>
+  <text x="468" y="199" font-size="11" text-anchor="middle" fill="#B4402F">Ana llegó en el segundo 1 y espera a que el hilo se desocupe</text>
+
+  <text x="56" y="228" font-size="11.5" fill="#B4402F">Con 100 hilos y 100 personas esperando, la 101 recibe un error — y la máquina estaba sin hacer nada.</text>
+
+  <!-- CON await -->
+  <rect x="36" y="266" width="908" height="150" rx="10" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="56" y="292" font-size="14" font-weight="600" fill="#2F7D5C">CON await — el hilo se va a atender a otra persona</text>
+
+  <text x="56" y="322" font-size="12" fill="#4A4A4A">hilo 1</text>
+  <rect x="110" y="308" width="104" height="24" rx="4" fill="#17495B"/>
+  <text x="162" y="325" font-size="11" text-anchor="middle" fill="#fff">recibe</text>
+  <rect x="218" y="308" width="240" height="24" rx="4" fill="#2F7D5C"/>
+  <text x="338" y="325" font-size="11" text-anchor="middle" fill="#fff">atiende a Ana</text>
+  <rect x="462" y="308" width="256" height="24" rx="4" fill="#F4F2EC" stroke="#4A4A4A" stroke-dasharray="5 3"/>
+  <text x="590" y="325" font-size="11" text-anchor="middle" fill="#4A4A4A">libre</text>
+  <rect x="722" y="308" width="104" height="24" rx="4" fill="#17495B"/>
+  <text x="774" y="325" font-size="11" text-anchor="middle" fill="#fff">responde</text>
+
+  <text x="56" y="366" font-size="12" fill="#4A4A4A">la base</text>
+  <rect x="218" y="352" width="500" height="24" rx="4" fill="#E39B2D"/>
+  <text x="468" y="369" font-size="11" text-anchor="middle" fill="#fff">trabajando — tarda EXACTAMENTE lo mismo que arriba</text>
+
+  <text x="56" y="398" font-size="11.5" fill="#2F7D5C">Con los mismos 100 hilos se atiende a miles: nadie se queda parado esperando a un disco.</text>
+
+  <!-- la regla -->
+  <rect x="36" y="436" width="908" height="76" rx="8" fill="#fff" stroke="#E39B2D" stroke-width="2"/>
+  <text x="56" y="459" font-size="12.5" font-weight="600" fill="#17495B">La regla en este proyecto</text>
+  <text x="56" y="478" font-size="12" fill="#4A4A4A">Todo lo que espera a algo de afuera —la base, otra API— va con `async`/`await`, de punta a punta: del controlador al</text>
+  <text x="56" y="497" font-size="12" fill="#4A4A4A">servicio y al repositorio. Un solo método sin `await` en la cadena vuelve a parar el hilo.</text>
+</svg>

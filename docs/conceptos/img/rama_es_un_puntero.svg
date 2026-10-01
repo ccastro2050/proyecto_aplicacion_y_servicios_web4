@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 540" width="980" height="540" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Una rama es un puntero, no una copia</title>
+  <desc>Mucha gente cree que crear una rama copia los archivos a otra carpeta. No: una rama es un archivo de 41 bytes con el identificador de un commit. La carpeta es siempre la misma.</desc>
+  <defs>
+    <marker id="fl" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#17495B"/>
+    </marker>
+    <marker id="flr" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#B4402F"/>
+    </marker>
+  </defs>
+  <rect width="980" height="540" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">Una rama es un PUNTERO, no una copia de los archivos</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">Es el malentendido numero uno, y de el salen casi todos los errores posteriores.</text>
+
+  <!-- ===== IZQUIERDA: lo que la gente cree ===== -->
+  <rect x="36" y="94" width="420" height="300" rx="10" fill="#fff" stroke="#B4402F" stroke-width="2"/>
+  <text x="56" y="122" font-size="15" font-weight="600" fill="#B4402F">LO QUE MUCHA GENTE CREE</text>
+  <text x="56" y="144" font-size="12.5" fill="#4A4A4A">«Crear una rama copia el proyecto a otro lado»</text>
+
+  <rect x="56" y="162" width="118" height="74" rx="6" fill="#F4F2EC" stroke="#B4402F" stroke-width="1.5"/>
+  <text x="115" y="186" font-size="11.5" font-weight="600" text-anchor="middle" fill="#4A4A4A">carpeta/</text>
+  <text x="115" y="204" font-size="10.5" text-anchor="middle" fill="#4A4A4A">main</text>
+  <text x="115" y="222" font-size="10.5" text-anchor="middle" fill="#4A4A4A">12 MB</text>
+
+  <rect x="186" y="162" width="118" height="74" rx="6" fill="#F4F2EC" stroke="#B4402F" stroke-width="1.5"/>
+  <text x="245" y="186" font-size="11.5" font-weight="600" text-anchor="middle" fill="#4A4A4A">carpeta-2/</text>
+  <text x="245" y="204" font-size="10.5" text-anchor="middle" fill="#4A4A4A">rama-carlos</text>
+  <text x="245" y="222" font-size="10.5" text-anchor="middle" fill="#4A4A4A">12 MB</text>
+
+  <rect x="316" y="162" width="118" height="74" rx="6" fill="#F4F2EC" stroke="#B4402F" stroke-width="1.5"/>
+  <text x="375" y="186" font-size="11.5" font-weight="600" text-anchor="middle" fill="#4A4A4A">carpeta-3/</text>
+  <text x="375" y="204" font-size="10.5" text-anchor="middle" fill="#4A4A4A">rama-paco</text>
+  <text x="375" y="222" font-size="10.5" text-anchor="middle" fill="#4A4A4A">12 MB</text>
+
+  <text x="56" y="266" font-size="12.5" font-weight="600" fill="#B4402F">Y de ahi salen estas preguntas, que no tienen sentido:</text>
+  <text x="56" y="288" font-size="12" fill="#4A4A4A">· «¿en cual de las carpetas estaba trabajando?»</text>
+  <text x="56" y="308" font-size="12" fill="#4A4A4A">· «¿tengo que copiar mi archivo a la otra rama?»</text>
+  <text x="56" y="328" font-size="12" fill="#4A4A4A">· «¿no se va a llenar el disco con tres ramas?»</text>
+  <text x="56" y="356" font-size="12" font-style="italic" fill="#B4402F">Asi branchaban los sistemas viejos. Git no.</text>
+  <text x="56" y="376" font-size="12" font-style="italic" fill="#B4402F">Ahi tardaba minutos; en Git es instantaneo.</text>
+
+  <!-- ===== DERECHA: lo que pasa ===== -->
+  <rect x="500" y="94" width="444" height="300" rx="10" fill="#fff" stroke="#2F7D5C" stroke-width="2.5"/>
+  <text x="520" y="122" font-size="15" font-weight="600" fill="#2F7D5C">LO QUE PASA DE VERDAD</text>
+  <text x="520" y="144" font-size="12.5" fill="#4A4A4A">Una carpeta. Tres punteros de 41 bytes cada uno.</text>
+
+  <!-- los commits -->
+  <line x1="548" y1="206" x2="900" y2="206" stroke="#17495B" stroke-width="2"/>
+  <circle cx="560" cy="206" r="11" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <circle cx="650" cy="206" r="11" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <circle cx="760" cy="206" r="11" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <circle cx="880" cy="206" r="11" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="724" y="184" font-size="11" text-anchor="middle" fill="#4A4A4A">los commits</text>
+
+  <!-- punteros -->
+  <rect x="596" y="252" width="118" height="30" rx="5" fill="#17495B"/>
+  <text x="655" y="272" font-size="11.5" font-weight="600" text-anchor="middle" fill="#fff">rama-paco</text>
+  <line x1="655" y1="252" x2="651" y2="221" stroke="#17495B" stroke-width="2" marker-end="url(#fl)"/>
+
+  <rect x="706" y="300" width="118" height="30" rx="5" fill="#17495B"/>
+  <text x="765" y="320" font-size="11.5" font-weight="600" text-anchor="middle" fill="#fff">rama-carlos</text>
+  <line x1="765" y1="300" x2="761" y2="221" stroke="#17495B" stroke-width="2" marker-end="url(#fl)"/>
+
+  <rect x="826" y="252" width="98" height="30" rx="5" fill="#17495B"/>
+  <text x="875" y="272" font-size="11.5" font-weight="600" text-anchor="middle" fill="#fff">main</text>
+  <line x1="875" y1="252" x2="879" y2="221" stroke="#17495B" stroke-width="2" marker-end="url(#fl)"/>
+
+  <!-- HEAD -->
+  <rect x="706" y="344" width="118" height="28" rx="5" fill="#E39B2D"/>
+  <text x="765" y="363" font-size="11.5" font-weight="600" text-anchor="middle" fill="#4A4A4A">HEAD</text>
+  <line x1="765" y1="344" x2="765" y2="334" stroke="#4A4A4A" stroke-width="2" marker-end="url(#fl)"/>
+  <text x="840" y="363" font-size="11" fill="#4A4A4A">apunta a la RAMA,</text>
+  <text x="840" y="378" font-size="11" fill="#4A4A4A">no al commit</text>
+
+  <!-- ===== CIERRE ===== -->
+  <rect x="36" y="414" width="908" height="96" rx="8" fill="#17495B"/>
+  <text x="60" y="444" font-size="14.5" font-weight="600" fill="#fff">41 bytes: 40 caracteres del identificador del commit, y un salto de linea.</text>
+  <text x="60" y="470" font-size="13" fill="#F4F2EC">Compruebelo:  Get-Content .git\refs\heads\main   — responde un identificador, y nada mas.</text>
+  <text x="60" y="494" font-size="13" fill="#E39B2D">Cambiar de rama mueve HEAD y cambia el contenido de la MISMA carpeta. Nada se copia.</text>
+</svg>

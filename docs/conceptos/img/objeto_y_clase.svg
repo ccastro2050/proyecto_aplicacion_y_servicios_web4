@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 540" width="980" height="540" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Clase y objeto: el molde y las fichas</title>
+  <desc>Factura es la clase: el molde con sus datos y lo que sabe hacer. Cada factura emitida es un objeto distinto hecho con ese molde.</desc>
+  <defs>
+    <marker id="p1" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#17495B"/>
+    </marker>
+  </defs>
+  <rect width="980" height="540" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">La clase es el molde; el objeto es la ficha</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">`Factura` se escribe UNA vez. Facturas emitidas hay miles, y cada una es un objeto distinto hecho con ese molde.</text>
+
+  <!-- la clase -->
+  <rect x="36" y="100" width="300" height="252" rx="10" fill="#fff" stroke="#17495B" stroke-width="2.5"/>
+  <rect x="36" y="100" width="300" height="38" rx="10" fill="#17495B"/>
+  <text x="186" y="126" font-size="16" font-weight="600" text-anchor="middle" fill="#fff">class Factura</text>
+
+  <text x="56" y="164" font-size="12" font-weight="600" fill="#4A4A4A">Lo que SABE (los datos)</text>
+  <text x="56" y="186" font-size="12" font-family="Consolas, monospace" fill="#17495B">int Numero</text>
+  <text x="56" y="205" font-size="12" font-family="Consolas, monospace" fill="#17495B">DateTime Fecha</text>
+  <text x="56" y="224" font-size="12" font-family="Consolas, monospace" fill="#17495B">decimal Total</text>
+  <text x="56" y="243" font-size="12" font-family="Consolas, monospace" fill="#17495B">string Estado</text>
+  <text x="56" y="262" font-size="12" font-family="Consolas, monospace" fill="#17495B">List&lt;Producto&gt; Productos</text>
+
+  <line x1="56" y1="278" x2="316" y2="278" stroke="#4A4A4A" stroke-width="1"/>
+  <text x="56" y="300" font-size="12" font-weight="600" fill="#4A4A4A">Lo que HACE</text>
+  <text x="56" y="322" font-size="12" font-family="Consolas, monospace" fill="#2F7D5C">EstaAnulada()</text>
+  <text x="56" y="341" font-size="12" font-family="Consolas, monospace" fill="#2F7D5C">CantidadDeRenglones()</text>
+
+  <text x="186" y="372" font-size="11" text-anchor="middle" fill="#4A4A4A">se escribe UNA vez</text>
+
+  <!-- las fichas -->
+  <text x="420" y="124" font-size="12" font-weight="600" fill="#17495B">new Factura(...) &#8594; objetos, uno por cada factura emitida</text>
+
+  <rect x="420" y="140" width="250" height="92" rx="8" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="440" y="164" font-size="13" font-weight="600" fill="#2F7D5C">factura #3</text>
+  <text x="440" y="186" font-size="11.5" fill="#4A4A4A">Total 2.030.000 · activa</text>
+  <text x="440" y="205" font-size="11.5" fill="#4A4A4A">3 renglones</text>
+  <text x="440" y="223" font-size="11.5" fill="#4A4A4A">cliente: Ana Torres</text>
+
+  <rect x="694" y="140" width="250" height="92" rx="8" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="714" y="164" font-size="13" font-weight="600" fill="#2F7D5C">factura #4</text>
+  <text x="714" y="186" font-size="11.5" fill="#4A4A4A">Total 950.000 · anulada</text>
+  <text x="714" y="205" font-size="11.5" fill="#4A4A4A">1 renglón</text>
+  <text x="714" y="223" font-size="11.5" fill="#4A4A4A">cliente: Ana Torres</text>
+
+  <rect x="420" y="248" width="250" height="92" rx="8" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="440" y="272" font-size="13" font-weight="600" fill="#2F7D5C">factura #5</text>
+  <text x="440" y="294" font-size="11.5" fill="#4A4A4A">Total 2.740.000 · activa</text>
+  <text x="440" y="313" font-size="11.5" fill="#4A4A4A">2 renglones</text>
+  <text x="440" y="331" font-size="11.5" fill="#4A4A4A">cliente: Luis Mora</text>
+
+  <rect x="694" y="248" width="250" height="92" rx="8" fill="#F4F2EC" stroke="#4A4A4A" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="819" y="286" font-size="13" text-anchor="middle" fill="#4A4A4A">…y las que vengan</text>
+  <text x="819" y="308" font-size="11.5" text-anchor="middle" fill="#4A4A4A">todas con el mismo molde</text>
+
+  <line x1="340" y1="186" x2="414" y2="186" stroke="#17495B" stroke-width="2" marker-end="url(#p1)"/>
+  <line x1="340" y1="226" x2="414" y2="294" stroke="#17495B" stroke-width="2" marker-end="url(#p1)"/>
+
+  <!-- encapsulamiento -->
+  <rect x="36" y="394" width="908" height="118" rx="8" fill="#fff" stroke="#E39B2D" stroke-width="2"/>
+  <text x="56" y="418" font-size="13" font-weight="600" fill="#17495B">Encapsulamiento: por qué `Total` no tiene setter público</text>
+  <text x="56" y="441" font-size="12" fill="#4A4A4A">Porque el total NO lo decide el programa: lo calcula el disparador de la base sumando los subtotales. Si hubiera un `factura.Total = 5000`,</text>
+  <text x="56" y="460" font-size="12" fill="#4A4A4A">habría dos fuentes de verdad, y el día que no coincidan gana la que nadie revisó.</text>
+  <text x="56" y="486" font-size="12" fill="#B4402F">El objeto protege sus datos: deja leer lo que se puede leer y cambiar solo lo que de verdad se puede cambiar.</text>
+  <text x="56" y="505" font-size="12" fill="#4A4A4A">Lo mismo con `Numero`: es la llave, la pone la base, y no cambia nunca.</text>
+</svg>

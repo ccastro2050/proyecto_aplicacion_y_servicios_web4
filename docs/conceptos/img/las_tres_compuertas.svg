@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 578" width="980" height="578" font-family="Segoe UI, system-ui, sans-serif">
+  <title>El método SDD: los nueve documentos y las tres compuertas</title>
+  <desc>La especificación se escribe antes del código y pasa por tres compuertas. Con una casilla en rojo no se programa.</desc>
+  <defs>
+    <marker id="s1" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#17495B"/>
+    </marker>
+  </defs>
+  <rect width="980" height="578" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">La especificación se escribe ANTES, y pasa por tres compuertas</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">Si el spec kit se escribe al final es un informe de lo que se hizo — y entonces no sirvió para decidir nada.</text>
+
+  <!-- los documentos -->
+  <rect x="36" y="96" width="908" height="112" rx="10" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="56" y="122" font-size="13" font-weight="600" fill="#17495B">Los documentos de CADA versión, en orden</text>
+
+  <rect x="56" y="136" width="128" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="120" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">2_spec</text>
+  <text x="120" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">QUÉ construir</text>
+
+  <rect x="196" y="136" width="128" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="260" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">3_plan</text>
+  <text x="260" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">CÓMO</text>
+
+  <rect x="336" y="136" width="128" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="400" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">4_research</text>
+  <text x="400" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">el porqué</text>
+
+  <rect x="476" y="136" width="128" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="540" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">5_data_model</text>
+  <text x="540" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">las tablas</text>
+
+  <rect x="616" y="136" width="128" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="680" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">6_contracts</text>
+  <text x="680" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">los endpoints</text>
+
+  <rect x="756" y="136" width="86" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="799" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">7_quick</text>
+  <text x="799" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">se prueba</text>
+
+  <rect x="854" y="136" width="70" height="52" rx="6" fill="#F4F2EC" stroke="#4A4A4A"/>
+  <text x="889" y="158" font-size="12" font-weight="600" text-anchor="middle" fill="#17495B">8_tasks</text>
+  <text x="889" y="176" font-size="10.5" text-anchor="middle" fill="#4A4A4A">el orden</text>
+
+  <!-- las tres compuertas -->
+  <rect x="36" y="238" width="286" height="150" rx="10" fill="#fff" stroke="#E39B2D" stroke-width="2.5"/>
+  <text x="56" y="266" font-size="14" font-weight="600" fill="#E39B2D">COMPUERTA 1</text>
+  <text x="56" y="288" font-size="12.5" font-weight="600" fill="#17495B">Ningún [NECESITA ACLARACIÓN]</text>
+  <text x="56" y="312" font-size="11.5" fill="#4A4A4A">Cada duda que quedó marcada en el</text>
+  <text x="56" y="330" font-size="11.5" fill="#4A4A4A">2_spec se resuelve PREGUNTANDO,</text>
+  <text x="56" y="348" font-size="11.5" fill="#4A4A4A">no adivinando. Una duda sin resolver</text>
+  <text x="56" y="366" font-size="11.5" fill="#4A4A4A">es una decisión que tomó el que programó.</text>
+
+  <rect x="347" y="238" width="286" height="150" rx="10" fill="#fff" stroke="#E39B2D" stroke-width="2.5"/>
+  <text x="367" y="266" font-size="14" font-weight="600" fill="#E39B2D">COMPUERTA 2</text>
+  <text x="367" y="288" font-size="12.5" font-weight="600" fill="#17495B">El chequeo de constitución</text>
+  <text x="367" y="312" font-size="11.5" fill="#4A4A4A">Lo que se va a construir no contradice</text>
+  <text x="367" y="330" font-size="11.5" fill="#4A4A4A">ninguna regla permanente: las capas,</text>
+  <text x="367" y="348" font-size="11.5" fill="#4A4A4A">el SQL a la vista, una ruta por recurso,</text>
+  <text x="367" y="366" font-size="11.5" fill="#4A4A4A">cero secretos en el código.</text>
+
+  <rect x="658" y="238" width="286" height="150" rx="10" fill="#fff" stroke="#E39B2D" stroke-width="2.5"/>
+  <text x="678" y="266" font-size="14" font-weight="600" fill="#E39B2D">COMPUERTA 3</text>
+  <text x="678" y="288" font-size="12.5" font-weight="600" fill="#17495B">El 9_checklist, firmado</text>
+  <text x="678" y="312" font-size="11.5" fill="#4A4A4A">Lo marca UNA PERSONA, no una IA:</text>
+  <text x="678" y="330" font-size="11.5" fill="#4A4A4A">quien firma responde por la versión.</text>
+  <text x="678" y="348" font-size="11.5" fill="#4A4A4A">Revisa la ESPECIFICACIÓN, no el código,</text>
+  <text x="678" y="366" font-size="11.5" fill="#4A4A4A">porque todavía no hay código.</text>
+
+  <line x1="326" y1="313" x2="343" y2="313" stroke="#17495B" stroke-width="2" marker-end="url(#s1)"/>
+  <line x1="637" y1="313" x2="654" y2="313" stroke="#17495B" stroke-width="2" marker-end="url(#s1)"/>
+
+  <!-- y despues -->
+  <rect x="36" y="412" width="440" height="60" rx="8" fill="#2F7D5C"/>
+  <text x="56" y="436" font-size="13" font-weight="600" fill="#fff">Las tres en verde → AHORA se programa</text>
+  <text x="56" y="458" font-size="11.5" fill="#F4F2EC">Y lo que se programa es lo que dice la spec, ni más ni menos.</text>
+
+  <rect x="504" y="412" width="440" height="60" rx="8" fill="#B4402F"/>
+  <text x="524" y="436" font-size="13" font-weight="600" fill="#fff">Una sola en rojo → NO se escribe código</text>
+  <text x="524" y="458" font-size="11.5" fill="#F4F2EC">Se vuelve al documento que la causó, se corrige, y se pasa otra vez.</text>
+
+  <!-- el prompt -->
+  <rect x="36" y="492" width="908" height="70" rx="8" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="56" y="514" font-size="12.5" font-weight="600" fill="#17495B">Y el eslabón del medio, que también se entrega</text>
+  <text x="56" y="532" font-size="12" fill="#4A4A4A">El spec kit dice QUÉ construir; el código es LO CONSTRUIDO; el prompt es CÓMO se pasó de uno al otro.</text>
+  <text x="56" y="550" font-size="12" fill="#4A4A4A">Entregar los dos extremos y no el medio es entregar un resultado sin su procedimiento.</text>
+</svg>

@@ -7,13 +7,24 @@
 #                                 └→ PostgreSQL (bdfacturas, :15462)
 #
 # Uso: docker compose up -d --build     (UN solo comando)
-#   La API habla con PostgreSQL por defecto; para cambiar de motor
-#   SIN tocar código:  $env:MOTOR_BD="sqlserver"
-#                      docker compose up -d api-facturas
+#
+#   LAS CUATRO VERSIONES DEL CURSO SON CONTRA SQL SERVER, y por eso es el
+#   motor por defecto. PostgreSQL esta aqui como el ADELANTO DE LA v5 —la
+#   version de otros motores, que esta DESPUES de las cuatro—.
+#
+#   Para cambiar de motor SIN TOCAR UNA LINEA DE CODIGO:
+#       $env:MOTOR_BD="postgres"
+#       docker compose up -d api-facturas
+#
+#   Y ese es justamente el criterio de exito de la v5: que al cambiarlo NO
+#   haya que cambiar nada mas, y que los endpoints respondan igual. Si
+#   respondieran distinto, la v5 estaria mal.
+#
 # Reset de las BD: docker compose down -v && docker compose up -d
 #
-# Este archivo CRECE por versiones: v5 sumará MariaDB,
-# v6 el front Blazor.
+# Este archivo ya trae las dos bases y la interfaz grafica. Lo que falta para
+# cerrar la v5 es el tercer motor (MariaDB): con dos se puede resolver con un
+# `if`; con tres, el `if` ya no se sostiene — y ahi nace la fabrica de verdad.
 # ==============================================================
 services:
 
@@ -102,10 +113,12 @@ services:
       # v4 — la cadena del SEGUNDO motor (host interno postgres:5432):
       ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=bdfacturas_postgres_local;Username=postgres;Password=Paradigmas123!"
       # v4 — EL INTERRUPTOR: a qué motor le habla la API. Lee la
-      # variable MOTOR_BD de su terminal; si no existe, postgres.
+      # variable MOTOR_BD de su terminal; si no existe, sqlserver —
+      #   que es el motor de LAS CUATRO VERSIONES DEL CURSO. El otro
+      #   (postgres) es el adelanto de la v5, y no se usa por defecto.
       # Cambiar de motor = recrear SOLO este contenedor (segundos):
       #   $env:MOTOR_BD="sqlserver"; docker compose up -d api-facturas
-      Motor: ${MOTOR_BD:-postgres}
+      Motor: ${MOTOR_BD:-sqlserver}
     depends_on:
       sqlserver-init:
         condition: service_completed_successfully

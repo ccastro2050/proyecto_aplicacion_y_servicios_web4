@@ -33,6 +33,8 @@ builder.Services.AddSingleton(new MenuApp
     Version = 4,
     Entradas =
     [
+        // v4 — el tablero va PRIMERO: es lo que se mira al entrar.
+        new() { Ruta = "tablero", Texto = "Tablero", Permiso = "interfaz.inicio" },
         new() { Ruta = "productos", Texto = "Productos", Permiso = "interfaz.productos" },
         new() { Ruta = "empresas", Texto = "Empresas", Permiso = "interfaz.empresas" },
         new() { Ruta = "personas", Texto = "Personas", Permiso = "interfaz.personas" },
@@ -146,6 +148,13 @@ builder.Services.AddHttpClient<ServicioRolUsuario>(cliente =>
 });
 
 builder.Services.AddHttpClient<ServicioRutaRol>(cliente =>
+{
+    cliente.BaseAddress = new Uri(urlApi);
+    cliente.Timeout = TimeSpan.FromSeconds(10);
+});
+
+// v4 — las diez consultas del tablero.
+builder.Services.AddHttpClient<ServicioConsultas>(cliente =>
 {
     cliente.BaseAddress = new Uri(urlApi);
     cliente.Timeout = TimeSpan.FromSeconds(10);

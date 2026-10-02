@@ -533,3 +533,58 @@ a.card:hover {
 a.card:hover .card-title {
     color: var(--bs-primary);
 }
+
+/* --------------------------------------------------------------------------
+   v4 — LAS BARRAS DEL TABLERO
+
+   Un grafico de barras, sin libreria: cada barra es un `div` con el `width` en
+   porcentaje. Se ve exactamente lo que el navegador va a pintar.
+
+   La regla del proyecto es «sin CDN», y traer una libreria de graficos desde
+   el repositorio serian 200 KB para dibujar rectangulos. Una libreria se
+   justifica cuando hace falta interaccion, ejes o series temporales — nada de
+   eso hay aqui.
+   -------------------------------------------------------------------------- */
+.barra-fila {
+    display: grid;
+    grid-template-columns: minmax(0, 9rem) 1fr auto;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .5rem;
+    font-size: .875rem;
+}
+
+.barra-nombre {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--bs-body-color);
+}
+
+.barra-pista {
+    height: 1.125rem;
+    background: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius-sm);
+    overflow: hidden;
+}
+
+.barra {
+    height: 100%;
+    background: var(--bs-primary);
+    border-radius: var(--bs-border-radius-sm);
+    transition: width .35s ease;
+}
+
+.barra-verde   { background: var(--bs-success); }
+.barra-naranja { background: var(--bs-warning); }
+.barra-morada  { background: #6f42c1; }
+
+.barra-valor {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+    .barra-fila { grid-template-columns: minmax(0, 6rem) 1fr auto; font-size: .8125rem; }
+}

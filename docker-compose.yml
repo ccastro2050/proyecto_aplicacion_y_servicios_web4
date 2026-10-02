@@ -144,6 +144,11 @@ services:
       # El codigo montado: `dotnet watch` recompila al guardar, sin reconstruir
       # la imagen.
       - ./front_blazor:/app
+      - /app/bin                 # bin y obj quedan DENTRO del contenedor (Linux),
+      - /app/obj                 #   sin mezclarse con los compilados de Windows.
+                                 #   Sin esto, dotnet watch llena el log de avisos
+                                 #   «ContentRoots path not fully qualified: C:/...»
+                                 #   que no significan nada y tapan los que si.
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: "http://0.0.0.0:8099"

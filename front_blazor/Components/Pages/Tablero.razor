@@ -1,0 +1,453 @@
+@page "/tablero"
+@inject ServicioConsultas Servicio
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+
+@*
+   ============================================================
+   EL TABLERO — las diez consultas multitabla de la v4, dibujadas.
+
+   LOS GRAFICOS VAN SIN LIBRERIA Y SIN CDN, y conviene decir por que antes de
+   que parezca pereza:
+
+     1. La regla del proyecto es «sin CDN», y su razon esta escrita: un front
+        que necesita internet para verse bien no arranca en un salon sin red.
+
+     2. UNA BARRA ES GEOMETRIA. Un `div` con un `width` en porcentaje ES un
+        grafico de barras. Una libreria se justifica cuando hace falta
+        interaccion, ejes, escalas logaritmicas o series temporales — nada de
+        eso hay aqui.
+
+     3. Se ve EXACTAMENTE lo que el navegador va a pintar. Con una libreria uno
+        lee una configuracion y tiene que imaginarse el resultado.
+
+   Si el equipo quiere Chart.js, el sitio es `wwwroot/lib/`, servido desde el
+   repositorio — nunca un CDN.
+
+   Y LAS DIEZ SE PIDEN A LA VEZ, con Task.WhenAll: en fila serian diez viajes
+   encadenados, y con la API apagada, diez timeouts de 10 segundos cada uno.
+   ============================================================
+*@
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 pb-2 mb-4 border-bottom">
+    <div>
+        <h1 class="mb-1">Tablero</h1>
+        <p class="text-body-secondary mb-0">
+            Diez consultas que cruzan <strong>cuatro o más tablas</strong> cada una.
+            Ninguna la puede responder el CRUD de una sola.
+        </p>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" disabled="@cargando" @onclick="Cargar">
+        @(cargando ? "Actualizando…" : "Actualizar")
+    </button>
+</div>
+
+@if (aviso is not null)
+{
+    <div class="alert alert-danger" role="alert">@aviso</div>
+}
+
+@if (cargando)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando…</span>
+        </div>
+        <p class="text-body-secondary mt-3 mb-0">Pidiendo las diez consultas…</p>
+    </div>
+}
+else
+{
+    @* --- LOS NUMEROS DE ARRIBA: lo que se mira primero --- *@
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 bg-body-tertiary">
+                <div class="card-body">
+                    <div class="small text-body-secondary">Facturado</div>
+                    <div class="fs-4 fw-semibold">@Moneda(ventasProducto.Sum(v => v.Ingreso))</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 bg-body-tertiary">
+                <div class="card-body">
+                    <div class="small text-body-secondary">Unidades vendidas</div>
+                    <div class="fs-4 fw-semibold">@ventasProducto.Sum(v => v.Unidades)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 bg-body-tertiary">
+                <div class="card-body">
+                    <div class="small text-body-secondary">Clientes con compras</div>
+                    <div class="fs-4 fw-semibold">@ventasCliente.Count</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 @(anulaciones.Count > 0 ? "bg-danger-subtle" : "bg-body-tertiary")">
+                <div class="card-body">
+                    <div class="small text-body-secondary">Anulado</div>
+                    <div class="fs-4 fw-semibold">@Moneda(anulaciones.Sum(a => a.ValorAnulado))</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        @* --- 1. VENTAS POR PRODUCTO --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Ventas por producto</h2>
+                    <p class="small text-body-secondary">
+                        <code>producto · productosporfactura · factura · cliente</code>
+                    </p>
+                    @if (ventasProducto.Count == 0)
+                    {
+                        <div class="vacio">Todavía no hay ventas.</div>
+                    }
+                    else
+                    {
+                        var tope = ventasProducto.Max(v => v.Ingreso);
+                        @foreach (var v in ventasProducto)
+                        {
+                            <div class="barra-fila">
+                                <div class="barra-nombre" title="@v.Nombre">@v.Nombre</div>
+                                <div class="barra-pista">
+                                    @* El grafico: un div con el ancho en porcentaje. Eso es todo. *@
+                                    <div class="barra" style="width:@Porcentaje(v.Ingreso, tope)%"></div>
+                                </div>
+                                <div class="barra-valor">@Moneda(v.Ingreso)</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* --- 2. VENTAS POR CLIENTE --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Ventas por cliente</h2>
+                    <p class="small text-body-secondary">
+                        <code>persona · cliente · factura · productosporfactura</code>
+                    </p>
+                    @if (ventasCliente.Count == 0)
+                    {
+                        <div class="vacio">Todavía no hay compras.</div>
+                    }
+                    else
+                    {
+                        var tope = ventasCliente.Max(v => v.Comprado);
+                        @foreach (var v in ventasCliente)
+                        {
+                            <div class="barra-fila">
+                                <div class="barra-nombre" title="@v.Email">@v.Cliente</div>
+                                <div class="barra-pista">
+                                    <div class="barra barra-verde" style="width:@Porcentaje(v.Comprado, tope)%"></div>
+                                </div>
+                                <div class="barra-valor">@Moneda(v.Comprado)</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* --- 3. VENTAS POR VENDEDOR --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Ventas por vendedor</h2>
+                    <p class="small text-body-secondary">
+                        <code>persona · vendedor · factura · productosporfactura</code>
+                    </p>
+                    @if (ventasVendedor.Count == 0)
+                    {
+                        <div class="vacio">Todavía no hay ventas.</div>
+                    }
+                    else
+                    {
+                        var tope = ventasVendedor.Max(v => v.Vendido);
+                        @foreach (var v in ventasVendedor)
+                        {
+                            <div class="barra-fila">
+                                <div class="barra-nombre" title="carnet @v.Carnet">@v.Vendedor</div>
+                                <div class="barra-pista">
+                                    <div class="barra barra-naranja" style="width:@Porcentaje(v.Vendido, tope)%"></div>
+                                </div>
+                                <div class="barra-valor">@Moneda(v.Vendido)</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* --- 4. VENTAS POR EMPRESA --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Ventas por empresa</h2>
+                    <p class="small text-body-secondary">
+                        <code>empresa · cliente · factura · productosporfactura</code>
+                    </p>
+                    @if (ventasEmpresa.Count == 0)
+                    {
+                        <div class="vacio">Todavía no hay ventas a empresas.</div>
+                    }
+                    else
+                    {
+                        var tope = ventasEmpresa.Max(v => v.Facturado);
+                        @foreach (var v in ventasEmpresa)
+                        {
+                            <div class="barra-fila">
+                                <div class="barra-nombre" title="@v.Codigo">@v.Empresa</div>
+                                <div class="barra-pista">
+                                    <div class="barra barra-morada" style="width:@Porcentaje(v.Facturado, tope)%"></div>
+                                </div>
+                                <div class="barra-valor">@Moneda(v.Facturado)</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* --- 5. TICKET PROMEDIO --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Ticket promedio por vendedor</h2>
+                    <p class="small text-body-secondary">
+                        Cuánto vale una factura suya, en promedio.
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th>Vendedor</th><th class="text-end">Facturas</th><th class="text-end">Total</th><th class="text-end">Promedio</th></tr></thead>
+                            <tbody>
+                                @foreach (var t in ticket)
+                                {
+                                    <tr>
+                                        <td>@t.Vendedor</td>
+                                        <td class="text-end">@t.Facturas</td>
+                                        <td class="text-end">@Moneda(t.Total)</td>
+                                        <td class="text-end fw-semibold">@Moneda(t.TicketPromedio)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- 10. CREDITO CONTRA CONSUMO --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Crédito contra consumo</h2>
+                    <p class="small text-body-secondary">
+                        <code>persona · empresa · cliente · factura</code>
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th>Cliente</th><th class="text-end">Crédito</th><th class="text-end">Consumido</th><th class="text-end">Disponible</th></tr></thead>
+                            <tbody>
+                                @foreach (var c in credito)
+                                {
+                                    <tr>
+                                        <td>@c.Cliente<br /><span class="small text-body-secondary">@c.Empresa</span></td>
+                                        <td class="text-end">@Moneda(c.Credito)</td>
+                                        <td class="text-end">@Moneda(c.Consumido)</td>
+                                        @* Rojo cuando ya se paso del credito: el dato se VE, no hay
+                                           que leerlo fila por fila. *@
+                                        <td class="text-end fw-semibold @(c.Disponible < 0 ? "text-danger" : "text-success")">
+                                            @Moneda(c.Disponible)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- 8. ALCANCE DE USUARIOS --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">
+                        Hasta dónde llega cada usuario
+                        <span class="badge text-bg-secondary ms-1">5 tablas</span>
+                    </h2>
+                    <p class="small text-body-secondary">
+                        <code>usuario · rol_usuario · rol · rutarol · ruta</code>
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th>Correo</th><th class="text-end">Roles</th><th class="text-end">Interfaces</th></tr></thead>
+                            <tbody>
+                                @foreach (var a in alcance)
+                                {
+                                    <tr>
+                                        <td>@a.Email<br /><span class="small text-body-secondary">@a.SusRoles</span></td>
+                                        <td class="text-end">@a.Roles</td>
+                                        <td class="text-end fw-semibold">@a.Interfaces</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- LAS TRES DE AUDITORIA, que suelen venir vacias --- *@
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Lo que habría que revisar</h2>
+                    <p class="small text-body-secondary">
+                        Tres consultas de auditoría. <strong>Que vengan vacías es la
+                        respuesta</strong>, no un error: quiere decir que no hay nada
+                        que revisar.
+                    </p>
+
+                    <h3 class="small fw-semibold mt-3 mb-1">Productos que nunca se han vendido</h3>
+                    @if (sinVender.Count == 0)
+                    {
+                        <p class="small text-success mb-0">Ninguno: todo el catálogo se ha vendido alguna vez.</p>
+                    }
+                    else
+                    {
+                        <ul class="small mb-0">
+                            @foreach (var p in sinVender)
+                            {
+                                <li>@p.Nombre <span class="text-body-secondary">— @p.Stock en stock, @Moneda(p.Valorunitario)</span></li>
+                            }
+                        </ul>
+                    }
+
+                    <h3 class="small fw-semibold mt-3 mb-1">Facturas anuladas</h3>
+                    @if (anulaciones.Count == 0)
+                    {
+                        <p class="small text-success mb-0">Ninguna.</p>
+                    }
+                    else
+                    {
+                        <ul class="small mb-0">
+                            @foreach (var a in anulaciones)
+                            {
+                                <li>@a.Cliente <span class="text-body-secondary">— @a.Anuladas por @Moneda(a.ValorAnulado)</span></li>
+                            }
+                        </ul>
+                    }
+
+                    <h3 class="small fw-semibold mt-3 mb-1">Interfaces a las que no llega nadie</h3>
+                    @if (sinUsuarios.Count == 0)
+                    {
+                        <p class="small text-success mb-0">Ninguna: todas tienen al menos un usuario.</p>
+                    }
+                    else
+                    {
+                        <ul class="small mb-0">
+                            @foreach (var i in sinUsuarios)
+                            {
+                                <li><code>@i.Ruta</code> <span class="text-body-secondary">— @i.Descripcion</span></li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="nota mt-4">
+        <strong>El tablero reacciona a lo que pasa en el sistema.</strong> Anule una
+        factura en <a href="facturas">Facturas</a> y vuelva aquí: «Anulado» deja de
+        estar en cero y las ventas del producto bajan. No es una pantalla de adorno
+        — es la misma base, preguntada de otra forma.
+    </p>
+}
+
+@code {
+    private List<VentaPorProducto> ventasProducto = [];
+    private List<VentaPorCliente> ventasCliente = [];
+    private List<VentaPorVendedor> ventasVendedor = [];
+    private List<VentaPorEmpresa> ventasEmpresa = [];
+    private List<TicketPorVendedor> ticket = [];
+    private List<ProductoSinVender> sinVender = [];
+    private List<AnulacionPorCliente> anulaciones = [];
+    private List<AlcanceDeUsuario> alcance = [];
+    private List<InterfazSinUsuarios> sinUsuarios = [];
+    private List<CreditoContraConsumo> credito = [];
+
+    private bool cargando = true;
+    private string? aviso;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        aviso = null;
+
+        // LAS DIEZ A LA VEZ. En fila serian diez viajes encadenados — y con la
+        // API apagada, diez timeouts de diez segundos cada uno: cien segundos
+        // antes de mostrar el aviso.
+        var t1 = Servicio.VentasPorProductoAsync();
+        var t2 = Servicio.VentasPorClienteAsync();
+        var t3 = Servicio.VentasPorVendedorAsync();
+        var t4 = Servicio.VentasPorEmpresaAsync();
+        var t5 = Servicio.TicketPorVendedorAsync();
+        var t6 = Servicio.ProductosSinVenderAsync();
+        var t7 = Servicio.AnulacionesPorClienteAsync();
+        var t8 = Servicio.AlcanceDeUsuariosAsync();
+        var t9 = Servicio.InterfacesSinUsuariosAsync();
+        var t10 = Servicio.CreditoContraConsumoAsync();
+
+        await Task.WhenAll(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10);
+
+        ventasProducto = t1.Result.Dato ?? [];
+        ventasCliente = t2.Result.Dato ?? [];
+        ventasVendedor = t3.Result.Dato ?? [];
+        ventasEmpresa = t4.Result.Dato ?? [];
+        ticket = t5.Result.Dato ?? [];
+        sinVender = t6.Result.Dato ?? [];
+        anulaciones = t7.Result.Dato ?? [];
+        alcance = t8.Result.Dato ?? [];
+        sinUsuarios = t9.Result.Dato ?? [];
+        credito = t10.Result.Dato ?? [];
+
+        // Si alguna fallo, se dice UNA vez. Diez avisos iguales no informan.
+        var falla = new[] { t1.Result.Mensaje, t2.Result.Mensaje, t3.Result.Mensaje,
+                            t4.Result.Mensaje, t5.Result.Mensaje, t6.Result.Mensaje,
+                            t7.Result.Mensaje, t8.Result.Mensaje, t9.Result.Mensaje,
+                            t10.Result.Mensaje }
+            .FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
+        if (falla is not null) { aviso = falla; }
+
+        cargando = false;
+    }
+
+    /// <summary>El ancho de la barra, de 0 a 100. Un minimo de 2 para que una
+    /// barra muy pequena siga siendo visible: una barra de ancho cero parece un
+    /// dato que falta, y no lo es.</summary>
+    private static int Porcentaje(decimal valor, decimal tope) =>
+        tope <= 0 ? 0 : Math.Max(2, (int)Math.Round(valor * 100 / tope));
+
+    private static string Moneda(decimal v) => v.ToString("N0");
+}

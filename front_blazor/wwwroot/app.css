@@ -1,0 +1,595 @@
+/* ==========================================================================
+   LOS ESTILOS DEL PROYECTO, ENCIMA DE BOOTSTRAP
+
+   Bootstrap se carga antes que este archivo (App.razor), y se sirve DESDE EL
+   REPOSITORIO —`wwwroot/lib/bootstrap/`—, no desde un CDN. La regla del
+   proyecto es «sin CDN» y su razón está escrita: un front que necesita
+   internet para verse bien no arranca en un salón sin red. Con el archivo
+   adentro, la razón se respeta entera.
+
+   POR QUÉ ESTE ARCHIVO EXISTE EN VEZ DE PONERLE CLASES DE BOOTSTRAP AL
+   MARCADO, que sería lo normal:
+
+     1. Las doce interfaces ya están hechas y verificadas. Tocar su marcado por
+        un cambio de aspecto es volver a verificarlas todas.
+
+     2. Sus clases son del DOMINIO y en castellano —`tarjeta`, `campos`,
+        `botones`, `vacio`, `acciones`— igual que el menú dice «Productos» y no
+        `/api/producto`. Cambiarlas por `card`, `row` y `btn-group` sería
+        perder eso.
+
+   Así que aquí se MAPEA cada clase del proyecto sobre el aspecto de Bootstrap,
+   usando SUS variables. Si mañana se cambia el tema de Bootstrap, esto lo
+   sigue solo.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   TIPOGRAFÍA Y TÍTULOS
+   Bootstrap ya trae su escala; aquí solo se ajusta el peso y el aire, que con
+   los tamaños por defecto quedaban demasiado sueltos para tablas de datos.
+   -------------------------------------------------------------------------- */
+h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    letter-spacing: -.01em;
+}
+
+h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--bs-emphasis-color);
+}
+
+/* --------------------------------------------------------------------------
+   LA TARJETA del formulario  ->  se ve como un `.card` de Bootstrap
+   -------------------------------------------------------------------------- */
+.tarjeta {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg);
+    padding: 1.25rem 1.25rem 1rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .055);
+}
+
+/* --------------------------------------------------------------------------
+   LOS CAMPOS  ->  se ven como `.form-label` + `.form-control`
+
+   La rejilla se adapta sola: en una pantalla ancha caben varios campos por
+   fila; en el teléfono, uno por fila. Sin media queries, con `auto-fit`.
+   -------------------------------------------------------------------------- */
+.campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+}
+
+.campos label {
+    display: flex;
+    flex-direction: column;
+    gap: .375rem;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--bs-body-color);
+}
+
+.campos input,
+.campos select {
+    display: block;
+    width: 100%;
+    padding: .4375rem .75rem;
+    font-size: .9375rem;
+    font-weight: 400;
+    font-family: inherit;
+    line-height: 1.5;
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.campos select {
+    /* La flechita del desplegable, la misma que usa Bootstrap. Va en el CSS y
+       no como imagen para no pedirle un archivo más al servidor. */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.25rem;
+    appearance: none;
+}
+
+.campos input:focus,
+.campos select:focus {
+    /* EL FOCO VA EN AZUL CORDILLERA, no en el azul de Bootstrap.
+       Dos razones: la hoja de marca ya definia un foco distinto —ambar— y
+       tener dos es tener ninguno; y el ambar da 2.09 de contraste cuando
+       WCAG pide 3.0 para un indicador de interfaz. El azul da 8.76. */
+    border-color: var(--azul-cordillera);
+    outline: 0;
+    box-shadow: 0 0 0 .25rem rgba(23, 73, 91, .25);
+}
+
+.campos input:disabled {
+    background-color: var(--bs-secondary-bg);
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   LOS BOTONES  ->  se ven como `.btn` de Bootstrap
+
+   `button` sin clase  = secundario con borde
+   `.primario`         = la acción principal
+   `.peligro`          = la destructiva
+   `.plano`            = cancelar, sin borde
+   -------------------------------------------------------------------------- */
+.botones {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+}
+
+button {
+    --color-fondo: transparent;
+    --color-borde: var(--bs-border-color);
+    --color-texto: var(--bs-body-color);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .375rem;
+    padding: .4375rem .875rem;
+    font-size: .9375rem;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 1.5;
+    color: var(--color-texto);
+    background-color: var(--color-fondo);
+    border: var(--bs-border-width) solid var(--color-borde);
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
+    transition: color .15s, background-color .15s, border-color .15s, box-shadow .15s;
+}
+
+button:hover {
+    --color-fondo: var(--bs-secondary-bg);
+}
+
+button:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+button:disabled {
+    opacity: .65;
+    cursor: default;
+}
+
+button.primario {
+    --color-fondo: var(--bs-primary);
+    --color-borde: var(--bs-primary);
+    --color-texto: #fff;
+}
+
+button.primario:hover {
+    /* El hover del primario sale de la marca, no del azul de Bootstrap. */
+    --color-fondo: var(--azul-cordillera-oscuro);
+    --color-borde: var(--azul-cordillera-oscuro);
+}
+
+button.peligro {
+    --color-borde: var(--bs-danger-border-subtle);
+    --color-texto: var(--bs-danger);
+}
+
+button.peligro:hover {
+    --color-fondo: var(--bs-danger);
+    --color-borde: var(--bs-danger);
+    --color-texto: #fff;
+}
+
+button.plano {
+    --color-borde: transparent;
+    --color-texto: var(--bs-secondary-color);
+}
+
+/* --------------------------------------------------------------------------
+   LOS AVISOS  ->  se ven como `.alert` de Bootstrap
+
+   Siempre EN PANTALLA, nunca en la consola: un error que solo está en la
+   consola no existe para quien usa el sistema.
+   -------------------------------------------------------------------------- */
+.aviso {
+    padding: .75rem 1rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--bs-border-radius);
+    font-size: .9375rem;
+}
+
+.aviso-error {
+    color: var(--bs-danger-text-emphasis);
+    background-color: var(--bs-danger-bg-subtle);
+    border-color: var(--bs-danger-border-subtle);
+}
+
+.aviso-bien {
+    color: var(--bs-success-text-emphasis);
+    background-color: var(--bs-success-bg-subtle);
+    border-color: var(--bs-success-border-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   LA TABLA  ->  se ve como `.table .table-hover`
+   -------------------------------------------------------------------------- */
+table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+    font-size: .9375rem;
+    vertical-align: middle;
+}
+
+th,
+td {
+    padding: .625rem .75rem;
+    text-align: left;
+    border-bottom: var(--bs-border-width) solid var(--bs-border-color);
+    vertical-align: middle;
+}
+
+thead th {
+    background-color: var(--bs-tertiary-bg);
+    border-bottom-width: 2px;
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--bs-secondary-color);
+    white-space: nowrap;
+}
+
+tbody tr:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+td.acciones {
+    display: flex;
+    gap: .375rem;
+    justify-content: flex-end;
+}
+
+td.acciones button {
+    padding: .25rem .625rem;
+    font-size: .8125rem;
+}
+
+/* --------------------------------------------------------------------------
+   VACÍO NO ES ERROR, y por eso no se ve como uno: es un recuadro que lo dice.
+   -------------------------------------------------------------------------- */
+.vacio {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: var(--bs-secondary-color);
+    background-color: var(--bs-tertiary-bg);
+    border: var(--bs-border-width) dashed var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg);
+}
+
+/* --------------------------------------------------------------------------
+   NOTAS Y PISTAS: explican ANTES de que la persona se estrelle
+   -------------------------------------------------------------------------- */
+.nota {
+    margin-top: 1rem;
+    padding: .75rem 1rem;
+    font-size: .875rem;
+    color: var(--bs-secondary-color);
+    background-color: var(--bs-tertiary-bg);
+    border-left: 3px solid var(--bs-primary);
+    border-radius: 0 var(--bs-border-radius) var(--bs-border-radius) 0;
+}
+
+.nota code {
+    color: var(--bs-code-color);
+}
+
+.pista {
+    font-size: .8125rem;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+}
+
+hr {
+    margin: 1.5rem 0;
+    border: 0;
+    border-top: var(--bs-border-width) solid var(--bs-border-color);
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   LA FACTURA EMITIDA: encabezado + su detalle anidado (v2)
+   -------------------------------------------------------------------------- */
+.factura {
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    background: var(--bs-body-bg);
+}
+
+.factura-cabeza {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.factura-datos {
+    font-size: .875rem;
+    color: var(--bs-secondary-color);
+}
+
+.detalle {
+    margin-top: .75rem;
+    font-size: .875rem;
+}
+
+.detalle thead th {
+    background-color: var(--bs-secondary-bg);
+}
+
+.detalle tfoot td {
+    background-color: var(--bs-tertiary-bg);
+    border-top: 2px solid var(--bs-border-color);
+    font-weight: 600;
+}
+
+/* El estado se VE, no hay que leerlo: una factura anulada tiene que notarse de
+   un golpe de vista. */
+.estado {
+    display: inline-block;
+    margin-left: .5rem;
+    padding: .25em .6em;
+    border-radius: 50rem;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.estado-activa {
+    color: var(--bs-success-text-emphasis);
+    background-color: var(--bs-success-bg-subtle);
+}
+
+.estado-anulada {
+    color: var(--bs-danger-text-emphasis);
+    background-color: var(--bs-danger-bg-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   LAS CASILLAS de los roles (v2)
+   -------------------------------------------------------------------------- */
+.casillas {
+    margin-top: 1rem;
+    padding: .875rem 1rem;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    background: var(--bs-body-bg);
+}
+
+.casillas legend {
+    float: none;
+    width: auto;
+    padding: 0 .375rem;
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.casilla {
+    display: inline-flex;
+    align-items: center;
+    gap: .4375rem;
+    margin-right: 1.25rem;
+    font-size: .9375rem;
+    cursor: pointer;
+}
+
+.casilla input {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    accent-color: var(--bs-primary);
+}
+
+/* Una etiqueta por rol: se cuentan de un vistazo */
+.etiqueta {
+    display: inline-block;
+    margin-right: .25rem;
+    padding: .3em .65em;
+    background-color: var(--bs-secondary-bg);
+    border-radius: 50rem;
+    font-size: .75rem;
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+}
+
+/* --------------------------------------------------------------------------
+   LA PARED de «identifíquese primero» (v3)
+   -------------------------------------------------------------------------- */
+.sin-sesion {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    background-color: var(--bs-tertiary-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg);
+}
+
+/* --------------------------------------------------------------------------
+   EL CARTEL DE RECONEXIÓN DE BLAZOR
+
+   Cuando el servidor se reinicia —al guardar un archivo, por ejemplo— el
+   «circuito» de Blazor Server se cae y aparece un cartel. Por defecto sale
+   EN INGLÉS y sin estilo: «Rejoin failed... trying again in 5 seconds».
+
+   Eso es lo que ve cualquiera cuando se cae la conexión, así que aquí se le
+   pone estilo y se traduce —el texto va en App.razor, con los ids que Blazor
+   busca—. No es cosmética: un cartel en inglés que nadie entiende hace que la
+   persona cierre la pestaña.
+   -------------------------------------------------------------------------- */
+#components-reconnect-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1055;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .35);
+}
+
+#components-reconnect-modal > div {
+    max-width: 26rem;
+    margin: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    background: var(--bs-body-bg);
+    border-radius: var(--bs-border-radius-lg);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175);
+}
+
+/* Blazor le pone al <body> una de estas clases según el estado, y el CSS
+   decide qué mensaje se ve. El marcado está en App.razor. */
+#components-reconnect-modal .reconectando,
+#components-reconnect-modal .fallo,
+#components-reconnect-modal .rechazado {
+    display: none;
+}
+
+.components-reconnect-show #components-reconnect-modal,
+.components-reconnect-failed #components-reconnect-modal,
+.components-reconnect-rejected #components-reconnect-modal {
+    display: flex;
+}
+
+.components-reconnect-show #components-reconnect-modal .reconectando,
+.components-reconnect-failed #components-reconnect-modal .fallo,
+.components-reconnect-rejected #components-reconnect-modal .rechazado {
+    display: block;
+}
+
+/* --------------------------------------------------------------------------
+   EN EL TELÉFONO
+   -------------------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+    h1 { font-size: 1.5rem; }
+
+    table { font-size: .875rem; }
+
+    td.acciones {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .casilla {
+        display: flex;
+        margin-right: 0;
+        margin-bottom: .5rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   EL ANILLO DE FOCO DEL TÍTULO
+
+   `<FocusOnNavigate Selector="h1" />` enfoca el título al cambiar de página, y
+   eso está bien: es lo que le dice a un lector de pantalla que la navegación
+   ocurrió. Pero el navegador dibuja un recuadro alrededor del título, y en una
+   página normal parece que algo se rompió.
+
+   `:focus-visible` distingue el foco que el navegador considera que hay que
+   MOSTRAR —el de teclado— del que no. Un `.focus()` por código no lo activa,
+   así que esto quita el recuadro de la navegación y conserva el del tabulador.
+   -------------------------------------------------------------------------- */
+h1:focus:not(:focus-visible) {
+    outline: 0;
+}
+
+/* --------------------------------------------------------------------------
+   LAS TARJETAS QUE SON ENLACE (el Inicio)
+   -------------------------------------------------------------------------- */
+a.card {
+    color: inherit;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+a.card:hover {
+    border-color: var(--bs-primary);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .075);
+}
+
+a.card:hover .card-title {
+    color: var(--bs-primary);
+}
+
+/* --------------------------------------------------------------------------
+   v4 — LAS BARRAS DEL TABLERO
+
+   Un grafico de barras, sin libreria: cada barra es un `div` con el `width` en
+   porcentaje. Se ve exactamente lo que el navegador va a pintar.
+
+   La regla del proyecto es «sin CDN», y traer una libreria de graficos desde
+   el repositorio serian 200 KB para dibujar rectangulos. Una libreria se
+   justifica cuando hace falta interaccion, ejes o series temporales — nada de
+   eso hay aqui.
+   -------------------------------------------------------------------------- */
+.barra-fila {
+    display: grid;
+    grid-template-columns: minmax(0, 9rem) 1fr auto;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .5rem;
+    font-size: .875rem;
+}
+
+.barra-nombre {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--bs-body-color);
+}
+
+.barra-pista {
+    height: 1.125rem;
+    background: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius-sm);
+    overflow: hidden;
+}
+
+.barra {
+    height: 100%;
+    background: var(--bs-primary);
+    border-radius: var(--bs-border-radius-sm);
+    transition: width .35s ease;
+}
+
+.barra-verde   { background: var(--bs-success); }
+.barra-naranja { background: var(--bs-warning); }
+.barra-morada  { background: var(--azul-cordillera); }   /* era el morado de Bootstrap */
+
+.barra-valor {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+    .barra-fila { grid-template-columns: minmax(0, 6rem) 1fr auto; font-size: .8125rem; }
+}

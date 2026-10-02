@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 540" width="980" height="540" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Qué levanta docker compose up -d en este proyecto</title>
+  <desc>Cuatro contenedores en una red privada, dos puertos publicados al computador y un volumen donde viven los datos.</desc>
+  <defs>
+    <marker id="d1" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#17495B"/>
+    </marker>
+  </defs>
+  <rect width="980" height="540" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">Qué levanta `docker compose up -d`</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">Tres contenedores en una red privada, dos puertos publicados a su computador, y un volumen donde viven los datos.</text>
+
+  <!-- el computador -->
+  <rect x="36" y="94" width="908" height="320" rx="12" fill="#fff" stroke="#4A4A4A" stroke-width="2"/>
+  <text x="56" y="120" font-size="13" font-weight="600" fill="#4A4A4A">SU COMPUTADOR</text>
+
+  <!-- navegador -->
+  <rect x="56" y="138" width="150" height="70" rx="8" fill="#F4F2EC" stroke="#17495B" stroke-width="2"/>
+  <text x="131" y="164" font-size="13" font-weight="600" text-anchor="middle" fill="#17495B">Navegador</text>
+  <text x="131" y="186" font-size="11" text-anchor="middle" fill="#4A4A4A">localhost</text>
+
+  <!-- la red privada -->
+  <rect x="246" y="138" width="520" height="196" rx="10" fill="#F4F2EC" stroke="#17495B" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="266" y="162" font-size="12" font-weight="600" fill="#17495B">RED PRIVADA del compose · aquí se hablan POR NOMBRE</text>
+
+  <rect x="266" y="176" width="150" height="66" rx="8" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="341" y="200" font-size="12.5" font-weight="600" text-anchor="middle" fill="#2F7D5C">front-blazor</text>
+  <text x="341" y="220" font-size="11" text-anchor="middle" fill="#4A4A4A">:8099</text>
+  <text x="341" y="235" font-size="10.5" text-anchor="middle" fill="#4A4A4A">la interfaz</text>
+
+  <rect x="446" y="176" width="150" height="66" rx="8" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="521" y="200" font-size="12.5" font-weight="600" text-anchor="middle" fill="#2F7D5C">api-facturas</text>
+  <text x="521" y="220" font-size="11" text-anchor="middle" fill="#4A4A4A">:8035</text>
+  <text x="521" y="235" font-size="10.5" text-anchor="middle" fill="#4A4A4A">la API</text>
+
+  <rect x="626" y="176" width="140" height="66" rx="8" fill="#17495B"/>
+  <text x="696" y="200" font-size="12.5" font-weight="600" text-anchor="middle" fill="#fff">sqlserver</text>
+  <text x="696" y="220" font-size="11" text-anchor="middle" fill="#F4F2EC">:1433</text>
+  <text x="696" y="235" font-size="10.5" text-anchor="middle" fill="#F4F2EC">la base</text>
+
+  <line x1="420" y1="209" x2="442" y2="209" stroke="#17495B" stroke-width="2" marker-end="url(#d1)"/>
+  <line x1="600" y1="209" x2="622" y2="209" stroke="#17495B" stroke-width="2" marker-end="url(#d1)"/>
+
+  <text x="266" y="270" font-size="11" fill="#4A4A4A">Dentro de la red el front llama a <tspan font-family="Consolas, monospace" fill="#17495B">http://api-facturas:8035</tspan></text>
+  <text x="266" y="286" font-size="11" fill="#4A4A4A">— el NOMBRE DEL SERVICIO, no localhost.</text>
+  <text x="266" y="306" font-size="11" fill="#B4402F">Si pusiera `localhost`, se buscaría a sí mismo y no hallaría nada.</text>
+  <text x="266" y="324" font-size="11" fill="#4A4A4A">La base no necesita publicar puerto: por dentro se llega por el nombre.</text>
+
+  <!-- los puertos publicados -->
+  <line x1="210" y1="173" x2="262" y2="196" stroke="#E39B2D" stroke-width="2.5" marker-end="url(#d1)"/>
+  <text x="60" y="226" font-size="11" font-weight="600" fill="#E39B2D">puertos publicados</text>
+  <text x="60" y="242" font-size="10.5" fill="#4A4A4A">8099 y 8035 salen a localhost</text>
+
+  <!-- el volumen -->
+  <rect x="810" y="176" width="114" height="66" rx="8" fill="#fff" stroke="#E39B2D" stroke-width="2.5"/>
+  <text x="867" y="200" font-size="12" font-weight="600" text-anchor="middle" fill="#E39B2D">volumen</text>
+  <text x="867" y="219" font-size="10.5" text-anchor="middle" fill="#4A4A4A">mssqldata</text>
+  <text x="867" y="234" font-size="10.5" text-anchor="middle" fill="#4A4A4A">los datos</text>
+  <line x1="770" y1="209" x2="806" y2="209" stroke="#E39B2D" stroke-width="2" marker-end="url(#d1)"/>
+
+  <text x="792" y="262" font-size="11" fill="#4A4A4A">Vive FUERA</text>
+  <text x="792" y="278" font-size="11" fill="#4A4A4A">del contenedor:</text>
+  <text x="792" y="294" font-size="11" fill="#4A4A4A">por eso `down`</text>
+  <text x="792" y="310" font-size="11" fill="#4A4A4A">no borra nada.</text>
+
+  <text x="56" y="360" font-size="12" fill="#4A4A4A">Un comando levanta los tres, en el orden correcto y con la base ya sembrada. Eso reemplaza a «instale esto,</text>
+  <text x="56" y="379" font-size="12" fill="#4A4A4A">después aquello, y configure lo otro». Y el mismo comando en otro computador da exactamente lo mismo.</text>
+  
+
+  <!-- down contra down -v -->
+  <rect x="36" y="434" width="446" height="76" rx="8" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="56" y="458" font-size="13" font-weight="600" fill="#2F7D5C">docker compose down</text>
+  <text x="56" y="480" font-size="11.5" fill="#4A4A4A">Apaga y borra los contenedores.</text>
+  <text x="56" y="499" font-size="11.5" fill="#4A4A4A">El VOLUMEN se queda: los datos siguen ahí.</text>
+
+  <rect x="498" y="434" width="446" height="76" rx="8" fill="#fff" stroke="#B4402F" stroke-width="2"/>
+  <text x="518" y="458" font-size="13" font-weight="600" fill="#B4402F">docker compose down -v</text>
+  <text x="518" y="480" font-size="11.5" fill="#4A4A4A">Lo mismo Y BORRA EL VOLUMEN.</text>
+  <text x="518" y="499" font-size="11.5" fill="#B4402F">Los datos se pierden. No hay deshacer.</text>
+</svg>

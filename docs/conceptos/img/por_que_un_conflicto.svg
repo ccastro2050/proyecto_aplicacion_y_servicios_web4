@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 556" width="980" height="556" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Por que ocurre un conflicto, y por que un archivo por persona lo evita</title>
+  <desc>Un conflicto ocurre cuando dos ramas cambian las mismas lineas del mismo archivo. Repartir el trabajo por archivos hace que Git una las ramas solo: el conflicto no se resuelve mejor, no se produce.</desc>
+  <rect width="980" height="556" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">Un conflicto no es un error: es Git diciendo «decida usted»</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">Ocurre cuando dos ramas cambian LAS MISMAS LINEAS del mismo archivo. Git sabe unir; no sabe decidir.</text>
+
+  <!-- ===== IZQUIERDA: el conflicto ===== -->
+  <rect x="36" y="94" width="444" height="276" rx="10" fill="#fff" stroke="#B4402F" stroke-width="2.5"/>
+  <text x="56" y="122" font-size="15" font-weight="600" fill="#B4402F">LOS DOS TOCAN EL MISMO ARCHIVO</text>
+
+  <rect x="56" y="140" width="190" height="78" rx="6" fill="#F4F2EC" stroke="#17495B" stroke-width="1.5"/>
+  <text x="151" y="162" font-size="11.5" font-weight="600" text-anchor="middle" fill="#17495B">rama-carlos</text>
+  <text x="70" y="184" font-size="11" fill="#4A4A4A">2_spec.md, el alcance:</text>
+  <text x="70" y="204" font-size="11.5" font-weight="600" fill="#2F7D5C">motor: MariaDB</text>
+
+  <rect x="270" y="140" width="190" height="78" rx="6" fill="#F4F2EC" stroke="#17495B" stroke-width="1.5"/>
+  <text x="365" y="162" font-size="11.5" font-weight="600" text-anchor="middle" fill="#17495B">rama-paco</text>
+  <text x="284" y="184" font-size="11" fill="#4A4A4A">2_spec.md, el alcance:</text>
+  <text x="284" y="204" font-size="11.5" font-weight="600" fill="#B4402F">motor: PostgreSQL</text>
+
+  <text x="258" y="244" font-size="26" font-weight="600" text-anchor="middle" fill="#B4402F">CONFLICTO</text>
+
+  <rect x="56" y="258" width="404" height="96" rx="6" fill="#F4F2EC" stroke="#B4402F" stroke-width="1.5"/>
+  <text x="70" y="280" font-size="11.5" font-family="Consolas, monospace" fill="#B4402F">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</text>
+  <text x="70" y="298" font-size="11.5" font-family="Consolas, monospace" fill="#4A4A4A">    motor: MariaDB</text>
+  <text x="70" y="316" font-size="11.5" font-family="Consolas, monospace" fill="#B4402F">=======</text>
+  <text x="70" y="334" font-size="11.5" font-family="Consolas, monospace" fill="#4A4A4A">    motor: PostgreSQL</text>
+  <text x="70" y="350" font-size="11.5" font-family="Consolas, monospace" fill="#B4402F">&gt;&gt;&gt;&gt;&gt;&gt;&gt; rama-paco</text>
+
+  <!-- ===== DERECHA: la prevencion ===== -->
+  <rect x="500" y="94" width="444" height="276" rx="10" fill="#fff" stroke="#2F7D5C" stroke-width="2.5"/>
+  <text x="520" y="122" font-size="15" font-weight="600" fill="#2F7D5C">CADA UNO TIENE SU ARCHIVO</text>
+
+  <rect x="520" y="142" width="404" height="46" rx="6" fill="#F4F2EC" stroke="#2F7D5C" stroke-width="1.5"/>
+  <text x="536" y="162" font-size="11.5" font-weight="600" fill="#17495B">rama-carlos</text>
+  <text x="536" y="180" font-size="11" fill="#4A4A4A">solo toca  2_spec.md</text>
+
+  <rect x="520" y="196" width="404" height="46" rx="6" fill="#F4F2EC" stroke="#2F7D5C" stroke-width="1.5"/>
+  <text x="536" y="216" font-size="11.5" font-weight="600" fill="#17495B">rama-paco</text>
+  <text x="536" y="234" font-size="11" fill="#4A4A4A">solo toca  5_data_model.md</text>
+
+  <rect x="520" y="250" width="404" height="46" rx="6" fill="#F4F2EC" stroke="#2F7D5C" stroke-width="1.5"/>
+  <text x="536" y="270" font-size="11.5" font-weight="600" fill="#17495B">rama-luis</text>
+  <text x="536" y="288" font-size="11" fill="#4A4A4A">solo toca  6_contracts.md</text>
+
+  <text x="722" y="332" font-size="22" font-weight="600" text-anchor="middle" fill="#2F7D5C">Git une las tres SOLO</text>
+  <text x="722" y="356" font-size="12.5" text-anchor="middle" fill="#4A4A4A">No es que el conflicto se resuelva mejor: NO SE PRODUCE.</text>
+
+  <!-- ===== LOS DATOS ===== -->
+  <rect x="36" y="388" width="908" height="72" rx="8" fill="#fff" stroke="#17495B" stroke-width="2"/>
+  <text x="56" y="411" font-size="13" font-weight="600" fill="#17495B">Y no son raros — 143 proyectos estudiados (Brindescu et al., 2020):</text>
+  <text x="56" y="432" font-size="12.5" fill="#4A4A4A">casi 1 de cada 5 fusiones produce conflicto  ·  el codigo con conflicto trae el DOBLE de errores</text>
+  <text x="56" y="450" font-size="12.5" fill="#4A4A4A">y 26 VECES mas si hubo que resolverlo a mano</text>
+
+  <!-- ===== CIERRE ===== -->
+  <rect x="36" y="474" width="908" height="62" rx="8" fill="#17495B"/>
+  <text x="60" y="500" font-size="14.5" font-weight="600" fill="#fff">Ese «26 veces» es la cifra que hay que recordar.</text>
+  <text x="60" y="524" font-size="13" fill="#E39B2D">Por eso la estrategia no es aprender a resolverlos rapido: es repartir el trabajo para que no ocurran.</text>
+</svg>

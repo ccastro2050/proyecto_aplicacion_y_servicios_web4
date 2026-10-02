@@ -56,7 +56,7 @@ código es su implementación.
 
 La era de la IA lo volvió urgente: una IA puede escribir el código, pero
 solo escribe EL CORRECTO si alguien le da una especificación precisa. En
-este curso usted lo vive: la [GUIA_IA.md de la versión en curso](spec_kit/versiones/v2_persona_factura/GUIA_IA2.md) construye la versión
+este curso usted lo vive: la [GUIA_IA.md de la versión en curso](spec_kit/versiones/v2_con_fk/GUIA_IA2.md) construye la versión
 entregándole a una IA el spec kit — y nada más.
 
 ## 2. El spec kit de este proyecto (8 documentos y una lista de chequeo)
@@ -79,7 +79,7 @@ código (§2.2), y por eso no se le entrega a la IA junto con los demás.
 - **La constitución es una y permanente**; los documentos 2 a 8 se escriben
   POR VERSIÓN, en `versiones/vN_nombre/`.
 - **La versión en curso:**
-  [spec_kit/versiones/v1_producto_sqlserver/](spec_kit/versiones/v1_producto_sqlserver/2_spec.md)
+  [spec_kit/versiones/v1_sin_fk/](spec_kit/versiones/v1_sin_fk/2_spec.md)
   — la spec de la v1 ES el documento que se le entrega a la IA (o al
   estudiante) para construirla.
 
@@ -439,7 +439,7 @@ su nombre.
 Tres reglas de nombre que no se rompen:
 
 1. La carpeta de la versión es `vN_tema`, en minúsculas y con guion bajo
-   (`v1_producto_sqlserver`). El tema dice qué agrega la versión.
+   (`v1_sin_fk`). El tema dice qué agrega la versión.
 2. **El número de un documento nunca cambia entre versiones:** el
    `6_contracts.md` de la v3 se llama igual que el de la v1. Se compara de
    una versión a otra sin buscar equivalencias.
@@ -607,7 +607,7 @@ clarify NO crea un archivo: escribe dentro de 2_spec.md
 ```
 
 **A mano, en este curso:** eso es exactamente la
-[la sección de Clarificaciones de 2_spec.md](spec_kit/versiones/v1_producto_sqlserver/2_spec.md),
+[la sección de Clarificaciones de 2_spec.md](spec_kit/versiones/v1_sin_fk/2_spec.md),
 y el marcador `[NECESITA ACLARACIÓN: …]` (§2.3) hace las veces de
 pregunta. La diferencia no es el resultado, es **quién detecta la
 ambigüedad**: allá la busca el agente; aquí la busca usted — que es
@@ -660,9 +660,9 @@ Estado: NO convergido. Vuelva a implement y corra converge otra vez.
 ```
 
 **A mano, en este curso:** es la última fase de
-[8_tasks.md](spec_kit/versiones/v1_producto_sqlserver/8_tasks.md) —el
+[8_tasks.md](spec_kit/versiones/v1_sin_fk/8_tasks.md) —el
 cierre— corriendo el smoke test del
-[7_quickstart.md](spec_kit/versiones/v1_producto_sqlserver/7_quickstart.md).
+[7_quickstart.md](spec_kit/versiones/v1_sin_fk/7_quickstart.md).
 Si un criterio no pasa, la versión **no se cierra ni se le pone el tag**:
 se agregan tareas y se sigue. La regla del curso —"no se avanza con una
 fase en rojo"— y `converge` dicen exactamente lo mismo.
@@ -758,4 +758,4 @@ Cuatro razones, en orden de peso:
 3. Especificación por el ejemplo: Adzic, G. — *Specification by Example*
    (Manning, 2011).
 4. En este repositorio: el [spec kit completo](spec_kit/1_constitution.md)
-   y la [GUIA_IA.md de la versión en curso](spec_kit/versiones/v2_persona_factura/GUIA_IA2.md) que lo pone a prueba.
+   y la [GUIA_IA.md de la versión en curso](spec_kit/versiones/v2_con_fk/GUIA_IA2.md) que lo pone a prueba.

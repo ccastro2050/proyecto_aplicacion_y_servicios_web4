@@ -91,4 +91,4 @@ DELETE FROM persona WHERE codigo = 'P001';
 3. Kleppmann, M. — *Designing Data-Intensive Applications* (O'Reilly,
    2017), cap. 7: la mejor discusión moderna de ACID.
 4. En este repositorio: las tablas, FK y triggers de bdfacturas en el
-   [modelo de datos de la v1](spec_kit/versiones/v1_producto_sqlserver/5_data_model.md).
+   [modelo de datos de la v1](spec_kit/versiones/v1_sin_fk/5_data_model.md).

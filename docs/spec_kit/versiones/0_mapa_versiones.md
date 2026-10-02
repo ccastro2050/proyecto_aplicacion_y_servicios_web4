@@ -80,7 +80,7 @@ Las 12 tablas de `bdfacturas`, repartidas:
 | **v1** | `producto` · `empresa` · `persona` · `rol` · `ruta` · `usuario` | **Las SEIS sin clave foránea.** Se pueden llenar sin que exista nada más |
 | **v2** | `cliente` · `vendedor` · `factura` · `productosporfactura` · `rol_usuario` · `rutarol` · `usuario_con_roles` | **Las SEIS con clave foránea**, incluidas las puente. Con la v2, las **12** están |
 | **v3** | `sesion` · `permisos` — **y ninguna de las dos es una tabla** | **No agrega tablas.** El CRUD de `usuario`, `rol` y `ruta` es de la v1; el de `rol_usuario` y `rutarol`, de la v2. La v3 agrega **la puerta** |
-| **v4** | — | No agrega tablas: **consultas, tablero, marca y publicación** |
+| **v4** | `consultas` — **y no es una tabla**, igual que las dos de la v3 | **No agrega tablas.** Agrega `/api/consultas`, que CRUZA las doce: diez preguntas que ninguna tabla responde sola |
 
 > **`usuario_con_roles` no es una tabla**, y por eso aparece en la lista con una
 > advertencia: es un **recurso** —`api/usuario-con-roles`— que opera `usuario` y

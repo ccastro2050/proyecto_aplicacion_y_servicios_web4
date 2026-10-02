@@ -96,7 +96,7 @@ Para leer en esta pantalla:
   llavecita = llave primaria —, `nombre (nvarchar(100))`, `stock (int)`
   y `valorunitario (decimal(18,2))`. Compare con el modelo `Producto`
   de la API: los mismos tipos vistos desde el motor (es la tabla del
-  [modelo de datos](spec_kit/versiones/v1_producto_sqlserver/5_data_model.md)).
+  [modelo de datos](spec_kit/versiones/v1_sin_fk/5_data_model.md)).
 - **Claves / Restricciones / Desencadenadores** — la llave primaria y
   los **triggers** de facturación ("desencadenadores" en español), ya
   escritos y esperando a las versiones siguientes del curso. En el paso
@@ -244,7 +244,7 @@ Para leer en el diagrama:
   muchos-a-muchos entre factura y producto — la esquina donde la v2 del
   curso va a trabajar.
 - Ese dibujo ES el [modelo de datos de la
-  v1](spec_kit/versiones/v1_producto_sqlserver/5_data_model.md),
+  v1](spec_kit/versiones/v1_sin_fk/5_data_model.md),
   dibujado por el motor real.
 
 Si guarda el diagrama (`Ctrl+S`, póngale un nombre), queda dentro de la

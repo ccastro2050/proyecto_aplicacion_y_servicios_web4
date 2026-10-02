@@ -40,7 +40,7 @@ Cada petición trae su explicación en la pestaña de descripción.
 
 La colección usa la variable `base` = `http://localhost:8035` (el proyecto
 del curso). Si está probando **SU reconstrucción** (la de la
-[GUIA_IA](../docs/spec_kit/versiones/v4_postgresql/GUIA_IA4.md), que corre en el puerto 8135): clic en la
+[GUIA_IA](../docs/spec_kit/versiones/v5_otros_motores/GUIA_IA5.md), que corre en el puerto 8135): clic en la
 colección → pestaña **Variables** → cambie `base` a
 `http://localhost:8135`. Una sola edición y las 41 peticiones apuntan a su
 proyecto.

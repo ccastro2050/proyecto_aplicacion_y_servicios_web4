@@ -388,7 +388,7 @@ docker run -d --name postgres --network proyecto_aplicacion_y_servicios_web4_def
   -e "POSTGRES_PASSWORD=Paradigmas123!" `
   -e "POSTGRES_DB=bdfacturas_postgres_local" `
   -v pgdata:/var/lib/postgresql/data `
-  -v "${PWD}/db/bdfacturas_postgres.sql:/docker-entrypoint-initdb.d/bdfacturas_postgres.sql:ro" `
+  -v "${PWD}/db/bdfacturas.sql:/docker-entrypoint-initdb.d/bdfacturas.sql:ro" `
   -p 15462:5432 postgres:16-alpine
 
 # 6. ESPERAR a que responda de verdad… mirándolo a ojo

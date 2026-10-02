@@ -115,23 +115,70 @@ cd proyecto_aplicacion_y_servicios_web4
 docker compose up -d --build
 ```
 
-**Eso es todo.** La primera vez tarda varios minutos (descarga imágenes,
-el inicializador crea la BD, y la primera compilación de la API toma
-~1 minuto más). Al terminar quedan corriendo los DOS motores (bdfacturas
-completa en SQL Server Y en PostgreSQL — la v4) y la API, que por defecto
-habla con PostgreSQL:
+**Eso es todo.** La primera vez tarda unos minutos (descarga imágenes,
+el inicializador crea la base, y la primera compilación
+toma ~1 minuto más). Al terminar quedan corriendo **tres contenedores**: la
+base de datos, la API y la **interfaz gráfica**.
+
+### Lo primero que hay que abrir
 
 | Qué | Dónde |
 |---|---|
-| **API Facturas** — diagnóstico | http://localhost:8035/ |
-| **Swagger** (documentación interactiva: ver y probar los endpoints) | http://localhost:8035/swagger |
-| Listar productos | http://localhost:8035/api/producto |
+| **La interfaz gráfica** — por aquí se empieza | **http://localhost:8099** |
+| **Swagger** — la API, para verla y probarla | http://localhost:8035/swagger |
+| La API — diagnóstico | http://localhost:8035/ |
 | SQL Server (para SQLTools/SSMS, opcional) | `localhost,11466` · `sa`/`Paradigmas123!` |
-| PostgreSQL (para psql/pgAdmin, opcional — v4) | `localhost:15462` · `postgres`/`Paradigmas123!` |
 
-Pruebe la joya didáctica de la v1: PUT con solo `{"stock": 99}` → 422; el
-mismo body en PATCH → 200. Esa diferencia es parte de lo que enseña la
-versión (contratos exactos en el spec kit).
+> **La interfaz gráfica y la API son dos puertos distintos**, y conviene no
+> confundirlos: el **8099** es lo que se abre en el navegador; el **8035**
+> es lo que esa interfaz consume. Abrir `8099/swagger` da 404 — Swagger vive
+> en la API.
+
+### El menú de la interfaz gráfica
+
+**Doce entradas**, agrupadas por versión — y es la forma más rápida de ver que cada versión **incluye la anterior**:
+
+| Dirección | En el menú | De la |
+|---|---|---|
+| `/productos` | Productos | v1 |
+| `/empresas` | Empresas | v1 |
+| `/personas` | Personas | v1 |
+| `/roles` | Roles | v1 |
+| `/rutas` | Rutas | v1 |
+| `/usuarios` | Usuarios | v1 |
+| `/clientes` | Clientes | v2 |
+| `/vendedores` | Vendedores | v2 |
+| `/facturas` | Facturas | v2 |
+| `/usuario-con-roles` | Usuarios y roles | v2 |
+| `/rol-usuario` | Roles por usuario | v2 |
+| `/ruta-rol` | Permisos por rol | v2 |
+
+> **El menú nombra RECURSOS del dominio, no tablas ni rutas de la API.**
+> Dice «Facturas», no `/api/factura`.
+
+### Y en esta versión hay que identificarse primero
+
+**La v3 le pone la puerta a todo lo anterior.** Sin iniciar sesión, la interfaz
+manda a `/sesion` y la API responde **401**.
+
+| Correo | Contraseña | Qué ve en el menú |
+|---|---|---|
+| `admin@correo.com` | `admin123` | **las 12** interfaces |
+| `vendedor1@correo.com` | `vendedor123` | Facturas y Clientes — **no** Usuarios, Personas ni Productos |
+| `cliente1@correo.com` | `cliente123` | Productos — **no** Facturas ni Clientes, al revés que el vendedor |
+
+> **En Swagger hay que autorizar antes de probar nada:** `POST /api/sesion` con
+> uno de esos correos → copie el `token` de la respuesta → botón **Authorize**
+> arriba a la derecha → pegue **solo el token** (la palabra `Bearer` la pone
+> Swagger).
+
+**La prueba que importa:** entre como `vendedor1` y escriba **`/usuarios` en la
+barra de direcciones**. La interfaz se abre y tiene que decir que no tiene
+permiso, con **cero filas**. Si mostrara los datos, el control estaba en el
+menú — y esconder una entrada del menú **no es** control de acceso.
+
+> **Recargar con F5 cierra la sesión.** El token vive en el circuito de Blazor
+> Server, en memoria del servidor, y no baja al navegador.
 
 > ℹ️ Este proyecto usa los puertos 8035, 11466 y 15462: si alguno ya está ocupado
 > en su máquina, cámbielo en `docker-compose.yml` (el lado izquierdo del

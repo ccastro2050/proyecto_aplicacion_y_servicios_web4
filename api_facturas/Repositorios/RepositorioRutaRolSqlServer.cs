@@ -50,7 +50,8 @@ public class RepositorioRutaRolSqlServer : IRepositorioRutaRol
         // Duplicado → viola la PK compuesta → excepción del motor → 500:
         const string sql = @"INSERT INTO rutarol (fkidruta, fkidrol) VALUES (@Fkidruta, @Fkidrol)";
         await using var conexion = CrearConexion();
-        await conexion.ExecuteAsync(sql, asignacion);
+        await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, asignacion));
     }
 
     public async Task<int> EliminarAsync(int fkidruta, int fkidrol)
@@ -58,6 +59,7 @@ public class RepositorioRutaRolSqlServer : IRepositorioRutaRol
         // LA PAREJA EXACTA: las dos columnas en el WHERE.
         const string sql = @"DELETE FROM rutarol WHERE fkidruta = @fkidruta AND fkidrol = @fkidrol";
         await using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync(sql, new { fkidruta, fkidrol });
+        return await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, new { fkidruta, fkidrol }));
     }
 }

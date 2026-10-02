@@ -47,7 +47,8 @@ public class RepositorioUsuarioSqlServer : IRepositorioUsuario
         var hash = BC.HashPassword(contrasena, workFactor: 12);
         const string sql = @"INSERT INTO usuario (email, contrasena) VALUES (@email, @hash)";
         await using var conexion = CrearConexion();
-        await conexion.ExecuteAsync(sql, new { email, hash });
+        await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, new { email, hash }));
     }
 
     public async Task<int> ActualizarContrasenaAsync(string email, string contrasena)
@@ -55,7 +56,8 @@ public class RepositorioUsuarioSqlServer : IRepositorioUsuario
         var hash = BC.HashPassword(contrasena, workFactor: 12);
         const string sql = @"UPDATE usuario SET contrasena = @hash WHERE email = @email";
         await using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync(sql, new { hash, email });
+        return await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, new { hash, email }));
     }
 
     public async Task<int> EliminarAsync(string email)
@@ -63,7 +65,8 @@ public class RepositorioUsuarioSqlServer : IRepositorioUsuario
         // Si el usuario tiene roles asignados, la FK rechaza → 500:
         const string sql = "DELETE FROM usuario WHERE email = @email";
         await using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync(sql, new { email });
+        return await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, new { email }));
     }
 
     public async Task<bool?> VerificarContrasenaAsync(string email, string contrasena)

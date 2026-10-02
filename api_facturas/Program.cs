@@ -160,6 +160,14 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IRepositorioAcceso>(
     _ => fabrica.CrearRepositorioAcceso());
 builder.Services.AddScoped<IServicioSesion, ServicioSesion>();
+// El recurso MAESTRO-DETALLE sobre la tabla puente: el usuario Y sus roles en
+// una sola operacion. Por la FABRICA, como todos: con el motor en postgres, uno
+// que siguiera hablando con SQL Server no se notaria hasta que los dos motores
+// dejaran de tener los mismos datos.
+builder.Services.AddScoped<IRepositorioUsuarioConRoles>(
+    _ => fabrica.CrearRepositorioUsuarioConRoles());
+builder.Services.AddScoped<IServicioUsuarioConRoles, ServicioUsuarioConRoles>();
+
 
 // ------------------------------------------------------------
 // 2. Los controladores y la validación de la petición (el 422)

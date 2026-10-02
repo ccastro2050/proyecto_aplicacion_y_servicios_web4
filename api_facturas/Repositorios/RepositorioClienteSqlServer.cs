@@ -54,7 +54,8 @@ public class RepositorioClienteSqlServer : IRepositorioCliente
                              VALUES (@Credito, @Fkcodpersona, @Fkcodempresa)";
         await using var conexion = CrearConexion();
         // El OBJETO del modelo como fuente de parámetros (@Propiedad):
-        await conexion.ExecuteAsync(sql, entidad);
+        await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, entidad));
     }
 
     public async Task<int> ActualizarAsync(int id, Dictionary<string, object> datos)
@@ -68,7 +69,8 @@ public class RepositorioClienteSqlServer : IRepositorioCliente
         parametros.Add("pk_clave", id);
         await using var conexion = CrearConexion();
         // ExecuteAsync devuelve las FILAS AFECTADAS (0 = no existía):
-        return await conexion.ExecuteAsync(sql, parametros);
+        return await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, parametros));
     }
 
     public async Task<int> EliminarAsync(int id)
@@ -76,6 +78,7 @@ public class RepositorioClienteSqlServer : IRepositorioCliente
         // Si otras tablas lo referencian, la FK del motor rechaza → 500:
         const string sql = "DELETE FROM cliente WHERE id = @id";
         await using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync(sql, new { id });
+        return await ErroresSqlServer.TraducirAsync(
+            () => conexion.ExecuteAsync(sql, new { id }));
     }
 }

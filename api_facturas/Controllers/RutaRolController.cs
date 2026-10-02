@@ -112,6 +112,20 @@ public class RutaRolController : ControllerBase
             await _servicio.CrearAsync(asignacion);
             return Ok(new { estado = 200, mensaje = "Asignación creada exitosamente." });
         }
+        catch (ConflictoExcepcion e)
+        {
+            // 409, y NO 422: el dato tiene la forma correcta -lo paso la
+            // validacion de la peticion- y lo que se rompe es el ESTADO de la
+            // base. Tres causas posibles: la clave foranea apunta a una fila
+            // que no existe, la clave ya esta usada, o hay otra fila que
+            // depende de esta y el motor no deja borrarla.
+            return StatusCode(409, new
+            {
+                estado = 409,
+                mensaje = "La operacion choca con los datos que ya existen.",
+                detalle = e.Message,
+            });
+        }
         catch (Exception e)
         {
             // Duplicado (PK compuesta) o llave inexistente (FK) → 500:
@@ -134,6 +148,20 @@ public class RutaRolController : ControllerBase
         catch (NoEncontradoExcepcion e)
         {
             return StatusCode(404, new { estado = 404, mensaje = "Asignación no encontrada.", detalle = e.Message });
+        }
+        catch (ConflictoExcepcion e)
+        {
+            // 409, y NO 422: el dato tiene la forma correcta -lo paso la
+            // validacion de la peticion- y lo que se rompe es el ESTADO de la
+            // base. Tres causas posibles: la clave foranea apunta a una fila
+            // que no existe, la clave ya esta usada, o hay otra fila que
+            // depende de esta y el motor no deja borrarla.
+            return StatusCode(409, new
+            {
+                estado = 409,
+                mensaje = "La operacion choca con los datos que ya existen.",
+                detalle = e.Message,
+            });
         }
         catch (Exception e)
         {

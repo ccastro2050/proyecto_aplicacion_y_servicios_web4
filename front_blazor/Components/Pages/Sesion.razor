@@ -5,7 +5,7 @@
 
 @*
    ============================================================
-   LA INTERFAZ DE IDENTIFICACION.
+   LA INTERFAZ DE IDENTIFICACIÓN.
 
    Usa los componentes de Bootstrap directamente -card, form-control, alert-
    porque es una pagina suelta, sin tablas ni formularios de CRUD. Las otras
@@ -35,8 +35,8 @@
         {
             <div class="card shadow-sm mt-4">
                 <div class="card-body text-center p-4">
-                    <h1 class="h4 card-title mb-3">Ya tiene una sesion abierta</h1>
-                    <p class="text-body-secondary mb-1">Esta identificado como</p>
+                    <h1 class="h4 card-title mb-3">Ya tiene una sesión abierta</h1>
+                    <p class="text-body-secondary mb-1">Está identificado como</p>
                     <p class="fs-5 fw-semibold mb-2">@Estado.Email</p>
                     <p class="mb-4">
                         @foreach (var r in Estado.Roles)
@@ -55,9 +55,9 @@
         {
             <div class="card shadow-sm mt-4">
                 <div class="card-body p-4">
-                    <h1 class="h4 card-title mb-1">Iniciar sesion</h1>
+                    <h1 class="h4 card-title mb-1">Iniciar sesión</h1>
                     <p class="text-body-secondary small mb-4">
-                        Facturas &middot; version 4
+                        Facturas &middot; versión 4
                     </p>
 
                     @if (aviso is not null)
@@ -75,7 +75,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label" for="clave">Contrasena</label>
+                        <label class="form-label" for="clave">Contraseña</label>
                         @* type="password": no se muestra en pantalla *@
                         <input id="clave" type="password" class="form-control"
                                @bind="contrasena" @bind:event="oninput"
@@ -104,13 +104,13 @@
                     <h2 class="h6 card-title">Para probar el control de acceso</h2>
                     <p class="small text-body-secondary">
                         Hacen falta <strong>dos sesiones distintas</strong>: con una sola
-                        no se nota la diferencia. Las contrasenas estan en el
+                        no se nota la diferencia. Las contraseñas están en el
                         <code>7_quickstart.md</code> de esta version.
                     </p>
                     <div class="table-responsive">
                         <table class="table table-sm align-middle mb-0">
                             <thead>
-                                <tr><th>Correo</th><th>Contrasena</th><th>Entra a</th></tr>
+                                <tr><th>Correo</th><th>Contraseña</th><th>Entra a</th></tr>
                             </thead>
                             <tbody>
                                 <tr>
@@ -135,7 +135,7 @@
                         <strong>La prueba que importa:</strong> entre como
                         <code>vendedor1</code> y escriba <code>/usuarios</code> en la barra
                         de direcciones. La interfaz se abre y tiene que decir que no tiene
-                        permiso — porque quien protege es la API, no el menu.
+                        permiso — porque quien protege es la API, no el menú.
                     </p>
                 </div>
             </div>

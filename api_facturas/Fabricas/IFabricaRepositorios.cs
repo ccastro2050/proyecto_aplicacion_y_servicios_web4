@@ -40,4 +40,11 @@ public interface IFabricaRepositorios
     /// siguiera hablando con SQL Server no se notaria —los dos motores
     /// tienen los mismos datos— hasta que dejaran de tenerlos.</summary>
     IRepositorioAcceso CrearRepositorioAcceso();
+
+    /// <summary>Las diez consultas multitabla de la v4. Tambien por la
+    /// fabrica: un tablero que leyera de otro motor que el resto del sistema
+    /// mostraria numeros que no corresponden a lo que el usuario acaba de
+    /// hacer — y nadie lo notaria mientras los dos motores tengan los
+    /// mismos datos.</summary>
+    IRepositorioConsultas CrearRepositorioConsultas();
 }

@@ -168,6 +168,16 @@ builder.Services.AddScoped<IRepositorioUsuarioConRoles>(
     _ => fabrica.CrearRepositorioUsuarioConRoles());
 builder.Services.AddScoped<IServicioUsuarioConRoles, ServicioUsuarioConRoles>();
 
+// ------------------------------------------------------------
+// LA v4 — las diez consultas multitabla
+// ------------------------------------------------------------
+// No agregan ninguna tabla: cruzan las que ya estan. Lo que agregan es la
+// pregunta que ningun endpoint anterior podia responder.
+builder.Services.AddScoped<IRepositorioConsultas>(
+    _ => fabrica.CrearRepositorioConsultas());
+builder.Services.AddScoped<IServicioConsultas, ServicioConsultas>();
+
+
 
 // ------------------------------------------------------------
 // 2. Los controladores y la validación de la petición (el 422)

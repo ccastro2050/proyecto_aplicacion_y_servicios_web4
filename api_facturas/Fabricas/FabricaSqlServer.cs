@@ -37,4 +37,7 @@ public class FabricaSqlServer : IFabricaRepositorios
 
     // v3 — el control de acceso.
     public IRepositorioAcceso CrearRepositorioAcceso() => new RepositorioAccesoSqlServer(_cadenaConexion);
+
+    // v4 — las diez consultas del tablero.
+    public IRepositorioConsultas CrearRepositorioConsultas() => new RepositorioConsultasSqlServer(_cadenaConexion);
 }

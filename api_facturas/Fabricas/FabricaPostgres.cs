@@ -36,4 +36,7 @@ public class FabricaPostgres : IFabricaRepositorios
 
     // v3 — el control de acceso.
     public IRepositorioAcceso CrearRepositorioAcceso() => new RepositorioAccesoPostgres(_cadenaConexion);
+
+    // v4 — las diez consultas del tablero.
+    public IRepositorioConsultas CrearRepositorioConsultas() => new RepositorioConsultasPostgres(_cadenaConexion);
 }

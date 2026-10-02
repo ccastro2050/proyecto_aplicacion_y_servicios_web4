@@ -30,4 +30,10 @@ public class FabricaPostgres : IFabricaRepositorios
     public IRepositorioRuta CrearRepositorioRuta() => new RepositorioRutaPostgres(_cadenaConexion);
     public IRepositorioRolUsuario CrearRepositorioRolUsuario() => new RepositorioRolUsuarioPostgres(_cadenaConexion);
     public IRepositorioRutaRol CrearRepositorioRutaRol() => new RepositorioRutaRolPostgres(_cadenaConexion);
+
+    // v2 — el recurso maestro-detalle sobre la tabla puente.
+    public IRepositorioUsuarioConRoles CrearRepositorioUsuarioConRoles() => new RepositorioUsuarioConRolesPostgres(_cadenaConexion);
+
+    // v3 — el control de acceso.
+    public IRepositorioAcceso CrearRepositorioAcceso() => new RepositorioAccesoPostgres(_cadenaConexion);
 }

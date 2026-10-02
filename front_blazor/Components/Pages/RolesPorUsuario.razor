@@ -1,0 +1,193 @@
+@page "/rol-usuario"
+@inject ServicioRolUsuario Servicio
+@inject ServicioUsuario ServicioUsuarios
+@inject ServicioRol ServicioRoles
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+@*
+   ============================================================
+   UNA TABLA PUENTE, y por eso esta interfaz grafica tiene DOS botones menos.
+
+   `rol_usuario` no tiene campos propios: solo dos claves foraneas que juntas
+   son la clave primaria. De ahi salen tres diferencias:
+
+     NO HAY EDITAR.  Una asignacion existe o no existe. Cambiar «Ana es
+                     vendedora» por «Ana es administradora» es quitar una
+                     pareja y poner otra, no editar un campo.
+
+     EL QUITAR LLEVA DOS CLAVES.  DELETE /api/rol-usuario/{email}/{idrol}. Con
+                     una sola no se sabe cual de las parejas quitar.
+
+     LOS DOS CAMPOS SON DESPLEGABLES.  Los dos son claves foraneas.
+
+   Y OJO CON ESTA INTERFAZ FRENTE A LA DE «Usuarios y roles»: esta administra
+   la TABLA pareja a pareja. La otra crea el usuario Y sus roles en una sola
+   transaccion. Las dos sirven, para cosas distintas, y la de al lado es la que
+   se usa a diario.
+   ============================================================
+*@
+
+<h1>Roles por usuario</h1>
+
+<p class="nota">
+    Esta interfaz administra la tabla puente <code>rol_usuario</code> pareja a
+    pareja. Para crear un usuario <strong>con</strong> sus roles de una vez, use
+    <a href="usuario-con-roles">Usuarios y roles</a>.
+</p>
+
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="tarjeta">
+    <h2>Asignar un rol a un usuario</h2>
+
+    <div class="campos">
+        <label>
+            Usuario
+            <select @bind="email">
+                <option value="">— elija un usuario —</option>
+                @foreach (var u in usuarios)
+                {
+                    <option value="@u.Email">@u.Email</option>
+                }
+            </select>
+        </label>
+        <label>
+            Rol
+            <select @bind="idRol">
+                <option value="0">— elija un rol —</option>
+                @foreach (var r in roles)
+                {
+                    <option value="@r.Id">@r.Nombre</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    @* UN solo boton: no hay «guardar cambios» porque no hay nada que cambiar. *@
+    <div class="botones">
+        <button class="primario" @onclick="Asignar">Asignar</button>
+    </div>
+</section>
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    <div class="vacio">Todavia no hay asignaciones.</div>
+}
+else
+{
+    <table>
+        <thead><tr><th>Usuario</th><th>Rol</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var a in lista)
+            {
+                <tr>
+                    <td>@a.Fkemail</td>
+                    @* El endpoint devuelve el id pelado: el nombre lo resuelve
+                       el front contra la lista de roles que ya tiene. *@
+                    <td>@NombreRol(a.Fkidrol)</td>
+                    <td class="acciones">
+                        @* LAS DOS CLAVES van al quitar. *@
+                        <button class="peligro" @onclick="() => Quitar(a.Fkemail, a.Fkidrol)">
+                            Quitar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<RolUsuario> lista = [];
+    private List<Usuario> usuarios = [];
+    private List<Rol> roles = [];
+
+    private string email = "";
+    private int idRol;
+
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        // Los dos desplegables A LA VEZ: en fila, con la API apagada, son 10
+        // segundos de timeout mas otros 10 antes de que la interfaz diga nada.
+        var tareaUsuarios = ServicioUsuarios.ListarAsync();
+        var tareaRoles = ServicioRoles.ListarAsync();
+        var tareaLista = Cargar();
+        await Task.WhenAll(tareaUsuarios, tareaRoles, tareaLista);
+
+        var ru = tareaUsuarios.Result;
+        var rr = tareaRoles.Result;
+        if (ru.Bien) { usuarios = ru.Dato!; }
+        if (rr.Bien) { roles = rr.Dato!; }
+        if (!ru.Bien || !rr.Bien)
+            Avisar("No se pudieron cargar las listas de usuarios o roles.", true);
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Asignar()
+    {
+        if (string.IsNullOrWhiteSpace(email)) { Avisar("Elija el usuario.", true); return; }
+        if (idRol == 0) { Avisar("Elija el rol.", true); return; }
+
+        var r = await Servicio.CrearAsync(new RolUsuario { Fkemail = email, Fkidrol = idRol });
+        if (r.Bien)
+        {
+            Avisar("Rol asignado.", false);
+            idRol = 0;
+            await Cargar();
+        }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Quitar(string correo, int rol)
+    {
+        var r = await Servicio.EliminarAsync(correo, rol);
+        if (r.Bien) { Avisar("Asignacion quitada.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private string NombreRol(int id) =>
+        roles.FirstOrDefault(r => r.Id == id)?.Nombre ?? id.ToString();
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

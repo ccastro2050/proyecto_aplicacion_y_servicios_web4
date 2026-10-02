@@ -1,0 +1,168 @@
+@page "/rutas"
+@inject ServicioRuta Servicio
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+<h1>Rutas</h1>
+
+@* El `id` lo genera la base (SERIAL): al crear no se pide, y al editar se
+   muestra pero no se puede cambiar. *@
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="tarjeta">
+    <h2>@(editando ? "Editar" : "Agregar ruta")</h2>
+
+    <div class="campos">
+        <label>
+            Ruta
+            <input @bind="enEdicion.RutaTexto" placeholder="interfaz.productos" />
+        </label>
+        <label>
+            Descripcion
+            <input @bind="enEdicion.Descripcion" placeholder="Gestión de productos" />
+        </label>
+    </div>
+
+    @*
+        LOS DOS BOTONES DE GUARDAR: «la ficha completa» es el PUT (si falta un
+        campo, 422) y «solo lo que cambie» es el PATCH (el mismo cuerpo, 200).
+        La interfaz gráfica NO le dice PUT ni PATCH a la persona.
+    *@
+    <div class="botones">
+        @if (editando)
+        {
+            <button class="primario" @onclick="GuardarCompleta">Guardar la ficha completa</button>
+            <button @onclick="GuardarSoloCambios">Guardar solo lo que cambié</button>
+            <button class="plano" @onclick="Cancelar">Cancelar</button>
+        }
+        else
+        {
+            <button class="primario" @onclick="Crear">Agregar</button>
+        }
+    </div>
+</section>
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    @* Vacío NO es error: es un recuadro que lo dice. *@
+    <div class="vacio">Todavía no hay registros.</div>
+}
+else
+{
+    <table>
+        <thead><tr><th>Id</th><th>Ruta</th><th>Descripcion</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var e in lista)
+            {
+                <tr>
+                    <td>@e.Id</td><td>@e.RutaTexto</td><td>@e.Descripcion</td>
+                    <td class="acciones">
+                        <button @onclick="() => Editar(e)">Editar</button>
+                        <button class="peligro" @onclick="() => Quitar(e.Id)">Quitar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Ruta> lista = [];
+    private Ruta enEdicion = new();
+    private bool editando;
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Crear()
+    {
+        var r = await Servicio.CrearAsync(enEdicion);
+        if (r.Bien)
+        {
+            Avisar("Registro agregado.", false);
+            enEdicion = new();     // solo se limpia CUANDO SALIO BIEN
+            await Cargar();
+        }
+        else
+        {
+            // El error NO borra lo que la persona escribio: queda en interfaz gráfica
+            // para que pueda corregirlo.
+            Avisar(r.Mensaje!, true);
+        }
+    }
+
+    private async Task GuardarCompleta()
+    {
+        var r = await Servicio.ReemplazarAsync(enEdicion.Id, enEdicion);
+        if (r.Bien) { Avisar("Ficha completa guardada.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task GuardarSoloCambios()
+    {
+        var parcial = new { ruta = enEdicion.RutaTexto };
+        var r = await Servicio.ActualizarAsync(enEdicion.Id, parcial);
+        if (r.Bien) { Avisar("Cambios guardados.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Quitar(int clave)
+    {
+        var r = await Servicio.EliminarAsync(clave);
+        if (r.Bien) { Avisar("Registro quitado.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private void Editar(Ruta e)
+    {
+        enEdicion = new Ruta { Id = e.Id, RutaTexto = e.RutaTexto, Descripcion = e.Descripcion };
+        editando = true;
+        aviso = null;
+    }
+
+    private void Cancelar() { enEdicion = new(); editando = false; }
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

@@ -164,33 +164,94 @@ INSERT INTO rol (id, nombre) VALUES
 SELECT setval('rol_id_seq', (SELECT MAX(id) FROM rol));
 
 -- Rutas
+-- ============================================================
+-- LOS NOMBRES DE `ruta` LLEVAN PUNTO, NO BARRA
+--
+-- Decian '/producto', '/usuario', '/permiso/crear'... y se confundian con los
+-- ENDPOINTS de la API -/api/producto-, que son OTRA COSA.
+--
+-- Esto no son rutas HTTP: son INTERFACES y ACCIONES PROTEGIBLES. Lo que la
+-- tabla guarda es «a que se puede entrar», y quien lo consume es
+-- verificar_acceso_ruta, no el enrutador de la API.
+--
+--   interfaz.productos   una interfaz grafica a la que un rol entra o no
+--   permiso.crear        una accion concreta
+--
+-- La notacion de punto no se puede leer como una URL, que es justamente el
+-- punto. El procedimiento usa el ID y no el texto, asi que el cambio no rompe
+-- nada.
+-- ============================================================
 INSERT INTO ruta (ruta, descripcion) VALUES
-('/home', 'Página principal - Dashboard'),
-('/usuario', 'Gestión de usuarios'),
-('/factura', 'Gestión de facturas'),
-('/cliente', 'Gestión de clientes'),
-('/vendedor', 'Gestión de vendedores'),
-('/persona', 'Gestión de personas'),
-('/empresa', 'Gestión de empresas'),
-('/producto', 'Gestión de productos'),
-('/rol', 'Gestión de roles'),
-('/permiso', 'Gestión de permisos (asignación rol-ruta)'),
-('/permiso/crear', 'Crear permiso (POST)'),
-('/permiso/eliminar', 'Eliminar permiso (POST)'),
-('/ruta', 'Gestión de rutas del sistema'),
-('/ruta/crear', 'Crear ruta (POST)'),
-('/ruta/eliminar', 'Eliminar ruta (POST)');
+('interfaz.inicio', 'Página principal - Dashboard'),
+('interfaz.usuarios', 'Gestión de usuarios'),
+('interfaz.facturas', 'Gestión de facturas'),
+('interfaz.clientes', 'Gestión de clientes'),
+('interfaz.vendedores', 'Gestión de vendedores'),
+('interfaz.personas', 'Gestión de personas'),
+('interfaz.empresas', 'Gestión de empresas'),
+('interfaz.productos', 'Gestión de productos'),
+('interfaz.roles', 'Gestión de roles'),
+('interfaz.permisos', 'Gestión de permisos (asignación rol-ruta)'),
+('permiso.crear', 'Crear permiso (POST)'),
+('permiso.eliminar', 'Eliminar permiso (POST)'),
+('interfaz.rutas', 'Gestión de rutas del sistema'),
+('ruta.crear', 'Crear ruta (POST)'),
+('ruta.eliminar', 'Eliminar ruta (POST)');
 
 -- Usuarios
+-- ============================================================
+-- LAS CONTRASENAS: CON HASH, Y SE SABEN CUALES SON
+--
+-- Dos reglas, y la segunda es la que suele faltar:
+--
+--   1. NINGUNA fila guarda texto legible. La columna es NVARCHAR(200) -y no
+--      20- precisamente porque un hash de bcrypt ocupa 60 caracteres.
+--
+--   2. Las contrasenas en claro estan ESCRITAS EN LA DOCUMENTACION, porque del
+--      hash no se puede volver a la clave -eso es lo que lo hace un hash-. Sin
+--      saberlas no hay forma de iniciar sesion, y sin iniciar sesion no se
+--      comprueba un solo criterio del control de acceso.
+--
+-- EL HASH ES BCRYPT CON COSTO 12. El `$2a$12$` del principio lo dice: `2a` es
+-- la variante y `12` el costo. Subir el costo a 13 duplica el tiempo de
+-- calculo — y es para lo que se diseno bcrypt: para encarecerlo cuando las
+-- maquinas sean mas rapidas, sin cambiar de funcion.
+--
+-- Y CADA HASH ES DISTINTO AUNQUE LA CLAVE SEA LA MISMA. Los dos usuarios de
+-- carlos.castro comparten contrasena y sus hash no se parecen: bcrypt trae
+-- SALT incorporado. Sin el, dos hash iguales delatarian que esas dos personas
+-- usan la misma clave.
+--
+-- Las contrasenas en claro, para las pruebas (7_quickstart.md):
+--
+--   admin@correo.com                      admin123       Administrador
+--   vendedor1@correo.com                  vendedor123    Vendedor + Cajero
+--   jefe@correo.com                       jefe123        Administrador + Cajero + Contador
+--   cliente1@correo.com                   cliente123     Cliente
+--   test_encript@correo.com               test123        Administrador
+--   nuevo@correo.com                      nuevo123       Administrador + Vendedor + Cajero
+--   carlos.castro@usbmed.edu.co           carlos123      todos los roles
+--   carloscastro5033@correo.itm.edu.co    carlos123      todos los roles
+--
+-- LOS TRES QUE IMPORTAN PARA PROBAR EL CONTROL DE ACCESO:
+--
+--   admin@correo.com       Administrador: entra a las 15 rutas
+--   vendedor1@correo.com   Vendedor: SOLO inicio, facturas y clientes
+--   cliente1@correo.com    Cliente: SOLO inicio y productos
+--
+-- Con esos tres se comprueba el 403: identificarse como vendedor1 y pedir
+-- /api/usuario tiene que responder 403, no 401. Y NO porque la interfaz
+-- esconda el boton: escribiendo la direccion a mano.
+-- ============================================================
 INSERT INTO usuario (email, contrasena) VALUES
-('admin@correo.com', '$2a$12$3UgI.Eof.FhzsYUWESI9n.qFaqkV2JPhvW3L/1GTKowNJnGaD8F.G'),
-('vendedor1@correo.com', '$2a$12$Dgog4VaHqMzhliPVJy1BcOMd6.izEGNeRDtZ.O7SPmBLc6UVthVTG'),
-('jefe@correo.com', 'jefe123'),
-('cliente1@correo.com', 'cli123'),
-('test_encript@correo.com', '$2a$11$Ci0J2yBltDgQHfjadgkl0OtbcF5pUf97vTq/4Xr0KEU/86l8ybjBe'),
-('nuevo@correo.com', '$2a$11$cmtGBxllwc7MCzpnKVSWuumiOgCaG6PaKWcN1z9N0bjjnkobbFDzO'),
-('carlos.castro@usbmed.edu.co', '$2a$10$YYl6bHCflCnk8suUrms3ie.rnpLvfD9nHJtehZwhcSkINelGwt6iC'),
-('carloscastro5033@correo.itm.edu.co', '$2a$10$YYl6bHCflCnk8suUrms3ie.rnpLvfD9nHJtehZwhcSkINelGwt6iC');
+(N'admin@correo.com', N'$2a$12$PJf6LIuW8uL9q9hK0LsG0ebvUll.eLcJgg6lmTIPVk84p0fwD0T5u'),
+(N'vendedor1@correo.com', N'$2a$12$MeuuKTqIN3JeEYGUCMtbueU5k8QVy7mmiB.yVDkT9hUp0FIyyrdZ2'),
+(N'jefe@correo.com', N'$2a$12$Ymj52uGk70gKEzBTbRuJZe951H0y1dMXWe6C92k0iEqI/ztDiEoI2'),
+(N'cliente1@correo.com', N'$2a$12$6jj6g3NiJU9QJ/DmPifIc.z4LP/csDIdbmZKlRgLAYfFcMz4S.Y9a'),
+(N'test_encript@correo.com', N'$2a$12$FfoTc6rfT1N8jnjZtT5f0OzEC.36IgR2yHQmPgURMfh5lNrw6W7ky'),
+(N'nuevo@correo.com', N'$2a$12$ug9KzUG5hN77MpwVzy/vyuSwo.bFxFIA80xwkr4//R3lkwgudaKOy'),
+(N'carlos.castro@usbmed.edu.co', N'$2a$12$f1UjnYhuaQUrCS8w/EARw.BtSSqCyPh3lA82/tTEgeZ.kQcbZMFzi'),
+(N'carloscastro5033@correo.itm.edu.co', N'$2a$12$F7CLooKrzi/ec4U0iI9.leBhPod38EMnViwRD6ER.6IkSaha8kF3K');
 
 -- Clientes
 INSERT INTO cliente (id, credito, fkcodpersona, fkcodempresa) VALUES

@@ -1,0 +1,204 @@
+@page "/vendedores"
+@inject ServicioVendedor Servicio
+@inject ServicioPersona ServicioPersonas
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+@*
+   Misma leccion que Clientes con UNA clave foranea, y obligatoria: un
+   vendedor SIEMPRE es una persona. Asi que el desplegable no tiene opcion
+   «(ninguno)» — solo la invitacion a elegir, que no es un valor valido.
+*@
+
+<h1>Vendedores</h1>
+
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="tarjeta">
+    <h2>@(editando ? $"Editar el vendedor {enEdicion.Id}" : "Agregar vendedor")</h2>
+
+    <div class="campos">
+        <label>
+            Carnet
+            <input type="number" @bind="enEdicion.Carnet" />
+        </label>
+        <label>
+            Direccion
+            <input @bind="enEdicion.Direccion" placeholder="Calle 10 # 20-30" />
+        </label>
+        <label>
+            Persona
+            <select @bind="enEdicion.Fkcodpersona">
+                <option value="">— elija una persona —</option>
+                @foreach (var p in personas)
+                {
+                    <option value="@p.Codigo">@p.Nombre (@p.Codigo)</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <div class="botones">
+        @if (editando)
+        {
+            <button class="primario" @onclick="GuardarCompleta">Guardar la ficha completa</button>
+            <button @onclick="GuardarSoloCambios">Guardar solo lo que cambie</button>
+            <button class="plano" @onclick="Cancelar">Cancelar</button>
+        }
+        else
+        {
+            <button class="primario" @onclick="Crear">Agregar</button>
+        }
+    </div>
+
+    @if (personas.Count == 0)
+    {
+        <p class="nota">No hay personas registradas todavia. Agregue una en
+           <a href="personas">Personas</a> antes de crear un vendedor.</p>
+    }
+</section>
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    <div class="vacio">Todavia no hay registros.</div>
+}
+else
+{
+    <table>
+        <thead>
+            <tr><th>Id</th><th>Carnet</th><th>Direccion</th><th>Persona</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var v in lista)
+            {
+                <tr>
+                    <td>@v.Id</td>
+                    <td>@v.Carnet</td>
+                    <td>@v.Direccion</td>
+                    <td>@NombrePersona(v.Fkcodpersona)</td>
+                    <td class="acciones">
+                        <button @onclick="() => Editar(v)">Editar</button>
+                        <button class="peligro" @onclick="() => Quitar(v.Id)">Quitar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Vendedor> lista = [];
+    private List<Persona> personas = [];
+    private Vendedor enEdicion = new();
+    private bool editando;
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        // El desplegable y la lista A LA VEZ, no uno despues del otro.
+        var tareaPersonas = ServicioPersonas.ListarAsync();
+        var tareaLista = Cargar();
+        await Task.WhenAll(tareaPersonas, tareaLista);
+
+        var rp = tareaPersonas.Result;
+        if (rp.Bien) { personas = rp.Dato!; }
+        else { Avisar("No se pudo cargar la lista de personas.", true); }
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Crear()
+    {
+        if (string.IsNullOrWhiteSpace(enEdicion.Fkcodpersona))
+        {
+            Avisar("Elija la persona del vendedor.", true);
+            return;
+        }
+
+        var r = await Servicio.CrearAsync(enEdicion);
+        if (r.Bien)
+        {
+            Avisar("Registro agregado.", false);
+            enEdicion = new();
+            await Cargar();
+        }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task GuardarCompleta()
+    {
+        var r = await Servicio.ReemplazarAsync(enEdicion.Id, enEdicion);
+        if (r.Bien) { Avisar("Ficha completa guardada.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task GuardarSoloCambios()
+    {
+        var parcial = new { direccion = enEdicion.Direccion };
+        var r = await Servicio.ActualizarAsync(enEdicion.Id, parcial);
+        if (r.Bien) { Avisar("Cambios guardados.", false); Cancelar(); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Quitar(int id)
+    {
+        var r = await Servicio.EliminarAsync(id);
+        if (r.Bien) { Avisar("Registro quitado.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private void Editar(Vendedor v)
+    {
+        enEdicion = new Vendedor
+        {
+            Id = v.Id, Carnet = v.Carnet,
+            Direccion = v.Direccion, Fkcodpersona = v.Fkcodpersona,
+        };
+        editando = true;
+        aviso = null;
+    }
+
+    private void Cancelar() { enEdicion = new(); editando = false; }
+
+    private string NombrePersona(string? codigo) =>
+        personas.FirstOrDefault(p => p.Codigo == codigo)?.Nombre ?? codigo ?? "—";
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

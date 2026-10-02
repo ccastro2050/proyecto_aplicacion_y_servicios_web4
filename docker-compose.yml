@@ -90,6 +90,15 @@ services:
       # se resuelven por nombre. Esta variable SOBREESCRIBE el valor de
       # appsettings.json (ASP.NET lee "ConnectionStrings__X" así).
       ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=bdfacturas_sqlserver_local;User Id=sa;Password=Paradigmas123!;TrustServerCertificate=True;"
+      # v3 — la clave del token. Aqui esta en claro a proposito: es una
+      # clave de DESARROLLO y este repositorio es material de curso. En
+      # un sistema real sale de un gestor de secretos, y lo que importa
+      # es que el codigo la lea de la configuracion y no la lleve
+      # escrita adentro — eso es lo que permite cambiarla sin recompilar.
+      Jwt__Key: "ClaveDeDesarrolloDelCursoAplicacionYServiciosWeb_2026_2_NoEsUnSecreto!"
+      Jwt__Issuer: "ApiFacturas"
+      Jwt__Audience: "FrontFacturas"
+      Jwt__DuracionMinutos: "60"
       # v4 — la cadena del SEGUNDO motor (host interno postgres:5432):
       ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=bdfacturas_postgres_local;Username=postgres;Password=Paradigmas123!"
       # v4 — EL INTERRUPTOR: a qué motor le habla la API. Lee la
@@ -105,6 +114,32 @@ services:
       postgres:
         condition: service_healthy
         # ↑ …y cuando el motor nuevo ya responde (él se inicializa solo).
+
+  # ------------------------------------------------------------
+  # LA INTERFAZ GRAFICA (Blazor Server)
+  #
+  # Es un CONTENEDOR APARTE, y eso es lo que se quiere demostrar: la interfaz
+  # y la API son dos procesos distintos que se hablan por HTTP. Apague la API
+  # y la interfaz sigue en pie, con su aviso y sin una sola fila.
+  # ------------------------------------------------------------
+  front-blazor:
+    build: ./front_blazor
+    container_name: facturas-front-aysw-v4
+    ports:
+      - "8099:8099"
+    volumes:
+      # El codigo montado: `dotnet watch` recompila al guardar, sin reconstruir
+      # la imagen.
+      - ./front_blazor:/app
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://0.0.0.0:8099"
+      # El NOMBRE del servicio, no localhost: dentro del contenedor del front,
+      # localhost seria el front mismo.
+      UrlApi: "http://api-facturas:8035"
+    depends_on:
+      # NO depende de la base: el front no tiene nada que hacer con ella.
+      - api-facturas
 
 volumes:
   mssqldata:      # declaración del volumen nombrado (la "memoria" de la BD)

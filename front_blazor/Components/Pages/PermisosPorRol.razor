@@ -1,0 +1,187 @@
+@page "/ruta-rol"
+@inject ServicioRutaRol Servicio
+@inject ServicioRuta ServicioRutas
+@inject ServicioRol ServicioRoles
+@inject EstadoSesion Estado
+@inject NavigationManager Navegador
+@* El prerender se apaga porque EstadoSesion es `scoped` al CIRCUITO:
+   con el encendido, Blazor dibuja la pagina una vez ANTES de que el
+   circuito conecte, con un EstadoSesion distinto y vacio — y la
+   interfaz parpadearia entre «identifiquese» y los datos. *@
+
+@*
+   ============================================================
+   LA SEGUNDA TABLA PUENTE: que ROL entra a que INTERFAZ.
+
+   Mismo trato que `rol_usuario`: sin editar, y el quitar con las dos claves.
+
+   PERO HAY QUE LEER ESTO ANTES DE CREER QUE EL SISTEMA YA ESTA PROTEGIDO:
+
+     En la v2 esta tabla se ADMINISTRA. Se listan las parejas, se agregan y se
+     quitan — y nada mas.
+
+     En la v3 esta tabla se HACE VALER: el sistema le pregunta a
+     `verificar_acceso_ruta` si el rol de quien pide tiene esa interfaz, y
+     responde 403 si no.
+
+   Administrar los permisos y aplicarlos son dos cosas distintas. Hoy, con esta
+   interfaz llena de parejas, CUALQUIERA sigue entrando a todo: no hay quien
+   pregunte. Eso llega con la v3.
+   ============================================================
+*@
+
+<h1>Permisos por rol</h1>
+
+<p class="nota">
+    Esta interfaz <strong>administra</strong> los permisos. Todavia no los
+    <strong>aplica</strong>: mientras no llegue el control de acceso, cualquiera
+    entra a todo aunque esta tabla diga otra cosa.
+</p>
+
+@if (aviso is not null)
+{
+    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @aviso
+    </div>
+}
+
+<section class="tarjeta">
+    <h2>Dar acceso a un rol</h2>
+
+    <div class="campos">
+        <label>
+            Interfaz o accion
+            <select @bind="idRuta">
+                <option value="0">— elija una —</option>
+                @foreach (var r in rutas)
+                {
+                    @* Los valores son `interfaz.productos`, `permiso.crear`…
+                       con punto y no con barra, para que nadie los confunda
+                       con los endpoints de la API. *@
+                    <option value="@r.Id">@r.RutaTexto — @r.Descripcion</option>
+                }
+            </select>
+        </label>
+        <label>
+            Rol
+            <select @bind="idRol">
+                <option value="0">— elija un rol —</option>
+                @foreach (var r in roles)
+                {
+                    <option value="@r.Id">@r.Nombre</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <div class="botones">
+        <button class="primario" @onclick="Dar">Dar acceso</button>
+    </div>
+</section>
+
+@if (cargando)
+{
+    <p>Cargando…</p>
+}
+else if (lista.Count == 0)
+{
+    <div class="vacio">Todavia no hay permisos asignados.</div>
+}
+else
+{
+    <table>
+        <thead><tr><th>Interfaz o accion</th><th>Rol</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var a in lista)
+            {
+                <tr>
+                    <td>@TextoRuta(a.Fkidruta)</td>
+                    <td>@NombreRol(a.Fkidrol)</td>
+                    <td class="acciones">
+                        <button class="peligro" @onclick="() => Quitar(a.Fkidruta, a.Fkidrol)">
+                            Quitar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<RutaRol> lista = [];
+    private List<Ruta> rutas = [];
+    private List<Rol> roles = [];
+
+    private int idRuta;
+    private int idRol;
+
+    private bool cargando = true;
+    private string? aviso;
+    private bool avisoEsError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
+        //
+        // No es la proteccion -la proteccion es el 401 que responde la API-
+        // sino cortesia: sin token, la peticion traeria un 401 y la persona
+        // veria un error en vez de entender que le falta identificarse.
+        //
+        // OJO CON LO QUE ESTO *NO* HACE: no comprueba PERMISOS. Si alguien
+        // identificado escribe esta direccion a mano sin tener el permiso, la
+        // interfaz se abre, le pide los datos a la API, y la API responde 403.
+        // Eso es exactamente lo que tiene que pasar — y es el criterio 9.
+        if (!Estado.Identificado)
+        {
+            Navegador.NavigateTo("/sesion");
+            return;
+        }
+
+        // Los dos A LA VEZ, por lo mismo que en las demas.
+        var tareaRutas = ServicioRutas.ListarAsync();
+        var tareaRoles = ServicioRoles.ListarAsync();
+        var tareaLista = Cargar();
+        await Task.WhenAll(tareaRutas, tareaRoles, tareaLista);
+
+        var rr = tareaRutas.Result;
+        var rl = tareaRoles.Result;
+        if (rr.Bien) { rutas = rr.Dato!; }
+        if (rl.Bien) { roles = rl.Dato!; }
+        if (!rr.Bien || !rl.Bien)
+            Avisar("No se pudieron cargar las listas de interfaces o roles.", true);
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.ListarAsync();
+        cargando = false;
+        if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Dar()
+    {
+        if (idRuta == 0) { Avisar("Elija la interfaz o la accion.", true); return; }
+        if (idRol == 0) { Avisar("Elija el rol.", true); return; }
+
+        var r = await Servicio.CrearAsync(new RutaRol { Fkidruta = idRuta, Fkidrol = idRol });
+        if (r.Bien) { Avisar("Acceso dado.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private async Task Quitar(int ruta, int rol)
+    {
+        var r = await Servicio.EliminarAsync(ruta, rol);
+        if (r.Bien) { Avisar("Acceso quitado.", false); await Cargar(); }
+        else { Avisar(r.Mensaje!, true); }
+    }
+
+    private string TextoRuta(int id) =>
+        rutas.FirstOrDefault(r => r.Id == id)?.RutaTexto ?? id.ToString();
+
+    private string NombreRol(int id) =>
+        roles.FirstOrDefault(r => r.Id == id)?.Nombre ?? id.ToString();
+
+    private void Avisar(string t, bool esError) { aviso = t; avisoEsError = esError; }
+}

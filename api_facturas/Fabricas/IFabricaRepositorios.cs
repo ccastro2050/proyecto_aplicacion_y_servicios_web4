@@ -30,4 +30,14 @@ public interface IFabricaRepositorios
     IRepositorioRuta CrearRepositorioRuta();
     IRepositorioRolUsuario CrearRepositorioRolUsuario();
     IRepositorioRutaRol CrearRepositorioRutaRol();
+
+    /// <summary>El recurso maestro-detalle sobre la tabla puente (v2):
+    /// el usuario Y sus roles en una sola operacion.</summary>
+    IRepositorioUsuarioConRoles CrearRepositorioUsuarioConRoles();
+
+    /// <summary>El control de acceso (v3). Tambien pasa por aqui, y es
+    /// importante: con el motor en postgres, un repositorio de acceso que
+    /// siguiera hablando con SQL Server no se notaria —los dos motores
+    /// tienen los mismos datos— hasta que dejaran de tenerlos.</summary>
+    IRepositorioAcceso CrearRepositorioAcceso();
 }

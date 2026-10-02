@@ -5,12 +5,27 @@ using ApiFacturas.Excepciones;
 using ApiFacturas.Modelos;
 using ApiFacturas.Peticiones;
 using ApiFacturas.Servicios;
+using ApiFacturas.Autorizacion;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiFacturas.Controllers;
 
 [ApiController]
 [Route("api/vendedor")]
+// v3 — LA PUERTA. Antes de la v3 este controlador era publico:
+// cualquiera que llegara a la direccion hacia cualquier cosa.
+//
+//   [Authorize]      exige TOKEN. Sin token o con uno alterado o
+//                    vencido: 401 -«no se quien es usted»-.
+//   [ExigePermiso]   exige PERMISO. Con token valido pero sin el
+//                    permiso: 403 -«se quien es, y no puede»-.
+//
+// Y el permiso se consulta EN CADA PETICION contra la base, no se
+// lee del token: por eso quitarle el permiso a un rol surte efecto
+// sin que la persona vuelva a identificarse.
+[Authorize]
+[ExigePermiso("interfaz.vendedores")]
 public class VendedorController : ControllerBase
 {
     private readonly IServicioVendedor _servicio;

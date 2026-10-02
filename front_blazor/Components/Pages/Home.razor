@@ -1,0 +1,154 @@
+@page "/"
+
+@*
+   El Inicio. Cada version tiene el suyo, y conviene decir por que: durante un
+   tiempo este archivo fue EL MISMO en los cuatro proyectos, y decia «Version 1
+   del proyecto: el CRUD de productos». En el 2, el 3 y el 4 era falso — y es lo
+   primero que lee quien abre el sistema.
+
+   Paso porque el front de la v1 se copio tal cual y este archivo no se reviso:
+   no tiene codigo, solo texto, asi que ni el compilador ni el auditor lo
+   podian cachar. Un texto equivocado no rompe nada; solo engana.
+*@
+
+<div class="pb-2 mb-4 border-bottom">
+    <h1 class="mb-1">Facturas</h1>
+    <p class="fs-5 text-body-secondary mb-0">
+        Versión 4 — <strong>el aplicativo completo</strong>
+    </p>
+</div>
+
+<p class="mb-4">Las cuatro versiones del curso, y además el adelanto de la v5: una segunda implementación de los repositorios contra SQL Server, elegida por configuración.</p>
+
+<div class="alert alert-primary d-flex align-items-start gap-2" role="alert">
+    <div>
+        <strong>Esta versión pide identificarse.</strong>
+        Sin sesión, la interfaz manda a <a href="sesion" class="alert-link">iniciar sesión</a>
+        y la API responde <code>401</code>. Y el menú de arriba
+        <strong>solo muestra lo que su rol puede abrir</strong> — pero eso es
+        comodidad, no protección: quien escriba la dirección a mano recibe un
+        <code>403</code> de la API, que es quien de verdad protege.
+    </div>
+</div>
+
+<h2 class="h5 mt-4 mb-3">
+    Lo que hay
+    <span class="badge text-bg-secondary align-middle ms-1">12 interfaces</span>
+</h2>
+
+<h3 class="h6 text-body-secondary text-uppercase small mb-3">De la versión 1 — sin clave foránea</h3>
+<div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="productos">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Productos</h3>
+                        <p class="card-text small text-body-secondary mb-0">Código, nombre, stock y valor unitario</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="empresas">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Empresas</h3>
+                        <p class="card-text small text-body-secondary mb-0">Las empresas a las que puede pertenecer un cliente</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="personas">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Personas</h3>
+                        <p class="card-text small text-body-secondary mb-0">Quiénes son clientes y vendedores</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="roles">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Roles</h3>
+                        <p class="card-text small text-body-secondary mb-0">Administrador, Vendedor, Cajero, Contador, Cliente</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="rutas">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Rutas</h3>
+                        <p class="card-text small text-body-secondary mb-0">Las interfaces y acciones protegibles</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="usuarios">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Usuarios</h3>
+                        <p class="card-text small text-body-secondary mb-0">Quiénes pueden entrar al sistema</p>
+                    </div>
+                </a>
+            </div>
+</div>
+
+<h3 class="h6 text-body-secondary text-uppercase small mb-3">De la versión 2 — con clave foránea</h3>
+<div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="clientes">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Clientes</h3>
+                        <p class="card-text small text-body-secondary mb-0">Con su persona y su empresa, elegidas de un desplegable</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="vendedores">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Vendedores</h3>
+                        <p class="card-text small text-body-secondary mb-0">Con su carnet y su persona</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="facturas">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Facturas</h3>
+                        <p class="card-text small text-body-secondary mb-0">Maestro-detalle: la factura y sus renglones, en un solo envío</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="usuario-con-roles">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Usuarios y roles</h3>
+                        <p class="card-text small text-body-secondary mb-0">El usuario y sus roles, con casillas</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="rol-usuario">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Roles por usuario</h3>
+                        <p class="card-text small text-body-secondary mb-0">La tabla puente, pareja a pareja</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="card h-100 text-decoration-none" href="ruta-rol">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">Permisos por rol</h3>
+                        <p class="card-text small text-body-secondary mb-0">Qué rol entra a qué interfaz</p>
+                    </div>
+                </a>
+            </div>
+</div>
+
+<div class="card bg-body-tertiary border-0 mt-4">
+    <div class="card-body">
+        <h2 class="h6 card-title">La interfaz gráfica y la API son dos procesos distintos</h2>
+        <p class="card-text small mb-0">
+            Y se puede comprobar: apague la API con
+            <code>docker compose stop api-facturas</code> y vuelva a cargar
+            <a href="productos">Productos</a>. El menú sigue en pie, con un aviso, y
+            <strong>sin una sola fila</strong>. Si siguiera mostrando los productos,
+            estaría leyendo de donde no debe.
+        </p>
+    </div>
+</div>

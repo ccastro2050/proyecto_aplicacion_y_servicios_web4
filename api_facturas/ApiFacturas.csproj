@@ -35,6 +35,10 @@
     <!-- v3: BCrypt.Net-Next — el hash de la contraseña de usuario
          (costo 12). Lo usa SOLO el repositorio de usuario. -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- v3: el token. La version se copio de
+         proyecto_construccion1/api_generica_csharp, que ya corre sobre
+         net10.0 con esta misma. No se adivino. -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
     <!-- v4: Npgsql — el proveedor ADO.NET oficial de PostgreSQL
          (las mismas ideas de SqlClient: Connection/Command/Reader). -->
     <PackageReference Include="Npgsql" Version="9.0.3" />

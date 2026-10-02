@@ -29,10 +29,17 @@
    interfaz se abre y tiene que mostrar el 403 que respondió la API.
    ============================================================
 *@
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-marca sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="/">
-            <span class="text-primary">Facturas</span>
+        @* LA MARCA, en sus tres piezas con el nombre que les da el manual:
+           el LOGOTIPO -la palabra, en serifa y versalitas-, el ISOTIPO -el
+           simbolo- y el DESCRIPTOR -lo que la empresa es-.
+
+           Va como enlace al inicio porque es lo que un navegante espera de
+           una marca arriba a la izquierda. *@
+        <a class="navbar-brand logosimbolo mb-0" href="/">
+            <span class="logotipo">Los Andes</span> <span class="isotipo">▲</span>
+            <small class="descriptor">comercial s.a.</small>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"

@@ -4,8 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Facturas — Construcción de Software</title>
+    <title>Inicio · Comercial Los Andes S.A.</title>
     <base href="/" />
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2317495B'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23E39B2D'>▲</text></svg>" />
 
     <!-- ============================================================
          BOOTSTRAP, SERVIDO DESDE ESTE REPOSITORIO. No desde un CDN.
@@ -20,6 +22,12 @@
     <!-- El CSS del proyecto va DESPUÉS, para poder ajustar lo de Bootstrap.
          En CSS, a igual especificidad gana el último que se carga. -->
     <link rel="stylesheet" href="app.css" />
+
+    <!-- Y LA MARCA DE ULTIMA, siempre: en CSS, a igual especificidad gana el
+         último que se carga. Así `marca.css` puede ajustar lo de Bootstrap y
+         lo de `app.css`, y no al revés — que es lo que hace que el manual de
+         marca sea una restricción y no una sugerencia. -->
+    <link rel="stylesheet" href="marca.css" />
     <HeadOutlet />
 </head>
 

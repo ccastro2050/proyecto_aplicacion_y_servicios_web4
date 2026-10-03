@@ -72,4 +72,65 @@ public class ServicioRutaRol : IServicioRutaRol
         }
         return filas;
     }
+
+    public async Task<int> ReemplazarAsync(int fkidruta, int fkidrol, RutaRol nueva)
+    {
+        // El PUT trae la pareja ENTERA: no hay nada que conservar.
+        return await MoverAsync(fkidruta, fkidrol, nueva.Fkidruta, nueva.Fkidrol);
+    }
+
+    public async Task<int> ActualizarAsync(int fkidruta, int fkidrol,
+                                           int? nuevaRuta, int? nuevoRol)
+    {
+        // EL PATCH DE UNA TABLA PUENTE: llega UNO de los dos lados y el otro se
+        // conserva. Pasarle una ruta a otro rol es cambiar el idrol; cambiarle
+        // la ruta al mismo rol es cambiar el idruta.
+        if (nuevaRuta == null && nuevoRol == null)
+        {
+            throw new ArgumentException("No se envió ningún campo para actualizar.");
+        }
+        return await MoverAsync(fkidruta, fkidrol,
+                                nuevaRuta ?? fkidruta, nuevoRol ?? fkidrol);
+    }
+
+    public async Task<int> ReemplazarDeRolAsync(int fkidrol, List<int> idsRuta)
+    {
+        if (fkidrol <= 0)
+        {
+            throw new ArgumentException("El id de rol debe ser un entero mayor que cero.");
+        }
+        if (idsRuta.Any(x => x <= 0))
+        {
+            throw new ArgumentException("Los ids de ruta deben ser enteros mayores que cero.");
+        }
+
+        // UNA LISTA VACÍA SÍ SE ACEPTA, y hay que decir por qué: dejar a un rol
+        // sin ninguna ruta es una decisión legítima —un rol recién creado, o
+        // uno al que se le revoca todo—. Lo que no se acepta es un id que no
+        // sea un id.
+        return await _repositorio.ReemplazarDeRolAsync(fkidrol, idsRuta);
+    }
+
+    /// <summary>Lo comun al PUT y al PATCH: validar y mover.</summary>
+    private async Task<int> MoverAsync(int rutaVieja, int rolViejo,
+                                       int rutaNueva, int rolNuevo)
+    {
+        if (rutaVieja <= 0 || rutaNueva <= 0)
+        {
+            throw new ArgumentException("El id de ruta debe ser un entero mayor que cero.");
+        }
+        if (rolViejo <= 0 || rolNuevo <= 0)
+        {
+            throw new ArgumentException("El id de rol debe ser un entero mayor que cero.");
+        }
+
+        var filas = await _repositorio.ReemplazarAsync(rutaVieja, rolViejo,
+                                                       rutaNueva, rolNuevo);
+        if (filas == 0)
+        {
+            throw new NoEncontradoExcepcion(
+                $"No existe la pareja ({rutaVieja}, {rolViejo}) en rutarol");
+        }
+        return filas;
+    }
 }

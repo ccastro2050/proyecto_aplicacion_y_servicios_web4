@@ -133,6 +133,71 @@ public class RolUsuarioController : ControllerBase
         }
     }
 
+    // ------------------------------------------------------------
+    // PUT /api/rolusuario/{email}/{idrol}  →  MOVER la asignación
+    // ------------------------------------------------------------
+    // EN UNA TABLA PUENTE «ACTUALIZAR» ES MOVER LA FILA, y ésa es la
+    // lección de estos dos verbos.
+    //
+    // Las dos columnas SON la llave primaria: no hay un campo suelto que
+    // cambiar. Así que el PUT recibe la pareja nueva ENTERA, borra la
+    // vieja e inserta la nueva — en una transacción, porque si el INSERT
+    // falla el DELETE no puede quedarse hecho.
+    [HttpPut("{email}/{idrol:int}")]
+    public async Task<IActionResult> Reemplazar(string email, int idrol,
+                                                [FromBody] RolUsuarioCrear body)
+    {
+        try
+        {
+            var nueva = new RolUsuario { Fkemail = body.Fkemail!, Fkidrol = body.Fkidrol!.Value };
+            var filas = await _servicio.ReemplazarAsync(email, idrol, nueva);
+            return Ok(new { estado = 200, mensaje = "Asignación reemplazada exitosamente.", filasAfectadas = filas });
+        }
+        catch (ArgumentException e)
+        {
+            return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
+        }
+        catch (NoEncontradoExcepcion e)
+        {
+            return StatusCode(404, new { estado = 404, mensaje = "Asignación no encontrada.", detalle = e.Message });
+        }
+        catch (Exception e)
+        {
+            // La pareja nueva ya existía (PK duplicada) o el rol/usuario no
+            // existe (FK): la base rechaza y el rollback deja todo como estaba.
+            return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
+        }
+    }
+
+    // ------------------------------------------------------------
+    // PATCH /api/rolusuario/{email}/{idrol}  →  mover UN lado
+    // ------------------------------------------------------------
+    // Igual que el PUT, pero llega solo el lado que cambia y el otro se
+    // conserva: `{"fkidrol": 3}` le cambia el rol a la misma persona;
+    // `{"fkemail": "otro@correo.com"}` le pasa ese rol a otra.
+    [HttpPatch("{email}/{idrol:int}")]
+    public async Task<IActionResult> Actualizar(string email, int idrol,
+                                                [FromBody] RolUsuarioActualizar body)
+    {
+        try
+        {
+            var filas = await _servicio.ActualizarAsync(email, idrol, body.Fkemail, body.Fkidrol);
+            return Ok(new { estado = 200, mensaje = "Asignación actualizada exitosamente.", filasAfectadas = filas });
+        }
+        catch (ArgumentException e)
+        {
+            return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
+        }
+        catch (NoEncontradoExcepcion e)
+        {
+            return StatusCode(404, new { estado = 404, mensaje = "Asignación no encontrada.", detalle = e.Message });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
+        }
+    }
+
     [HttpDelete("{email}/{idrol:int}")]
     public async Task<IActionResult> Eliminar(string email, int idrol)
     {

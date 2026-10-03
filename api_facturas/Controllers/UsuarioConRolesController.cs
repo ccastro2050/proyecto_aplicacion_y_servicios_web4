@@ -161,6 +161,68 @@ public class UsuarioConRolesController : ControllerBase
     }
 
     // ------------------------------------------------------------
+    // PATCH /api/usuario-con-roles/{email}  →  cambio PARCIAL
+    // ------------------------------------------------------------
+    // LA DIFERENCIA CON EL PUT DE ARRIBA, que es la lección de este par:
+    //
+    //   PUT   exige la lista de roles — la que llega es la que queda.
+    //   PATCH no la exige: si no llega, LOS ROLES NO SE TOCAN.
+    //
+    // Por eso `{"contrasena": "nueva123"}` le cambia la clave a alguien sin
+    // rozarle los roles, algo que con el PUT obligaría a reenviar la lista
+    // entera — y a arriesgarse a equivocarla.
+    //
+    // Quién decide qué se conserva es el SERVICIO: aquí solo se lee lo que
+    // llegó y se le pasa; mezclar es una regla de negocio, no de HTTP.
+    [HttpPatch("{email}")]
+    public async Task<IActionResult> Actualizar(string email,
+                                                [FromBody] UsuarioConRolesParcial body)
+    {
+        try
+        {
+            if (body.Contrasena == null && body.Roles == null)
+            {
+                // Forma válida y nada que hacer: 400, no 422.
+                return StatusCode(400, new
+                {
+                    estado = 400,
+                    mensaje = "Parámetros inválidos.",
+                    detalle = "No se envió ningún campo para actualizar.",
+                });
+            }
+
+            // Si no mandó roles, se conservan los que tiene: se leen y se
+            // reenvían, porque el procedimiento de la BD reemplaza la lista
+            // entera y no sabe «dejarla como está».
+            var roles = body.Roles;
+            if (roles == null)
+            {
+                var actual = await _servicio.ConsultarAsync(email);
+                roles = actual.Roles.Select(r => r.IdRol).ToList();
+            }
+
+            var actualizado = await _servicio.ActualizarAsync(email, body.Contrasena, roles);
+            return Ok(actualizado);
+        }
+        catch (ArgumentException e)
+        {
+            return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
+        }
+        catch (NoEncontradoExcepcion e)
+        {
+            return StatusCode(404, new { estado = 404, mensaje = "Usuario no encontrado.", detalle = e.Message });
+        }
+        catch (ConflictoExcepcion e)
+        {
+            return StatusCode(409, new { estado = 409, mensaje = "Uno de los roles no existe.", detalle = e.Message });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
+        }
+    }
+
+    // ------------------------------------------------------------
     // DELETE /api/usuario-con-roles/{email}  →  detalle y maestro juntos
     // ------------------------------------------------------------
     [HttpDelete("{email}")]

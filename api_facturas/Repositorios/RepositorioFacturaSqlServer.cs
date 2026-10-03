@@ -115,4 +115,26 @@ public class RepositorioFacturaSqlServer : IRepositorioFactura
     {
         return await EjecutarSpAsync("sp_anular_factura", new { p_numero = numero });
     }
+
+    public async Task<Factura> ReemplazarAsync(int numero, int fkidcliente,
+                                               int fkidvendedor, string productosJson)
+    {
+        // El MISMO SP que crea, pero con el número: adentro devuelve el stock
+        // de los renglones viejos, borra el detalle e inserta el nuevo, todo en
+        // UNA transacción. Si se hiciera desde aquí con tres llamadas, un fallo
+        // en la segunda dejaría la factura sin renglones.
+        var json = await EjecutarSpAsync("sp_actualizar_factura_y_productosporfactura",
+            new { p_numero = numero, p_fkidcliente = fkidcliente,
+                  p_fkidvendedor = fkidvendedor, p_productos = productosJson });
+        return ArmarFactura(json);
+    }
+
+    public async Task<string> EliminarAsync(int numero)
+    {
+        // Borrado FÍSICO: la fila se va. Compárelo con AnularAsync, que la deja
+        // con su número y su fecha — son dos cosas distintas y la API ofrece
+        // las dos para que se vea la diferencia.
+        return await EjecutarSpAsync("sp_borrar_factura_y_productosporfactura",
+            new { p_numero = numero });
+    }
 }

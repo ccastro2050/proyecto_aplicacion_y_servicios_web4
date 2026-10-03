@@ -78,6 +78,34 @@ public class ServicioSesion : IServicioSesion
         };
     }
 
+    public async Task<Sesion?> RenovarAsync(string email)
+    {
+        // AQUÍ NO SE PIDE CONTRASEÑA, y no es un descuido: quien llama ya trajo
+        // un token válido, y validarlo es exactamente comprobar que en su
+        // momento dio la contraseña correcta. Pedirla otra vez sería no
+        // creerle al token que la API misma firmó.
+        //
+        // Lo que sí se vuelve a leer son LOS ROLES: si a alguien le quitaron
+        // uno, el token nuevo sale sin él. Por eso renovar no es solo correr
+        // la fecha.
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return null;
+        }
+
+        var roles = await NombresDeRolesAsync(email.Trim());
+        var expira = DateTime.UtcNow.AddMinutes(
+            _jwt.DuracionMinutos > 0 ? _jwt.DuracionMinutos : 60);
+
+        return new Sesion
+        {
+            Token = ArmarToken(email.Trim(), roles, expira),
+            Email = email.Trim(),
+            Roles = roles,
+            Expira = expira,
+        };
+    }
+
     /// <summary>Los NOMBRES de los roles, no sus ids: el menú de la interfaz le
     /// habla a una persona.</summary>
     private async Task<List<string>> NombresDeRolesAsync(string email)

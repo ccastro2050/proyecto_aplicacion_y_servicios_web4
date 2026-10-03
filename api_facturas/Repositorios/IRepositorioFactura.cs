@@ -37,4 +37,17 @@ public interface IRepositorioFactura
     /// estado='anulada'. Devuelve el JSON del SP tal cual (mensaje,
     /// número, total anulado…). ConflictoExcepcion si ya estaba anulada.</summary>
     Task<string> AnularAsync(int numero);
+
+    /// <summary>Reemplaza la factura ENTERA —encabezado y renglones— en
+    /// una transacción del SP (sp_actualizar_factura_y_productosporfactura).
+    /// El SP devuelve el stock de los renglones viejos, borra el detalle,
+    /// inserta el nuevo y deja que el trigger recalcule todo.
+    /// NoEncontradoExcepcion si el número no existe.</summary>
+    Task<Factura> ReemplazarAsync(int numero, int fkidcliente, int fkidvendedor,
+                                  string productosJson);
+
+    /// <summary>Borrado FÍSICO (sp_borrar_factura_y_productosporfactura): la
+    /// fila desaparece y el stock vuelve a los productos. Devuelve el JSON del
+    /// SP. No confundir con AnularAsync, que la deja en la base.</summary>
+    Task<string> EliminarAsync(int numero);
 }

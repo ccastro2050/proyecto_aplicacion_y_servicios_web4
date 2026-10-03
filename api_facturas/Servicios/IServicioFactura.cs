@@ -32,4 +32,18 @@ public interface IServicioFactura
     /// <summary>Anula (borrado lógico). Devuelve el JSON del SP.
     /// ConflictoExcepcion si ya estaba anulada.</summary>
     Task<string> AnularAsync(int numero);
+
+    /// <summary>Reemplaza la factura entera (PUT). 'productosJson' llega
+    /// armado por el controlador desde la petición ya validada.</summary>
+    Task<Factura> ReemplazarAsync(int numero, int fkidcliente, int fkidvendedor,
+                                  string productosJson);
+
+    /// <summary>Actualización PARCIAL (PATCH): lee la factura, mezcla lo que
+    /// llegó —los que vengan en null se quedan como están— y la reenvía
+    /// completa, porque el SP no sabe escribir por partes.</summary>
+    Task<Factura> ActualizarAsync(int numero, int? fkidcliente, int? fkidvendedor,
+                                  string? productosJson);
+
+    /// <summary>Borrado FÍSICO (DELETE). Devuelve el JSON del SP.</summary>
+    Task<string> EliminarAsync(int numero);
 }

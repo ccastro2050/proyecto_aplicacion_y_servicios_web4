@@ -133,6 +133,68 @@ public class RutaRolController : ControllerBase
         }
     }
 
+    // ------------------------------------------------------------
+    // PUT /api/rutarol/{idruta}/{idrol}  →  MOVER el permiso
+    // ------------------------------------------------------------
+    // EN UNA TABLA PUENTE «ACTUALIZAR» ES MOVER LA FILA: las dos columnas
+    // SON la llave primaria, así que no hay un campo suelto que cambiar.
+    // El PUT recibe la pareja nueva ENTERA, borra la vieja e inserta la
+    // nueva — en una transacción, porque si el INSERT falla el DELETE no
+    // puede quedarse hecho.
+    [HttpPut("{idruta:int}/{idrol:int}")]
+    public async Task<IActionResult> Reemplazar(int idruta, int idrol,
+                                                [FromBody] RutaRolCrear body)
+    {
+        try
+        {
+            var nueva = new RutaRol { Fkidruta = body.Fkidruta!.Value, Fkidrol = body.Fkidrol!.Value };
+            var filas = await _servicio.ReemplazarAsync(idruta, idrol, nueva);
+            return Ok(new { estado = 200, mensaje = "Permiso reemplazado exitosamente.", filasAfectadas = filas });
+        }
+        catch (ArgumentException e)
+        {
+            return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
+        }
+        catch (NoEncontradoExcepcion e)
+        {
+            return StatusCode(404, new { estado = 404, mensaje = "Permiso no encontrado.", detalle = e.Message });
+        }
+        catch (Exception e)
+        {
+            // La pareja nueva ya existía (PK duplicada) o la ruta/rol no existe
+            // (FK): la base rechaza y el rollback deja todo como estaba.
+            return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
+        }
+    }
+
+    // ------------------------------------------------------------
+    // PATCH /api/rutarol/{idruta}/{idrol}  →  mover UN lado
+    // ------------------------------------------------------------
+    // Igual que el PUT, pero llega solo el lado que cambia y el otro se
+    // conserva: `{"fkidrol": 3}` le pasa esa ruta a otro rol.
+    [HttpPatch("{idruta:int}/{idrol:int}")]
+    public async Task<IActionResult> Actualizar(int idruta, int idrol,
+                                                [FromBody] RutaRolActualizar body)
+    {
+        try
+        {
+            var filas = await _servicio.ActualizarAsync(idruta, idrol, body.Fkidruta, body.Fkidrol);
+            return Ok(new { estado = 200, mensaje = "Permiso actualizado exitosamente.", filasAfectadas = filas });
+        }
+        catch (ArgumentException e)
+        {
+            return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
+        }
+        catch (NoEncontradoExcepcion e)
+        {
+            return StatusCode(404, new { estado = 404, mensaje = "Permiso no encontrado.", detalle = e.Message });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
+        }
+    }
+
     [HttpDelete("{idruta:int}/{idrol:int}")]
     public async Task<IActionResult> Eliminar(int idruta, int idrol)
     {

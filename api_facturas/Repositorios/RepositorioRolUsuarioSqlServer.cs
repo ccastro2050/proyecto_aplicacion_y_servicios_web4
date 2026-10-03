@@ -62,4 +62,47 @@ public class RepositorioRolUsuarioSqlServer : IRepositorioRolUsuario
         return await ErroresSqlServer.TraducirAsync(
             () => conexion.ExecuteAsync(sql, new { fkemail, fkidrol }));
     }
+
+    public async Task<int> ReemplazarAsync(string fkemailViejo, int fkidrolViejo,
+                                           string fkemailNuevo, int fkidrolNuevo)
+    {
+        // EN UNA TABLA PUENTE, «ACTUALIZAR» ES MOVER LA FILA.
+        //
+        // Las dos columnas son la llave primaria, así que no hay un campo
+        // suelto que cambiar: se borra la pareja vieja y se inserta la nueva.
+        // Y va en UNA transacción, porque si el INSERT fallara —la pareja
+        // nueva ya existe— el DELETE no puede quedarse hecho: se habría
+        // perdido una asignación sin poner ninguna.
+        const string sqlBorrar = @"DELETE FROM rol_usuario
+                                   WHERE fkemail = @viejoEmail AND fkidrol = @viejoRol";
+        const string sqlInsertar = @"INSERT INTO rol_usuario (fkemail, fkidrol)
+                                     VALUES (@nuevoEmail, @nuevoRol)";
+
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        await using var transaccion = await conexion.BeginTransactionAsync();
+        try
+        {
+            var filas = await conexion.ExecuteAsync(sqlBorrar,
+                new { viejoEmail = fkemailViejo, viejoRol = fkidrolViejo }, transaccion);
+
+            if (filas == 0)
+            {
+                // La pareja vieja no existía: no hay nada que mover. Se
+                // devuelve 0 y el SERVICIO decide que eso es un 404.
+                await transaccion.RollbackAsync();
+                return 0;
+            }
+
+            await conexion.ExecuteAsync(sqlInsertar,
+                new { nuevoEmail = fkemailNuevo, nuevoRol = fkidrolNuevo }, transaccion);
+            await transaccion.CommitAsync();
+            return filas;
+        }
+        catch
+        {
+            await transaccion.RollbackAsync();
+            throw;   // la traduce quien llama (FK inexistente, pareja repetida…)
+        }
+    }
 }

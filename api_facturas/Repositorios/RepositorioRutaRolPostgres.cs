@@ -60,4 +60,78 @@ public class RepositorioRutaRolPostgres : IRepositorioRutaRol
         await using var conexion = CrearConexion();
         return await conexion.ExecuteAsync(sql, new { fkidruta, fkidrol });
     }
+
+    public async Task<int> ReemplazarAsync(int fkidrutaViejo, int fkidrolViejo,
+                                           int fkidrutaNuevo, int fkidrolNuevo)
+    {
+        // EN UNA TABLA PUENTE, «ACTUALIZAR» ES MOVER LA FILA: las dos columnas
+        // son la llave primaria, así que se borra la pareja vieja y se inserta
+        // la nueva. Va en UNA transacción porque si el INSERT fallara —la
+        // pareja nueva ya existe— el DELETE no puede quedarse hecho: se habría
+        // quitado un permiso sin poner el otro.
+        const string sqlBorrar = @"DELETE FROM rutarol
+                                   WHERE fkidruta = @rutaVieja AND fkidrol = @rolViejo";
+        const string sqlInsertar = @"INSERT INTO rutarol (fkidruta, fkidrol)
+                                     VALUES (@rutaNueva, @rolNuevo)";
+
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        await using var transaccion = await conexion.BeginTransactionAsync();
+        try
+        {
+            var filas = await conexion.ExecuteAsync(sqlBorrar,
+                new { rutaVieja = fkidrutaViejo, rolViejo = fkidrolViejo }, transaccion);
+
+            if (filas == 0)
+            {
+                // La pareja vieja no existía: no hay nada que mover. Se
+                // devuelve 0 y el SERVICIO decide que eso es un 404.
+                await transaccion.RollbackAsync();
+                return 0;
+            }
+
+            await conexion.ExecuteAsync(sqlInsertar,
+                new { rutaNueva = fkidrutaNuevo, rolNuevo = fkidrolNuevo }, transaccion);
+            await transaccion.CommitAsync();
+            return filas;
+        }
+        catch
+        {
+            await transaccion.RollbackAsync();
+            throw;   // la traduce quien llama (FK inexistente, pareja repetida…)
+        }
+    }
+
+    public async Task<int> ReemplazarDeRolAsync(int fkidrol, List<int> idsRuta)
+    {
+        // TODO O NADA: borrar lo que tiene e insertar lo nuevo son dos pasos, y
+        // entre uno y otro el rol no puede entrar a ninguna parte. Si el
+        // segundo fallara —una ruta que no existe— y el primero quedara hecho,
+        // habríamos dejado a un rol sin permisos sin que nadie lo pidiera.
+        const string sqlBorrar = @"DELETE FROM rutarol WHERE fkidrol = @fkidrol";
+        const string sqlInsertar = @"INSERT INTO rutarol (fkidruta, fkidrol)
+                                     VALUES (@fkidruta, @fkidrol)";
+
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        await using var transaccion = await conexion.BeginTransactionAsync();
+        try
+        {
+            await conexion.ExecuteAsync(sqlBorrar, new { fkidrol }, transaccion);
+
+            foreach (var idruta in idsRuta.Distinct())
+            {
+                await conexion.ExecuteAsync(sqlInsertar,
+                    new { fkidruta = idruta, fkidrol }, transaccion);
+            }
+
+            await transaccion.CommitAsync();
+            return idsRuta.Distinct().Count();
+        }
+        catch
+        {
+            await transaccion.RollbackAsync();
+            throw;   // ruta inexistente (FK) → la traduce quien llama
+        }
+    }
 }

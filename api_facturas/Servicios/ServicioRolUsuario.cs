@@ -74,4 +74,45 @@ public class ServicioRolUsuario : IServicioRolUsuario
         }
         return filas;
     }
+
+    public async Task<int> ReemplazarAsync(string fkemail, int fkidrol, RolUsuario nueva)
+    {
+        // El PUT trae la pareja ENTERA: no hay nada que conservar.
+        return await MoverAsync(fkemail, fkidrol, nueva.Fkemail, nueva.Fkidrol);
+    }
+
+    public async Task<int> ActualizarAsync(string fkemail, int fkidrol,
+                                           string? nuevoEmail, int? nuevoRol)
+    {
+        // EL PATCH DE UNA TABLA PUENTE: llega UNO de los dos lados y el otro
+        // se conserva. Mover un rol de una persona a otra es cambiar el
+        // email; cambiarle el rol a la misma persona es cambiar el idrol.
+        if (nuevoEmail == null && nuevoRol == null)
+        {
+            throw new ArgumentException("No se envió ningún campo para actualizar.");
+        }
+        return await MoverAsync(fkemail, fkidrol,
+                                nuevoEmail ?? fkemail, nuevoRol ?? fkidrol);
+    }
+
+    /// <summary>Lo comun al PUT y al PATCH: validar y mover.</summary>
+    private async Task<int> MoverAsync(string emailViejo, int rolViejo,
+                                       string emailNuevo, int rolNuevo)
+    {
+        emailViejo = emailViejo.Trim();
+        emailNuevo = emailNuevo.Trim();
+        if (emailViejo == "" || emailNuevo == "")
+        {
+            throw new ArgumentException("El usuario no puede estar vacío.");
+        }
+
+        var filas = await _repositorio.ReemplazarAsync(emailViejo, rolViejo,
+                                                       emailNuevo, rolNuevo);
+        if (filas == 0)
+        {
+            throw new NoEncontradoExcepcion(
+                $"No existe la pareja ({emailViejo}, {rolViejo}) en rol_usuario");
+        }
+        return filas;
+    }
 }

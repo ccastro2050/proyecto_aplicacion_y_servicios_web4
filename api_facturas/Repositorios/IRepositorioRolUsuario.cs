@@ -13,4 +13,11 @@ public interface IRepositorioRolUsuario
     Task<List<RolUsuario>> ObtenerPorRolAsync(int fkidrol);
     Task CrearAsync(RolUsuario asignacion);
     Task<int> EliminarAsync(string fkemail, int fkidrol);   // ¡AMBAS columnas!
+
+    /// <summary>MUEVE la asignación: borra la pareja vieja e inserta la nueva,
+    /// en ese orden. En una tabla puente «actualizar» no es otra cosa — las dos
+    /// columnas SON la llave, y cambiar una es cambiar de fila.
+    /// Devuelve las filas afectadas (0 = la pareja vieja no existía).</summary>
+    Task<int> ReemplazarAsync(string fkemailViejo, int fkidrolViejo,
+                              string fkemailNuevo, int fkidrolNuevo);
 }

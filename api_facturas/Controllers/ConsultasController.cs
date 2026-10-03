@@ -38,6 +38,46 @@ public class ConsultasController : ControllerBase
     }
 
     // ------------------------------------------------------------
+    // GET /api/consultas  →  EL CATÁLOGO: cuáles hay
+    // ------------------------------------------------------------
+    // Sin esto, para armar el tablero había que saberse las diez de memoria o
+    // leer este archivo. Ahora la interfaz pregunta y pinta lo que le digan.
+    //
+    // La lista está escrita aquí y no en la base **a propósito**: estas diez
+    // consultas son código —cada una tiene su SQL y su endpoint—, no datos que
+    // alguien pueda agregar. Una lista en la base prometería que se puede
+    // crear una consulta nueva guardando una fila, y no es así.
+    [HttpGet]
+    public IActionResult Catalogo()
+    {
+        var consultas = new[]
+        {
+            new { nombre = "ventas-por-producto",     titulo = "Ventas por producto",          descripcion = "Cuánto se vendió de cada producto, en unidades y en dinero." },
+            new { nombre = "ventas-por-cliente",      titulo = "Ventas por cliente",           descripcion = "Cuánto compró cada cliente y en cuántas facturas." },
+            new { nombre = "ventas-por-vendedor",     titulo = "Ventas por vendedor",          descripcion = "Cuánto vendió cada vendedor." },
+            new { nombre = "ventas-por-empresa",      titulo = "Ventas por empresa",           descripcion = "Las ventas agrupadas por la empresa del cliente." },
+            new { nombre = "ticket-por-vendedor",     titulo = "Ticket promedio por vendedor", descripcion = "Cuánto vale en promedio una factura de cada vendedor." },
+            new { nombre = "productos-sin-vender",    titulo = "Productos sin vender",         descripcion = "Los que nunca aparecieron en una factura activa." },
+            new { nombre = "anulaciones-por-cliente", titulo = "Anulaciones por cliente",      descripcion = "Quién anula más, y cuánto dinero se devolvió." },
+            new { nombre = "alcance-de-usuarios",     titulo = "Alcance de los usuarios",      descripcion = "A cuántas interfaces llega cada usuario por sus roles." },
+            new { nombre = "interfaces-sin-usuarios", titulo = "Interfaces sin usuarios",      descripcion = "Rutas a las que hoy no llega nadie." },
+            new { nombre = "credito-contra-consumo",  titulo = "Crédito contra consumo",       descripcion = "Cuánto crédito tiene cada cliente contra lo que ha comprado." },
+        };
+
+        return Ok(new
+        {
+            total = consultas.Length,
+            datos = consultas.Select(c => new
+            {
+                c.nombre,
+                c.titulo,
+                c.descripcion,
+                ruta = $"/api/consultas/{c.nombre}",
+            }),
+        });
+    }
+
+    // ------------------------------------------------------------
     // GET /api/consultas/ventas-por-producto
     // Cuánto se ha vendido de cada producto
     // Cruza: producto · productosporfactura · factura · cliente

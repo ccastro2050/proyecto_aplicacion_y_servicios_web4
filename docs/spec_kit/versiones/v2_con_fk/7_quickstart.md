@@ -196,7 +196,7 @@ navegador**, en `http://localhost:8099`.
 |---|---|---|
 | **11** | Abrir `/clientes` | El desplegable de **persona** está **lleno**, con nombres. Si está vacío, la interfaz no pidió el catálogo |
 | **12** | Crear un cliente y mirar lo que viaja | Se ve **«Ana Torres»** y en el JSON va **`P001`**. Nombre para la persona, código para la base |
-| **13** | En `/facturas`: agregar **tres** renglones, quitar **uno**, emitir | **Llegan DOS** |
+| **13** | En `/facturas/nueva`: agregar **tres** renglones, quitar **uno**, emitir | **Llegan DOS** |
 | **14** | Mirar el cuerpo de esa petición | **No lleva `total`** ni `subtotal`. Los puso la base |
 | **15** | Buscar el botón de **eliminar** una factura | **No existe.** Hay **anular** — y después de anular, el stock del producto **subió** |
 | **16** | En `/usuario-con-roles`: marcar **dos** casillas y crear | **Un solo envío**, y la lista lo muestra con sus dos roles |
@@ -206,14 +206,14 @@ navegador**, en `http://localhost:8099`.
 ### El criterio 13, que es el único que no se puede aparentar
 
 ```
-1. Abra /facturas
+1. Abra /facturas y pulse «Nueva factura»   -> queda en /facturas/nueva
 2. Elija cliente y vendedor
-3. Agregue el producto A        -> aparece en la tabla de abajo
-4. Agregue el producto B        -> aparecen dos
-5. Agregue el producto C        -> aparecen tres
-6. QUITE el producto B          -> quedan dos
-7. Emita
-8. Abra la factura en la lista
+3. «Agregar al detalle» el producto A       -> aparece en la tabla de abajo
+4. «Agregar al detalle» el producto B       -> aparecen dos
+5. «Agregar al detalle» el producto C       -> aparecen tres
+6. QUITE el producto B                      -> quedan dos
+7. «Emitir la factura»                      -> vuelve a /facturas
+8. Pulse «Ver» en la factura nueva
 ```
 
 **Tienen que ser DOS renglones: A y C.** Si son tres —o si B sigue ahí— el

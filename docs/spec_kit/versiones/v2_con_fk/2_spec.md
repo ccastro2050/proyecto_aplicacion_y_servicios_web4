@@ -264,7 +264,7 @@ varios—. Un solo envío.
 |---|---|---|
 | **11** | Abrir `/clientes` | El desplegable de persona está **lleno**. Si está vacío, la interfaz no pidió el catálogo |
 | **12** | Mirar lo que viaja al crear | Se ve «Ana Torres» y en el JSON va `P001` |
-| **13** | En `/facturas`: agregar **tres** renglones, quitar **uno**, emitir | **Llegan dos.** Si llegan tres, el detalle se está enviando a medida que se agrega |
+| **13** | En `/facturas/nueva`: agregar **tres** renglones, quitar **uno**, emitir | **Llegan dos.** Si llegan tres, el detalle se está enviando a medida que se agrega |
 | **14** | Mirar el JSON que sale al emitir | **No lleva `total`** ni subtotales |
 | **15** | Buscar el botón de eliminar una factura | **No existe.** Hay **anular**, y después de anular el stock **subió** |
 | **16** | En `/usuario-con-roles`: crear uno con dos casillas marcadas | Un solo envío, y la lista lo muestra con sus dos roles |

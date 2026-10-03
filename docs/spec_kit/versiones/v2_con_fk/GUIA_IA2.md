@@ -149,6 +149,8 @@ New-Item front_blazor\Modelos\Cliente.cs, front_blazor\Servicios\ServicioCliente
   front_blazor\Components\Pages\Clientes.razor,`
   front_blazor\Components\Pages\Vendedores.razor,`
   front_blazor\Components\Pages\Facturas.razor,`
+  front_blazor\Components\Pages\EmitirFactura.razor,`
+  front_blazor\Components\Pages\FacturaDetalle.razor,`
   front_blazor\Components\Pages\UsuariosYRoles.razor,`
   front_blazor\Components\Pages\RolesPorUsuario.razor,`
   front_blazor\Components\Pages\PermisosPorRol.razor

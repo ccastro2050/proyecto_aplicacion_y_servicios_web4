@@ -370,10 +370,41 @@ según la calidad de lo entregado**)** o **No cumple (de 0 a 2.9)**.
 | **Dashboard y consultas (v4)** | 10 consultas de 4+ tablas con gráficos claros | Menos de 10 consultas, consultas de menos de 4 tablas, o sin dashboard |
 | **Imagen corporativa y responsive (v4)** | **Existe un manual de marca** —propio o el del ejemplo— y la interfaz gráfica lo cumple: los colores y las tipografías salen de él, no de un gusto; todo responsive | No hay manual, o lo hay y la interfaz gráfica no lo respeta, o no es responsive |
 | **Publicación (v4)** | Publicado, funcional, con secretos en variables de entorno del servidor | No publicado o con secretos expuestos |
+| **Interpretabilidad (desde la v2)** | Cada integrante **explica en voz alta** el código que entregó: qué hace, por qué está escrito así, qué pasa si falla y qué haría distinto. El código está comentado y los comentarios dicen el **porqué** | No puede explicar lo que entregó; lo lee en voz alta sin poder decir por qué; o atribuye a la IA decisiones que nadie revisó |
 
 Dentro de la franja "Cumple", la nota (3.0 a 5.0) refleja la calidad:
 completitud, solidez ante errores, claridad del código y de la spec, y la
 sustentación individual.
+
+### La interpretabilidad se califica DESDE LA SEGUNDA VERSIÓN
+
+**Y se califica hablando.** El profesor abre un archivo del repositorio
+—cualquiera, elegido por él— y le pide a quien lo entregó que cuente qué hace,
+por qué está escrito así y qué pasaría si fallara. **Es presencial**; cuando no
+se pueda, remoto, pero siempre **en vivo y en voz alta**: no se recibe por
+escrito.
+
+**No empieza en la v1 a propósito.** En la v1 se está aprendiendo a mover las
+piezas. Desde la v2 ya hay código heredado y decisiones que alguien tomó, y ahí
+es donde se ve quién entendió lo que entregó.
+
+**Qué se pregunta, para que nadie se sorprenda:**
+
+| | |
+|---|---|
+| **Qué hace** | Lea esta función y cuéntemela sin leerla línea por línea |
+| **Por qué así** | ¿Por qué este verbo y no otro? ¿Por qué esta validación está en el servicio y no en el controlador? |
+| **Qué pasa si falla** | Si la base rechaza aquí, ¿qué recibe quien llamó? ¿Y qué ve la persona en la pantalla? |
+| **Qué cambiaría** | Si mañana hubiera que agregar un campo, ¿dónde se toca? |
+
+> **Vale para el código escrito a mano y para el generado con IA, igual.** De
+> hecho el generado se pregunta más, porque es el que más fácil se entrega sin
+> leer. Que la IA lo haya escrito no cambia que usted lo esté entregando con su
+> nombre.
+>
+> Por eso la `GUIA_IA` de cada versión exige que la IA **comente lo que
+> genera**: los comentarios son lo que queda cuando el recuerdo de la
+> conversación con el chat ya se fue.
 
 **Entregar en cada versión:** enlaces a los 2 repos (con el tag `vN`
 puesto) + evidencia del quickstart de su spec pasando. En la v4, además:

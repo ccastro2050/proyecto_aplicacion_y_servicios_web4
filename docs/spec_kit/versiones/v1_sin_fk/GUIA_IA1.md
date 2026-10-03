@@ -9,6 +9,35 @@
 
 ---
 
+## LO PRIMERO: la IA tiene que COMENTAR lo que escribe
+
+Esto va antes que todo lo demás porque aplica a los dos caminos —el chat y el
+IDE agéntico— y a cada archivo que la IA entregue.
+
+**Exíjaselo en el prompt y recháceselo cuando no lo cumpla:**
+
+> Comenta todo el código que generes, en español. Cada archivo empieza con un
+> bloque que dice QUÉ ES y QUÉ PAPEL cumple en la arquitectura. Cada método no
+> evidente lleva su comentario. Y los comentarios dicen **por qué** está escrito
+> así, no **qué** hace la línea: `// suma uno al contador` no le sirve a nadie;
+> `// el límite es 1000 porque es el ancho de la columna en la base` sí.
+
+**Por qué esto no es un capricho de estilo:**
+
+| | |
+|---|---|
+| **Usted va a tener que explicarlo** | Desde la v2, la **interpretabilidad se califica**: el profesor le va a pedir que cuente, en voz alta, qué hace el código que entregó y por qué está así. Un archivo sin comentarios es un archivo que usted va a tener que reconstruir de memoria enfrente de él |
+| **El código generado se olvida más rápido que el escrito** | Lo que uno escribe a mano deja rastro en la cabeza. Lo que aceptó de un chat, no. El comentario es lo que queda cuando el recuerdo de la conversación se fue |
+| **Es la prueba de que usted entendió, no de que la IA produjo** | Un comentario que explica el porqué solo lo puede revisar quien entendió la decisión. Si usted no puede juzgar si el comentario es cierto, no entendió el código |
+
+> **Y una advertencia sobre los comentarios que la IA inventa.** A veces
+> comenta lo que *cree* que hace el código, no lo que hace. Léalos: un
+> comentario equivocado es peor que ninguno, porque el siguiente que lo lea le
+> va a creer. Corregirlos es trabajo suyo, y de los buenos: es exactamente el
+> tipo de corrección que la `GUIA_IA` le pide guardar.
+
+---
+
 ## 0. Los dos caminos, en una tabla
 
 | | **Camino A: chat web** | **Camino B: IDE agéntico** |

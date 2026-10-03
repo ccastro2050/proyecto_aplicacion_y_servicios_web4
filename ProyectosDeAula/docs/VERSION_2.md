@@ -326,6 +326,14 @@ seguir funcionando»: se corren.
 | **LOS PROMPTS** | Los que **de verdad usaron** para generar el código a partir del spec kit — por chat o con el IDE agéntico—, **con lo que tuvieron que corregirle a la IA**. Van en la carpeta de la versión, al lado de su guía de IA |
 | **El tag `v2`** | Sobre el commit que pasa los doce criterios |
 
+> **Y desde ESTA versión se califica la interpretabilidad.** El profesor abre
+> un archivo del repositorio y le pide a quien lo entregó que cuente qué hace y
+> por qué está escrito así — en voz alta, presencial, no por escrito. Está en
+> [0_METODOLOGIA.md](0_METODOLOGIA.md), en la rúbrica.
+>
+> De ahí que la guía de IA exija que la IA **comente lo que genera**: el
+> comentario es lo que queda cuando el recuerdo de la conversación se fue.
+
 > **El spec kit se escribe ANTES.** Si se escribe al final es un informe de lo
 > que se hizo, y entonces no sirvió para decidir nada. Las tres compuertas
 > están en [0_METODOLOGIA.md](0_METODOLOGIA.md) §3.1.

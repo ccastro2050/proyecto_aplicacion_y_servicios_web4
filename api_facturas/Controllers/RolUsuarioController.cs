@@ -132,18 +132,38 @@ public class RolUsuarioController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PUT /api/rolusuario/{email}/{idrol}  →  MOVER la asignación
-    // ------------------------------------------------------------
-    // EN UNA TABLA PUENTE «ACTUALIZAR» ES MOVER LA FILA, y ésa es la
-    // lección de estos dos verbos.
+    // ==================================================================
+    // [HttpPut("{email}/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
     //
-    // Las dos columnas SON la llave primaria: no hay un campo suelto que
-    // cambiar. Así que el PUT recibe la pareja nueva ENTERA, borra la
-    // vieja e inserta la nueva — en una transacción, porque si el INSERT
-    // falla el DELETE no puede quedarse hecho.
-    [HttpPut("{email}/{idrol:int}")]
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v2 (§D) dice: «NO HAY PUT NI PATCH. La fila no
+    // tiene campos: EXISTE O NO EXISTE». Para mover una asignación se
+    // quita y se pone otra.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PUT /api/rolusuario/{email}/{idrol}  →  MOVER la asignación
+    // // ------------------------------------------------------------
+    // // EN UNA TABLA PUENTE «ACTUALIZAR» ES MOVER LA FILA, y ésa es la
+    // // lección de estos dos verbos.
+    // //
+    // // Las dos columnas SON la llave primaria: no hay un campo suelto que
+    // // cambiar. Así que el PUT recibe la pareja nueva ENTERA, borra la
+    // // vieja e inserta la nueva — en una transacción, porque si el INSERT
+    // // falla el DELETE no puede quedarse hecho.
+    // [HttpPut("{email}/{idrol:int}")]
     public async Task<IActionResult> Reemplazar(string email, int idrol,
                                                 [FromBody] RolUsuarioCrear body)
     {
@@ -168,14 +188,33 @@ public class RolUsuarioController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PATCH /api/rolusuario/{email}/{idrol}  →  mover UN lado
-    // ------------------------------------------------------------
-    // Igual que el PUT, pero llega solo el lado que cambia y el otro se
-    // conserva: `{"fkidrol": 3}` le cambia el rol a la misma persona;
-    // `{"fkemail": "otro@correo.com"}` le pasa ese rol a otra.
-    [HttpPatch("{email}/{idrol:int}")]
+    // ==================================================================
+    // [HttpPatch("{email}/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v2 (§D): «No hay PUT ni PATCH. La fila no tiene
+    // campos: existe o no existe».
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PATCH /api/rolusuario/{email}/{idrol}  →  mover UN lado
+    // // ------------------------------------------------------------
+    // // Igual que el PUT, pero llega solo el lado que cambia y el otro se
+    // // conserva: `{"fkidrol": 3}` le cambia el rol a la misma persona;
+    // // `{"fkemail": "otro@correo.com"}` le pasa ese rol a otra.
+    // [HttpPatch("{email}/{idrol:int}")]
     public async Task<IActionResult> Actualizar(string email, int idrol,
                                                 [FromBody] RolUsuarioActualizar body)
     {

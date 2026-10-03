@@ -159,22 +159,42 @@ public class UsuarioConRolesController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PATCH /api/usuario-con-roles/{email}  →  cambio PARCIAL
-    // ------------------------------------------------------------
-    // LA DIFERENCIA CON EL PUT DE ARRIBA, que es la lección de este par:
+    // ==================================================================
+    // [HttpPatch("{email}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
     //
-    //   PUT   exige la lista de roles — la que llega es la que queda.
-    //   PATCH no la exige: si no llega, LOS ROLES NO SE TOCAN.
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
     //
-    // Por eso `{"contrasena": "nueva123"}` le cambia la clave a alguien sin
-    // rozarle los roles, algo que con el PUT obligaría a reenviar la lista
-    // entera — y a arriesgarse a equivocarla.
+    // POR QUÉ NO VA:
+    // El contrato de la v2 (§F) dice: «api/usuario-con-roles — el recurso
+    // que no es una tabla (5 ENDPOINTS)». Este PATCH sería el sexto.
+    // El PUT de arriba ya reemplaza la lista de roles, que es lo que pide.
     //
-    // Quién decide qué se conserva es el SERVICIO: aquí solo se lee lo que
-    // llegó y se le pasa; mezclar es una regla de negocio, no de HTTP.
-    [HttpPatch("{email}")]
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PATCH /api/usuario-con-roles/{email}  →  cambio PARCIAL
+    // // ------------------------------------------------------------
+    // // LA DIFERENCIA CON EL PUT DE ARRIBA, que es la lección de este par:
+    // //
+    // //   PUT   exige la lista de roles — la que llega es la que queda.
+    // //   PATCH no la exige: si no llega, LOS ROLES NO SE TOCAN.
+    // //
+    // // Por eso `{"contrasena": "nueva123"}` le cambia la clave a alguien sin
+    // // rozarle los roles, algo que con el PUT obligaría a reenviar la lista
+    // // entera — y a arriesgarse a equivocarla.
+    // //
+    // // Quién decide qué se conserva es el SERVICIO: aquí solo se lee lo que
+    // // llegó y se le pasa; mezclar es una regla de negocio, no de HTTP.
+    // [HttpPatch("{email}")]
     public async Task<IActionResult> Actualizar(string email,
                                                 [FromBody] UsuarioConRolesParcial body)
     {

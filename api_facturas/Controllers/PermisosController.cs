@@ -90,11 +90,31 @@ public class PermisosController : ControllerBase
     //
     // Todo esto sí exige permiso: ver los propios permisos no necesita
     // ninguno, pero repartir los de los demás es trabajo de administrador.
-
-    // ------------------------------------------------------------
-    // GET /api/permisos/rol/{idrol}  →  las rutas de ESE rol
-    // ------------------------------------------------------------
-    [HttpGet("rol/{idrol:int}")]
+    // ==================================================================
+    // [HttpGet("rol/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v3 (§D) declara un solo endpoint aquí:
+    // «GET /api/permisos/mios — para armar el menú». Repartir los permisos
+    // de los demás se hace por `api/rutarol`, que es su recurso.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // GET /api/permisos/rol/{idrol}  →  las rutas de ESE rol
+    // // ------------------------------------------------------------
+    // [HttpGet("rol/{idrol:int}")]
     [ExigePermiso("interfaz.permisos")]
     public async Task<IActionResult> DeRol(int idrol)
     {
@@ -117,41 +137,78 @@ public class PermisosController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // POST /api/permisos  →  CONCEDER una ruta a un rol
-    // ------------------------------------------------------------
-    [HttpPost]
-    [ExigePermiso("interfaz.permisos")]
-    public async Task<IActionResult> Conceder([FromBody] PermisoCrear body)
-    {
-        try
-        {
-            await _rutarol.CrearAsync(new RutaRol
-            {
-                Fkidruta = body.Fkidruta!.Value,
-                Fkidrol = body.Fkidrol!.Value,
-            });
-            return Ok(new { estado = 200, mensaje = "Permiso concedido exitosamente." });
-        }
-        catch (ArgumentException e)
-        {
-            return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
-        }
-        catch (Exception e)
-        {
-            // El rol ya tenía esa ruta (PK duplicada) o alguno no existe (FK):
-            return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
-        }
-    }
-
-    // ------------------------------------------------------------
-    // PUT /api/permisos/rol/{idrol}  →  REEMPLAZAR todas sus rutas
-    // ------------------------------------------------------------
-    // La lista que llega ES la que queda: lo que no esté, se revoca. Va en
-    // UNA transacción, porque entre borrar las viejas e insertar las nuevas
-    // el rol no puede entrar a ninguna parte.
-    [HttpPut("rol/{idrol:int}")]
+    // ==================================================================
+    // [HttpPost]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v3 (§D) solo declara `GET /api/permisos/mios`.
+    // Conceder un permiso es `POST /api/rutarol`.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // POST /api/permisos  →  CONCEDER una ruta a un rol
+    // // ------------------------------------------------------------
+    // [HttpPost]
+    // [ExigePermiso("interfaz.permisos")]
+    // public async Task<IActionResult> Conceder([FromBody] PermisoCrear body)
+    // {
+    // try
+    // {
+    // await _rutarol.CrearAsync(new RutaRol
+    // {
+    // Fkidruta = body.Fkidruta!.Value,
+    // Fkidrol = body.Fkidrol!.Value,
+    // });
+    // return Ok(new { estado = 200, mensaje = "Permiso concedido exitosamente." });
+    // }
+    // catch (ArgumentException e)
+    // {
+    // return StatusCode(400, new { estado = 400, mensaje = "Parámetros inválidos.", detalle = e.Message });
+    // }
+    // catch (Exception e)
+    // {
+    // // El rol ya tenía esa ruta (PK duplicada) o alguno no existe (FK):
+    // return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
+    // }
+    // }
+    // ==================================================================
+    // [HttpPut("rol/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v3 (§D) solo declara `GET /api/permisos/mios`.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PUT /api/permisos/rol/{idrol}  →  REEMPLAZAR todas sus rutas
+    // // ------------------------------------------------------------
+    // // La lista que llega ES la que queda: lo que no esté, se revoca. Va en
+    // // UNA transacción, porque entre borrar las viejas e insertar las nuevas
+    // // el rol no puede entrar a ninguna parte.
+    // [HttpPut("rol/{idrol:int}")]
     [ExigePermiso("interfaz.permisos")]
     public async Task<IActionResult> Reemplazar(int idrol, [FromBody] PermisosReemplazo body)
     {
@@ -175,17 +232,35 @@ public class PermisosController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PATCH /api/permisos/rol/{idrol}  →  agregar y/o quitar
-    // ------------------------------------------------------------
-    // Sobre un CONJUNTO, «parcial» no puede ser una lista a medias: dos
-    // rutas no dicen si las otras se quitan o se dejan. Por eso el PATCH
-    // manda `agregar` y `quitar`, que sí lo dicen.
+    // ==================================================================
+    // [HttpPatch("rol/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
     //
-    // Se resuelve leyendo lo que hay, aplicando las dos listas y reenviando
-    // el conjunto completo — la misma transacción del PUT.
-    [HttpPatch("rol/{idrol:int}")]
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v3 (§D) solo declara `GET /api/permisos/mios`.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PATCH /api/permisos/rol/{idrol}  →  agregar y/o quitar
+    // // ------------------------------------------------------------
+    // // Sobre un CONJUNTO, «parcial» no puede ser una lista a medias: dos
+    // // rutas no dicen si las otras se quitan o se dejan. Por eso el PATCH
+    // // manda `agregar` y `quitar`, que sí lo dicen.
+    // //
+    // // Se resuelve leyendo lo que hay, aplicando las dos listas y reenviando
+    // // el conjunto completo — la misma transacción del PUT.
+    // [HttpPatch("rol/{idrol:int}")]
     [ExigePermiso("interfaz.permisos")]
     public async Task<IActionResult> Actualizar(int idrol, [FromBody] PermisosParcial body)
     {
@@ -225,13 +300,32 @@ public class PermisosController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // DELETE /api/permisos/rol/{idrol}/ruta/{idruta}  →  REVOCAR una
-    // ------------------------------------------------------------
-    // Las dos llaves van en la URL porque las dos identifican el permiso:
-    // revocar «la ruta 5» sin decir de qué rol no significa nada.
-    [HttpDelete("rol/{idrol:int}/ruta/{idruta:int}")]
+    // ==================================================================
+    // [HttpDelete("rol/{idrol:int}/ruta/{idruta:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v3 (§D) solo declara `GET /api/permisos/mios`.
+    // Revocar es `DELETE /api/rutarol/{idruta}/{idrol}`.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // DELETE /api/permisos/rol/{idrol}/ruta/{idruta}  →  REVOCAR una
+    // // ------------------------------------------------------------
+    // // Las dos llaves van en la URL porque las dos identifican el permiso:
+    // // revocar «la ruta 5» sin decir de qué rol no significa nada.
+    // [HttpDelete("rol/{idrol:int}/ruta/{idruta:int}")]
     [ExigePermiso("interfaz.permisos")]
     public async Task<IActionResult> Revocar(int idrol, int idruta)
     {

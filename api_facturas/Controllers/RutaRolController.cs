@@ -132,16 +132,35 @@ public class RutaRolController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PUT /api/rutarol/{idruta}/{idrol}  →  MOVER el permiso
-    // ------------------------------------------------------------
-    // EN UNA TABLA PUENTE «ACTUALIZAR» ES MOVER LA FILA: las dos columnas
-    // SON la llave primaria, así que no hay un campo suelto que cambiar.
-    // El PUT recibe la pareja nueva ENTERA, borra la vieja e inserta la
-    // nueva — en una transacción, porque si el INSERT falla el DELETE no
-    // puede quedarse hecho.
-    [HttpPut("{idruta:int}/{idrol:int}")]
+    // ==================================================================
+    // [HttpPut("{idruta:int}/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v2 (§E) declara 5 endpoints para esta puente, y el
+    // PUT no es uno de ellos: una pareja existe o no existe.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PUT /api/rutarol/{idruta}/{idrol}  →  MOVER el permiso
+    // // ------------------------------------------------------------
+    // // EN UNA TABLA PUENTE «ACTUALIZAR» ES MOVER LA FILA: las dos columnas
+    // // SON la llave primaria, así que no hay un campo suelto que cambiar.
+    // // El PUT recibe la pareja nueva ENTERA, borra la vieja e inserta la
+    // // nueva — en una transacción, porque si el INSERT falla el DELETE no
+    // // puede quedarse hecho.
+    // [HttpPut("{idruta:int}/{idrol:int}")]
     public async Task<IActionResult> Reemplazar(int idruta, int idrol,
                                                 [FromBody] RutaRolCrear body)
     {
@@ -166,13 +185,31 @@ public class RutaRolController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PATCH /api/rutarol/{idruta}/{idrol}  →  mover UN lado
-    // ------------------------------------------------------------
-    // Igual que el PUT, pero llega solo el lado que cambia y el otro se
-    // conserva: `{"fkidrol": 3}` le pasa esa ruta a otro rol.
-    [HttpPatch("{idruta:int}/{idrol:int}")]
+    // ==================================================================
+    // [HttpPatch("{idruta:int}/{idrol:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
+    //
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v2 (§E) declara 5 endpoints, y el PATCH no es uno.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PATCH /api/rutarol/{idruta}/{idrol}  →  mover UN lado
+    // // ------------------------------------------------------------
+    // // Igual que el PUT, pero llega solo el lado que cambia y el otro se
+    // // conserva: `{"fkidrol": 3}` le pasa esa ruta a otro rol.
+    // [HttpPatch("{idruta:int}/{idrol:int}")]
     public async Task<IActionResult> Actualizar(int idruta, int idrol,
                                                 [FromBody] RutaRolActualizar body)
     {

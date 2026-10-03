@@ -123,18 +123,38 @@ public class FacturaController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PUT /api/factura/{numero}  →  reemplazo COMPLETO (SP + trigger)
-    // ------------------------------------------------------------
-    // Reemplazar exige la ficha ENTERA: cliente, vendedor y TODOS los
-    // renglones. Un PUT al que le falte la lista muere en 422 antes de
-    // llegar aquí — esa es la semántica de PUT, y es lo que lo separa
-    // del PATCH de más abajo.
+    // ==================================================================
+    // [HttpPut("{numero:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
     //
-    // Adentro, el SP devuelve el stock de los renglones viejos, borra el
-    // detalle e inserta el nuevo, todo en UNA transacción.
-    [HttpPut("{numero:int}")]
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v2 (§C) dice: «api/factura — maestro-detalle por
+    // procedimientos (4 ENDPOINTS)» y «NO HAY PUT NI PATCH. Una factura
+    // emitida es un documento. No se corrige: se anula y se hace otra».
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PUT /api/factura/{numero}  →  reemplazo COMPLETO (SP + trigger)
+    // // ------------------------------------------------------------
+    // // Reemplazar exige la ficha ENTERA: cliente, vendedor y TODOS los
+    // // renglones. Un PUT al que le falte la lista muere en 422 antes de
+    // // llegar aquí — esa es la semántica de PUT, y es lo que lo separa
+    // // del PATCH de más abajo.
+    // //
+    // // Adentro, el SP devuelve el stock de los renglones viejos, borra el
+    // // detalle e inserta el nuevo, todo en UNA transacción.
+    // [HttpPut("{numero:int}")]
     public async Task<IActionResult> Reemplazar(int numero, [FromBody] FacturaReemplazo body)
     {
         try
@@ -161,24 +181,44 @@ public class FacturaController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // PATCH /api/factura/{numero}  →  actualización PARCIAL
-    // ------------------------------------------------------------
-    // AQUÍ ESTÁ LA LECCIÓN DE ESTE CONTROLADOR, y por eso vale la pena
-    // leerlo aunque ya se haya leído el PATCH de producto:
+    // ==================================================================
+    // [HttpPatch("{numero:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
     //
-    // El procedimiento de la base exige los tres datos — no sabe escribir
-    // «solo el vendedor». Así que un PATCH sobre un maestro-detalle LEE la
-    // factura, MEZCLA lo que llegó y la reenvía completa.
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
     //
-    // Y esa mezcla la hace el SERVICIO, no este archivo: decidir qué se
-    // conserva es una regla de negocio; el controlador solo traduce HTTP.
+    // POR QUÉ NO VA:
+    // Lo mismo que el PUT de arriba: el contrato de la v2 (§C) no lo pide.
+    // Y aquí abajo está escrito cómo sería el PATCH de un maestro-detalle,
+    // que es la parte que vale la pena leer aunque esté apagada.
     //
-    // Un body `{}` pasa la validación de forma —ningún campo es
-    // obligatorio— y lo rechaza el servicio con un 400: «no mandó nada
-    // que cambiar» no es un error de FORMA.
-    [HttpPatch("{numero:int}")]
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // PATCH /api/factura/{numero}  →  actualización PARCIAL
+    // // ------------------------------------------------------------
+    // // AQUÍ ESTÁ LA LECCIÓN DE ESTE CONTROLADOR, y por eso vale la pena
+    // // leerlo aunque ya se haya leído el PATCH de producto:
+    // //
+    // // El procedimiento de la base exige los tres datos — no sabe escribir
+    // // «solo el vendedor». Así que un PATCH sobre un maestro-detalle LEE la
+    // // factura, MEZCLA lo que llegó y la reenvía completa.
+    // //
+    // // Y esa mezcla la hace el SERVICIO, no este archivo: decidir qué se
+    // // conserva es una regla de negocio; el controlador solo traduce HTTP.
+    // //
+    // // Un body `{}` pasa la validación de forma —ningún campo es
+    // // obligatorio— y lo rechaza el servicio con un 400: «no mandó nada
+    // // que cambiar» no es un error de FORMA.
+    // [HttpPatch("{numero:int}")]
     public async Task<IActionResult> Actualizar(int numero, [FromBody] FacturaActualizar body)
     {
         try
@@ -208,18 +248,38 @@ public class FacturaController : ControllerBase
             return StatusCode(500, new { estado = 500, mensaje = "Error interno.", detalle = e.Message });
         }
     }
-
-    // ------------------------------------------------------------
-    // DELETE /api/factura/{numero}  →  borrado FÍSICO (SP)
-    // ------------------------------------------------------------
-    // LA FILA SE VA. Compárelo con el POST de anular, que está justo
-    // debajo: anular deja la factura en la base, con su número y su
-    // fecha, marcada como anulada. Las dos devuelven el stock.
+    // ==================================================================
+    // [HttpDelete("{numero:int}")]  —  APAGADO POR ASUNTOS DIDÁCTICOS
+    // ==================================================================
     //
-    // La API ofrece las dos **a propósito**, para que se vea la
-    // diferencia entre un borrado físico y uno lógico sobre el mismo
-    // recurso. Cuál usa un negocio de verdad es otra conversación.
-    [HttpDelete("{numero:int}")]
+    // ESTE MÉTODO NO VA EN LA API, Y ESTÁ AQUÍ A PROPÓSITO: es material de
+    // clase, no código muerto que a alguien se le olvidó borrar.
+    //
+    // POR QUÉ NO VA:
+    // El contrato de la v2 lo dice en su tabla de arriba: «UN RECURSO SIN
+    // PUT NI PATCH NI DELETE — api/factura. Una factura emitida no se
+    // corrige: se anula». El POST de anular, que sí va, está más abajo.
+    //
+    // POR QUÉ ENTONCES ESTÁ ESCRITO: porque hay dos cosas que aprender y las
+    // dos importan. Una es cómo SE PROGRAMA este verbo —léalo abajo, está
+    // completo y comentado—. La otra es que una API NO lleva todos los verbos
+    // en todos los recursos: el contrato manda, y el contrato dice que éste no.
+    // Borrarlo enseñaría solo la segunda; dejarlo apagado enseña las dos.
+    //
+    // Para encenderlo basta con quitar las barras de estas líneas: lo que hay
+    // debajo en el servicio y en el repositorio SÍ está activo.
+    //
+    // // ------------------------------------------------------------
+    // // DELETE /api/factura/{numero}  →  borrado FÍSICO (SP)
+    // // ------------------------------------------------------------
+    // // LA FILA SE VA. Compárelo con el POST de anular, que está justo
+    // // debajo: anular deja la factura en la base, con su número y su
+    // // fecha, marcada como anulada. Las dos devuelven el stock.
+    // //
+    // // La API ofrece las dos **a propósito**, para que se vea la
+    // // diferencia entre un borrado físico y uno lógico sobre el mismo
+    // // recurso. Cuál usa un negocio de verdad es otra conversación.
+    // [HttpDelete("{numero:int}")]
     public async Task<IActionResult> Eliminar(int numero)
     {
         try

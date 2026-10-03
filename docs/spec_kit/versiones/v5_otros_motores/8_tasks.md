@@ -15,18 +15,37 @@
 ## Fase 1 — El motor nuevo en el compose (sin tocar la API)
 
 - [ ] `db/bdfacturas_postgres.sql` (cópielo del proyecto del curso — es
-      dato, no código a generar) e `db/init_postgres.sh`.
-- [ ] `docker-compose.yml`: servicios `postgres` (2022, :15462,
-      healthcheck con psql y `start_period`) y `postgres-init`
-      (entrypoint al .sh, `restart: "no"`).
+      dato, no código a generar).
+- [ ] `docker-compose.yml`: el servicio `postgres` (`postgres:16-alpine`,
+      :15462, healthcheck con `pg_isready`), con el `.sql` **montado en
+      `/docker-entrypoint-initdb.d/`**.
 - [ ] `docker compose up -d` — la API sigue en v3 contra SQL Server:
       **nada se rompe por agregar contenedores**.
 
+> **Aquí NO hace falta un script de arranque, y conviene decir por qué**,
+> porque en el proyecto del curso sí lo hay y se copia sin pensar: la imagen
+> de **PostgreSQL ejecuta sola** todo lo que encuentre en
+> `/docker-entrypoint-initdb.d/` la primera vez que nace el volumen. La de
+> **SQL Server no hace eso** — por eso el proyecto del curso lleva un script
+> de arranque y un servicio aparte que lo ejecuta, y aquí no hay ninguno de
+> los dos.
+>
+> Dos motores, dos formas de sembrar. Es el tipo de diferencia que esta
+> versión existe para mostrar.
+
 **Verificar:**
 ```powershell
-docker compose logs postgres-init | Select-String "correctamente"
-docker compose exec postgres /opt/mssql-tools18/bin/psql -S localhost -U sa -P "Paradigmas123!" -C -d bdfacturas_postgres_local -Q "SELECT COUNT(*) FROM producto"   # 8
+# que el contenedor este sano
+docker compose ps postgres
+
+# y que la semilla haya entrado: 8 productos
+docker compose exec postgres psql -U postgres -d bdfacturas_postgres_local -c "SELECT COUNT(*) FROM producto;"
 ```
+
+> **`psql` no se llama como `sqlcmd`.** No lleva `-S`, ni `-U sa`, ni `-P` con
+> la clave en la línea: el usuario es `postgres`, la base va en `-d` y la
+> consulta en `-c`. La clave la toma de la variable que el propio contenedor
+> ya tiene.
 
 ## Fase 2 — Los repositorios Postgres (el calco mecánico)
 

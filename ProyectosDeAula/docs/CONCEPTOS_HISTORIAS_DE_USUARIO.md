@@ -36,7 +36,7 @@ Los tres pedazos no son adorno:
 | Pedazo | Qué evita que pase |
 |---|---|
 | **Como [rol]** | Que la historia sea de «el usuario», que no existe. Un rol se puede entrevistar, y sus prioridades se pueden contrastar con las de otro rol |
-| **Quiero [acción]** | Que se pida una interfaz gráfica en vez de una capacidad |
+| **Quiero [acción]** | Que se pida una pantalla en vez de una capacidad |
 | **Para [beneficio]** | **Es el más importante y el que más se omite.** Sin él, nadie puede decidir si la historia vale lo que cuesta, ni proponer una forma más barata de lograr lo mismo |
 
 En este curso se escribe en primera persona y con nombre —«Yo, Marcela
@@ -81,7 +81,7 @@ Estimable, Small, Testable*.
 | Letra | Qué pregunta | Señal de que falla |
 |---|---|---|
 | **I**ndependiente | ¿Se puede construir sin esperar a otra? | «Esta va después de la 3, que va después de la 5…» |
-| **N**egociable | ¿Es una conversación, o ya trae la solución impuesta? | La historia describe la interfaz gráfica, campo por campo |
+| **N**egociable | ¿Es una conversación, o ya trae la solución impuesta? | La historia describe la pantalla, campo por campo |
 | **V**aliosa | ¿A quién le sirve, y para qué? | El «para» está vacío o dice «para tener el sistema completo» |
 | **E**stimable | ¿Se puede decir cuánto costaría? | Nadie entiende de qué se trata lo suficiente para estimarla |
 | **S**mall (pequeña) | ¿Cabe en una iteración? | «Como usuario quiero administrar todo el sistema» |

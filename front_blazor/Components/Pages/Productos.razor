@@ -89,7 +89,7 @@ else
                     <td class="acciones">
                         <button @onclick="() => Editar(p)">Editar</button>
                         @* El borrado es LÓGICO, así que la palabra es RETIRAR. *@
-                        <button class="peligro" @onclick="() => Retirar(p.Codigo)">Retirar</button>
+                        <button class="peligro" @onclick="() => Eliminar(p.Codigo)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -177,9 +177,9 @@ else
         else { Avisar(r.Mensaje!, true); }
     }
 
-    private async Task Retirar(string codigo)
+    private async Task Eliminar(string codigo)
     {
-        var r = await Servicio.RetirarAsync(codigo);
+        var r = await Servicio.EliminarAsync(codigo);
         if (r.Bien) { Avisar($"Producto {codigo} retirado.", false); await Cargar(); }
         else        { Avisar(r.Mensaje!, true); }
     }

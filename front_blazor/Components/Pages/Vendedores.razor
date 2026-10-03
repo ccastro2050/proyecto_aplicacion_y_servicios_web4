@@ -91,7 +91,7 @@ else
                     <td>@NombrePersona(v.Fkcodpersona)</td>
                     <td class="acciones">
                         <button @onclick="() => Editar(v)">Editar</button>
-                        <button class="peligro" @onclick="() => Quitar(v.Id)">Quitar</button>
+                        <button class="peligro" @onclick="() => Eliminar(v.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -177,7 +177,7 @@ else
         else { Avisar(r.Mensaje!, true); }
     }
 
-    private async Task Quitar(int id)
+    private async Task Eliminar(int id)
     {
         var r = await Servicio.EliminarAsync(id);
         if (r.Bien) { Avisar("Registro quitado.", false); await Cargar(); }

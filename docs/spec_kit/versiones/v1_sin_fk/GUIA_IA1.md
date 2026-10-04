@@ -35,7 +35,47 @@
 
 ---
 
-## 2. El orden NO es negociable
+## 2. Y quién escribe cada documento de ESTA carpeta
+
+**Los doce `.md` de `v1_sin_fk/` también se reparten**, y antes de que se escriba
+una línea de código. No los redacta el integrador solo:
+
+| Documento | Lo redacta | Por qué |
+|---|---|---|
+| [`1_constitution.md`](../../1_constitution.md) | **Carlos** | Rige **todas** las versiones: no es de ésta, es del proyecto |
+| [`2_spec.md`](2_spec.md) | **Paco** | El QUÉ y los criterios de aceptación |
+| [`3_plan.md`](3_plan.md) | **Luis** | El CÓMO: stack, carpetas, capas |
+| [`4_research.md`](4_research.md) | **Paco** | Las decisiones, y lo que se descartó |
+| [`5_data_model.md`](5_data_model.md) | **Luis** | El modelo de datos |
+| [`6_contracts.md`](6_contracts.md) | **Luis** | Los endpoints exactos |
+| [`7_quickstart.md`](7_quickstart.md) | **Paco** | La prueba de humo |
+| [`8_tasks.md`](8_tasks.md) | **Luis** | El orden de construcción |
+| [`9_checklist.md`](9_checklist.md) | **Carlos** | Es **la compuerta**, y la marca quien pone el tag |
+| **Este índice** | **Carlos** | Dice el reparto: es trabajo de integración |
+| `GUIA_IA1_CARLOS` · `_PACO` · `_LUIS` | **cada quien la suya** | Nadie sabe mejor que uno qué necesita su herramienta |
+
+> **El criterio:** lo que vale para **todas** las versiones —la constitución— o
+> es **una compuerta** —el checklist— se queda con el integrador. **Todo lo demás
+> se reparte**, para que los tres hayan leído el spec kit **escribiéndolo**, que
+> es la única forma de leerlo de verdad.
+>
+> Si Carlos lo escribiera solo, Paco y Luis construirían contra un documento que
+> no leyeron — y en la sustentación les van a preguntar **por qué el contrato
+> dice lo que dice**.
+
+> **Está acordado en**
+> [`PLAN_DE_TRABAJO.md`](../../../dominio/PLAN_DE_TRABAJO.md) **§5**, que es
+> donde manda. Esta tabla es una copia para que se encuentre desde aquí.
+
+> **Y se puede comprobar, archivo por archivo:**
+> ```powershell
+> git log -1 --format='%an' -- docs/spec_kit/versiones/v1_sin_fk/6_contracts.md
+> # responde: Luis
+> ```
+
+---
+
+## 3. El orden NO es negociable
 
 ```
     1 · CARLOS           2 · PACO y LUIS, a la vez        3 · CARLOS
@@ -56,7 +96,7 @@
 
 ---
 
-## 3. Por qué el reparto quedó así
+## 4. Por qué el reparto del CÓDIGO quedó así
 
 | | |
 |---|---|
@@ -71,7 +111,7 @@
 
 ---
 
-## 4. Lo que vale para los tres
+## 5. Lo que vale para los tres
 
 ### La IA tiene que COMENTAR lo que escribe
 
@@ -141,7 +181,7 @@ Cada uno en su rama — `rama-carlos`, `rama-paco`, `rama-luis` — y todo entra
 
 ---
 
-## 5. Lo que NINGUNO sube a la IA
+## 6. Lo que NINGUNO sube a la IA
 
 | No se sube | Por qué |
 |---|---|
@@ -151,7 +191,7 @@ Cada uno en su rama — `rama-carlos`, `rama-paco`, `rama-luis` — y todo entra
 
 ---
 
-## 6. Cuándo está terminada la versión
+## 7. Cuándo está terminada la versión
 
 Cuando los tres PR están fusionados, **el `9_checklist.md` lo marca una persona**
 —no la IA— y el sistema pasa sus criterios de aceptación. Ahí Carlos pone el tag:

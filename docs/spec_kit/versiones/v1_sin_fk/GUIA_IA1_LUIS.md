@@ -14,7 +14,7 @@
 > **juzgar lo que el agente escriba** en vez de aceptarlo.
 >
 > **No empiece hasta que el PR de Carlos esté fusionado:** usted calca un molde
-> que todavía no existe. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §2.
+> que todavía no existe. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §3.
 >
 > **Y lea la §2 antes del prompt.** Sus dos tablas **no se calcan igual** que las
 > de sus compañeros, y si no sabe por qué, el chat le va a entregar código que
@@ -133,7 +133,7 @@ git config user.email
 >
 > **Lo que protege no es dónde esté la configuración: es comprobarla** antes del
 > primer commit de cada carpeta. Los tres casos, en
-> [`GUIA_IA1.md`](GUIA_IA1.md) §4.
+> [`GUIA_IA1.md`](GUIA_IA1.md) §5.
 
 ---
 

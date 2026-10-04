@@ -7,7 +7,7 @@
 > agente lee los documentos del repositorio y escribe los archivos él mismo.
 >
 > **Y usted va primero, solo.** Paco y Luis no pueden empezar hasta que su
-> molde exista. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §2.
+> molde exista. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §3.
 
 ---
 
@@ -70,7 +70,7 @@ git config user.email
 >
 > **Lo que protege no es dónde esté la configuración: es comprobarla** antes del
 > primer commit de cada carpeta. Los tres casos, en
-> [`GUIA_IA1.md`](GUIA_IA1.md) §4.
+> [`GUIA_IA1.md`](GUIA_IA1.md) §5.
 
 ---
 

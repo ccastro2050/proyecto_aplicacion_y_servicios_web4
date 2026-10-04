@@ -14,7 +14,7 @@
 > **juzgar lo que el agente escriba** en vez de aceptarlo.
 >
 > **No empiece hasta que el PR de Carlos esté fusionado.** Usted no construye de
-> cero: **calca un molde que todavía no existe**. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §2.
+> cero: **calca un molde que todavía no existe**. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §3.
 
 ---
 
@@ -85,7 +85,7 @@ git config user.email
 >
 > **Lo que protege no es dónde esté la configuración: es comprobarla** antes del
 > primer commit de cada carpeta. Los tres casos, en
-> [`GUIA_IA1.md`](GUIA_IA1.md) §4.
+> [`GUIA_IA1.md`](GUIA_IA1.md) §5.
 
 ---
 

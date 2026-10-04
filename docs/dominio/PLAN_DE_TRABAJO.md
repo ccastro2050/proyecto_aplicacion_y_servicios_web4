@@ -61,28 +61,51 @@ para entonces ya hay dos arquitecturas en el mismo proyecto y una tarde perdida.
 
 ---
 
-## 3. Acuerdo 2 — Cada quien con una herramienta, y siempre la misma
+## 3. Acuerdo 2 — Chat primero, agente después: los dos, por todos
 
-> 💬 **Luis:** *«¿Y si yo quiero probar el agente en la v3?»*
+> 💬 **Luis:** *«¿Y si repartimos las herramientas? Uno con agente y los otros
+> dos con chat.»*
 >
-> 💬 **Carlos:** *«Entonces al final ninguno de los tres va a poder decir cómo se
-> trabaja de verdad con una de las dos. Si cambiamos, los tres terminamos con un
-> poco de cada una y sin profundidad en ninguna.»*
+> 💬 **Paco:** *«Entonces los dos terminamos el curso sin haber usado nunca un
+> agente. Yo no voy a salir de aquí sabiendo la mitad.»*
+>
+> 💬 **Carlos:** *«Y hay algo más: en la v1 un agente casi no sirve. El agente
+> gana cuando hay código que leer, y el primer día no hay nada. Entonces que
+> empecemos todos con chat y cambiemos cuando el proyecto ya sea grande.»*
 
-| | Herramienta | En todas las versiones |
+**Queda acordado:**
+
+| | **v1 · v2 · v3** | **v4 · v5** |
 |---|---|---|
-| **Carlos** | **IDE agéntico** — el agente lee el repositorio y escribe los archivos | v1 a v5 |
-| **Paco** | **Chat web** — sube archivos, copia la respuesta, la pega | v1 a v5 |
-| **Luis** | **Chat web** | v1 a v5 |
+| **Carlos** | IDE agéntico | IDE agéntico |
+| **Paco** | **chat web** | **IDE agéntico** |
+| **Luis** | **chat web** | **IDE agéntico** |
 
-> **Lo que el equipo gana:** al terminar el curso tienen **evidencia de las dos
-> formas**, hecha por sus propios integrantes, sobre el mismo problema. Comparar
-> chat contra agente leyendo un artículo no enseña nada; compararlo en el código
-> de uno, sí.
+> **Por qué el corte va en la v4, y no antes ni después.** Un agente lee el
+> repositorio y escribe solo; eso vale cuando **ya hay un repositorio que leer**.
+> En la v1 el proyecto está vacío: el agente no tiene contexto que aprovechar y
+> lo único que aporta es escribir sin que uno mire.
 >
-> **Lo que el equipo pierde, y se acepta a sabiendas:** Paco y Luis terminan el
-> curso **sin haber usado nunca un agente**. Es el precio de la profundidad, y
-> está decidido a propósito.
+> **De la v4 en adelante es al revés:** hay cuatro capas, quince controladores y
+> un front entero. Pedirle a un chat que entienda eso significa subirle treinta
+> archivos en cada conversación. Ahí el agente deja de ser comodidad y pasa a ser
+> la herramienta correcta.
+
+> **Y lo que el equipo gana haciéndolo en este orden**, que es lo que de verdad
+> justifica el acuerdo:
+>
+> | | |
+> |---|---|
+> | **Las tres primeras versiones, a mano** | Con chat hay que leer cada archivo antes de pegarlo. Es lento, y por eso se aprende |
+> | **Las dos últimas, con agente** | Cuando ya saben qué debe salir, pueden juzgar lo que el agente escribe |
+>
+> **Un agente en manos de quien no sabe qué esperar no acelera: esconde.**
+> Produce código que compila y que nadie revisó, y el error se descubre en la
+> sustentación. Por eso el agente llega **después** del chat, no antes.
+
+> **Carlos empieza con agente desde la v1 por su papel, no por privilegio:** es
+> el que monta el esqueleto, y es el único que va a tener que leer el código de
+> los otros dos en cada revisión de PR.
 
 ---
 
@@ -220,6 +243,7 @@ git log -1 --format='%an' -- api_facturas/Controllers/FacturaController.cs  # Ca
 
 | Versión | Fecha | Qué cambió |
 |---|---|---|
+| **1.1** | **1.º de octubre de 2026** | **Acuerdo 2 modificado en reunión.** La versión 1.0 repartía las herramientas de forma fija —Carlos agéntico, Paco y Luis chat— para las cinco versiones. Paco objetó que así él y Luis terminarían el curso sin haber usado nunca un agente. Queda: **chat en la v1, v2 y v3; agente de la v4 en adelante, los tres** |
 | 1.0 | 8 de agosto de 2026 | Reunión de arranque. Los cinco acuerdos |
 
 ---

@@ -2,8 +2,16 @@
 
 > **Su parte:** los recursos **`persona`** y **`empresa`**.
 >
-> **Su herramienta:** un chat web — DeepSeek, Gemini, ChatGPT. Usted le sube
-> archivos, él le devuelve código, y **usted lo pega en su proyecto**.
+> **Su herramienta en esta versión:** un chat web — DeepSeek, Gemini, ChatGPT.
+> Usted le sube archivos, él le devuelve código, y **usted lo pega en su
+> proyecto**.
+>
+> **Chat en la v1, la v2 y la v3; desde la v4 usted pasa a agente**, como los
+> otros dos. Está acordado en
+> [`PLAN_DE_TRABAJO.md`](../../../dominio/PLAN_DE_TRABAJO.md) §3, y el orden no
+> es casual: **un agente lee el repositorio, y en la v1 no hay nada que leer**.
+> Las tres primeras versiones a mano son las que le van a permitir, en la v4,
+> **juzgar lo que el agente escriba** en vez de aceptarlo.
 >
 > **No empiece hasta que el PR de Carlos esté fusionado.** Usted no construye de
 > cero: **calca un molde que todavía no existe**. Ver [`GUIA_IA1.md`](GUIA_IA1.md) §2.

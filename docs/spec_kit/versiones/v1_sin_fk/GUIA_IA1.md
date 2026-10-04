@@ -14,11 +14,24 @@
 | **Paco** | [`GUIA_IA1_PACO.md`](GUIA_IA1_PACO.md) | **A · Chat web** | `persona` y `empresa` |
 | **Luis** | [`GUIA_IA1_LUIS.md`](GUIA_IA1_LUIS.md) | **A · Chat web** | `rol` y `ruta` |
 
-> **Cada quien usa siempre la misma herramienta, en todas las versiones.** No es
-> para incomodar a nadie: es para que al final del curso el equipo tenga
-> **evidencia de las dos formas de trabajar con IA**, hecha por sus propios
-> integrantes y sobre el mismo problema. Comparar el chat con el agente leyendo
-> un blog no enseña nada; compararlos en el código de uno, sí.
+> **Esto cambia en la v4: ahí los tres pasan a trabajar con agente.** El acuerdo
+> está en [`PLAN_DE_TRABAJO.md`](../../../dominio/PLAN_DE_TRABAJO.md) §3, y la
+> razón es concreta: **un agente lee el repositorio, y en la v1 no hay nada que
+> leer.**
+>
+> | v1 · v2 · v3 | v4 · v5 |
+> |---|---|
+> | Paco y Luis con **chat** | los tres con **agente** |
+>
+> **Las tres primeras a mano, y por eso se aprenden.** Con chat hay que leer cada
+> archivo antes de pegarlo. Cuando el proyecto ya tiene cuatro capas y quince
+> controladores, subirle treinta archivos a un chat deja de tener sentido — y
+> para entonces los tres ya saben qué debe salir, que es lo único que permite
+> juzgar lo que un agente escribe.
+>
+> **Carlos empieza con agente desde la v1 por su papel**, no por privilegio: es
+> quien monta el esqueleto y quien va a leer el código de los otros dos en cada
+> revisión.
 
 ---
 

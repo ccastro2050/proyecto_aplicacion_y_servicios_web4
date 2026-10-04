@@ -23,14 +23,14 @@ Cada respuesta trae **tres cosas**, y la tercera es la que vale:
 | 🔎 **Qué se saca de ahí** | La traducción a requisito o a regla |
 | ⚙️ **Dónde quedó** | **La columna, el disparador o el procedimiento REAL** que existe en `bdfacturas` |
 
-> **La tercera columna es verdad verificable; las dos primeras son ficción.** Es
-> decir: el puente se lee de derecha a izquierda. La decisión existe —se puede
-> abrir el `.sql` y verla—; la conversación que la habría producido es lo que
-> está reconstruido.
+> **La tercera columna es verdad verificable; las personas son ficción.** La
+> decisión existe —se puede abrir el `.sql` y verla—, y la frase de negocio que
+> la justifica está escrita al lado.
 >
-> **Y ése es el ejercicio:** mirar una columna y preguntarse *«¿qué habría tenido
-> que decir alguien para que esto quedara así?»*. Es la habilidad que hace falta
-> para elicitar — y se puede practicar al revés.
+> **Y ése es el ejercicio: leer la fila completa, de izquierda a derecha.** Una
+> frase de alguien que no sabe programar se convierte en una restricción, un
+> disparador o un procedimiento. Esa traducción es el trabajo de la fase 0, y es
+> lo que separa un sistema de una base de datos con pantallas encima.
 
 ---
 
@@ -393,7 +393,7 @@ habría dado:
 | Límite | Por qué importa |
 |---|---|
 | **Nadie dijo nada de esto** | No es evidencia. Es un puente didáctico |
-| **Las preguntas acertaron porque el blanco ya estaba** | Una elicitación real falla, insiste y vuelve |
+| **Se leen demasiado ordenadas** | Una elicitación real falla, insiste y vuelve sobre lo mismo |
 | **No hay contradicciones** | Y una fuente real **se contradice**: dice una cosa en el minuto 12 y otra en el 58 |
 | **No hay nada que el usuario no supiera** | En una real, el usuario reconoce no saber — y eso también es un dato |
 

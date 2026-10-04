@@ -58,12 +58,40 @@ HTTP → Controller (valida el body contra la PETICIÓN del verbo → 422)
 funcionando, desde la primera versión. El código va montado como volumen y
 corre con `dotnet watch`: guardar un `.cs` recompila y reinicia solo.
 
-## Artículo 5 — La base de datos viene DADA
+## Artículo 5 — La base de datos se diseña UNA VEZ, en la fase 0
 
-La BD `bdfacturas` se crea **COMPLETA** (12 tablas, triggers, SPs, datos de
-ejemplo) desde la v1, con los scripts provistos en `db/` — se copian, no se
-generan. Lo que crece por versiones es la API. El código de cada versión
-solo puede nombrar las tablas que su spec le permite.
+La BD `bdfacturas` tiene **dos orígenes**, y conviene no confundirlos:
+
+- **Las 12 tablas vienen del curso de Bases de Datos** — el modelo ya estaba
+  hecho y se reusa tal cual. Son **169 líneas** del script.
+- **Los 3 disparadores y los 16 procedimientos se escriben en ESTE proyecto**,
+  en la fase 0, antes de la v1: son **las reglas del negocio**, y salen de la
+  elicitación. Son **1 371 líneas** — el 89 % del script.
+
+Ese trabajo está en
+[`docs/dominio/elicitacion/`](../dominio/elicitacion/1_PREGUNTAS.md),
+[`REGLAS_DE_NEGOCIO.md`](../dominio/REGLAS_DE_NEGOCIO.md) y
+[`DISENO_BD.md`](../dominio/DISENO_BD.md).
+
+> **Las tablas no deciden nada.** Que el stock no quede negativo o que una
+> factura no se anule dos veces vive en los disparadores y los procedimientos —
+> y ninguno existía antes de este proyecto.
+
+**Desde la v1 en adelante, la base VIENE DADA al código.** Se crea COMPLETA
+—12 tablas, disparadores, procedimientos y datos de ejemplo— con los scripts
+de `db/`: **se copian, no se generan**. Lo que crece por versiones es la API.
+El código de cada versión solo puede nombrar las tablas que su spec le
+permite.
+
+> **Por qué se diseña una vez y no por versiones.** Porque un modelo de datos
+> que cambia en cada entrega obliga a migrar los datos, a rehacer los
+> disparadores y a reescribir los procedimientos — y nada de eso es lo que el
+> curso enseña. **El modelo se piensa entero al principio, que es cuando se
+> piensa un modelo**, y después se construye la API por tramos.
+>
+> **Y por eso ninguna IA genera el esquema.** Si una propone un `CREATE TABLE`,
+> está rehaciendo un trabajo que ya se hizo — y lo va a hacer sin haber estado
+> en la elicitación.
 
 ## Artículo 6 — Todo en español, comentado para principiantes
 

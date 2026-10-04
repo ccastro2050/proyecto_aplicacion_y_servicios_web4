@@ -170,10 +170,18 @@ evita construir sobre una suposición.
 
 ## 7. En este proyecto
 
-**En este repositorio NO hubo elicitación, y conviene decirlo.** Es el ejemplo
-de clase: la base `bdfacturas` viene dada y los requisitos los puso el curso, no
-un cliente. No hay transcripciones con el minuto ni historias firmadas, porque
-no hubo reunión que transcribir.
+**En este repositorio la elicitación es la fase 0, y está SIMULADA.** No hubo un
+cliente real: «Comercial Los Andes S.A.» es ficticia y don Hernán no existe. Lo
+que no está simulado es **el orden**: primero se preguntó, después salieron las
+reglas, y de las reglas los disparadores y los procedimientos.
+
+> **Y hay una distinción que este proyecto hace y conviene copiar:** las **12
+> tablas** vienen del curso de Bases de Datos —el modelo ya estaba—, pero **los 3
+> disparadores y los 16 procedimientos se escribieron aquí**. Son 1 371 de las
+> 1 540 líneas del script.
+>
+> **Las tablas no deciden nada.** Todas las reglas del negocio viven en lo que se
+> escribió en este proyecto — y todas salen de la elicitación.
 
 Lo que sí hay es el lugar donde esos insumos se convierten en decisiones, que es
 lo que este documento enseña a mirar:
@@ -204,23 +212,21 @@ una fuente.
 | [`2_RESPUESTAS.md`](../dominio/elicitacion/2_RESPUESTAS.md) | Citas inventadas, **y al lado la columna REAL que cada una produjo** |
 | [`3_HISTORIAS_PROPUESTAS.md`](../dominio/elicitacion/3_HISTORIAS_PROPUESTAS.md) | Cinco huecos del sistema, escritos como historias |
 
-**Se escribieron al final, no al principio** — y eso es lo que las hace útiles
-para una cosa e inútiles para otra:
+**Lo que sirve de ahí, y lo que no:**
 
 | Sirve para | NO sirve para |
 |---|---|
-| Ver el **puente** entre una frase de negocio y una columna de la base | Ejemplo de **cómo se hace** una elicitación |
-| Preguntarse *«¿qué habría tenido que decir alguien para que esto quedara así?»* | Evidencia de un requisito: **no manda nada** |
+| Ver el **puente**: una frase de negocio → una regla → un disparador | Ejemplo de **cómo se conduce** una reunión real |
+| Seguir la cadena completa y comprobarla en el `.sql` | Evidencia de que alguien lo dijo: **las personas son ficción** |
 
-> **Por qué no sirve como ejemplo del método:** una elicitación de verdad se hace
-> **antes**, y quien la hace **no sabe cómo va a terminar el sistema**. Allí las
-> preguntas dan en el blanco porque el blanco ya estaba pintado.
+> **Lo que no se puede simular es la incomodidad.** Una elicitación real tiene
+> tramos confusos, contradicciones entre el minuto 12 y el 58, y cosas que el
+> usuario reconoce no saber. Para eso está `proyecto_catedras2`, donde la reunión
+> ocurrió y la transcripción existe con todo su ruido.
 >
-> **Y de ahí la señal de alarma que vale para el proyecto de aula: si su
-> elicitación se lee así de limpia, probablemente la escribió después.** Una real
-> tiene tramos confusos, contradicciones entre el minuto 12 y el 58, y cosas que
-> el propio usuario reconoce no saber. **Ese ruido es la prueba de que la fuente
-> existió.**
+> **Y de ahí la señal de alarma para el proyecto de aula: si su elicitación se
+> lee demasiado limpia, sospeche de ella.** Ese ruido es la prueba de que la
+> fuente existió.
 
 **Lea la sección 2 del [`PLAN_V1.md`](../dominio/PLAN_V1.md).** Ahí está lo que este documento describe
 en abstracto: alguien leyó el insumo, lo contrastó con los datos reales, y **lo

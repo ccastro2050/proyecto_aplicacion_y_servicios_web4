@@ -14,36 +14,35 @@
 
 ---
 
-## 0. Entonces, ¿para qué existe este documento?
+## 0. Para qué existe este documento
 
-Porque hay un ejercicio que vale la pena y que no se puede hacer con una
-elicitación de verdad: **leer la pregunta y el esquema al lado, y ver cómo una
-frase de una persona se convierte en una columna.**
+**Es la fase 0 del proyecto**, y es de donde salen las reglas del negocio.
 
-Estas preguntas se escribieron **al final**, no al principio. Es decir: se
-escribieron **sabiendo cómo terminó el sistema**, y se escogieron las que
-**explican decisiones que el sistema de verdad tomó** — por qué `cliente` y
-`vendedor` son tablas aparte, por qué una factura se anula y no se corrige, por
-qué el stock lo defiende un disparador.
+El equipo recibió las **doce tablas** del curso de Bases de Datos — el modelo ya
+estaba hecho. Lo que **no** había era un sistema: no había una sola regla que
+impidiera vender sin stock, ni que un total cuadrara, ni que una factura no se
+anulara dos veces.
 
-| Para qué SÍ sirve | Para qué NO sirve |
+> **Esas reglas no se inventan en una reunión de programadores: se preguntan.**
+> De aquí salen las 22 de [`REGLAS_DE_NEGOCIO.md`](../REGLAS_DE_NEGOCIO.md), y de
+> ahí los **3 disparadores** y los **16 procedimientos** que son el 89 % del
+> script — todo lo escrito en este proyecto.
+
+```
+estas preguntas  →  las 22 reglas  →  los disparadores y procedimientos  →  la API
+```
+
+### Y se puede seguir la cadena completa
+
+| | |
 |---|---|
-| Ver el **puente** entre una frase y una columna | Como ejemplo de **cómo se hace** una elicitación |
-| Entender por qué el modelo quedó así | Como fuente: **no manda nada** |
-| Practicar: ¿qué pregunta falta? | Como evidencia de un requisito |
+| **La pregunta 3.3** | *«¿Qué pasa si piden más de lo que hay?»* |
+| **La respuesta** | *«No se puede vender lo que no tengo. Eso es sagrado.»* |
+| **La regla** | **RN-10** — el stock nunca queda negativo |
+| **Dónde vive** | `trg_prodfact_insert`, con un `THROW 50001` |
 
-> **Por qué NO sirve como ejemplo del método, dicho sin rodeos:** una elicitación
-> de verdad se hace **antes**, y quien la hace **no sabe cómo va a terminar el
-> sistema**. Se pregunta a ciegas, se pregunta mal, se vuelve. Aquí las preguntas
-> dan en el blanco porque el blanco ya estaba pintado.
->
-> **El ejemplo de una real está en `proyecto_catedras2`**, donde la reunión
-> ocurrió y la transcripción existe — con sus tramos confusos, sus contradicciones
-> y las cosas que el usuario reconoció no saber.
-
-> **Y esto es lo que hay que aprender de la diferencia:** si su elicitación se
-> lee así de limpia, probablemente la escribió **después**. Una de verdad tiene
-> huecos, y los huecos son información.
+> **Las cuatro se pueden abrir y comparar.** Eso es lo que significa que una
+> decisión del sistema **tenga autor** en vez de haber aparecido sola.
 
 ---
 
@@ -120,8 +119,7 @@ Cuatro rondas, de lo general a lo concreto. El orden no es decorativo:
 
 ## 5. Lo que estas preguntas NO cubren, y hay que decirlo
 
-Aunque estén escritas al revés, quedaron huecos — **y dejarlos es parte del
-ejercicio**:
+La fase 0 dejó huecos, y **declararlos es parte del trabajo**:
 
 | No se preguntó | Y eso se nota en que… |
 |---|---|

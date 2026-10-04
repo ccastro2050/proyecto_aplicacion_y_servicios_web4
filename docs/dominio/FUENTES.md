@@ -12,42 +12,68 @@
 
 ---
 
-## 0. La fuente normativa de este proyecto **es un esquema de base de datos**
+## 0. De dónde sale la base de datos: dos orígenes, no uno
 
-Y conviene decirlo de entrada, porque es lo que lo distingue de cualquier
-proyecto de ingeniería normal:
+**Las doce tablas vienen de otro curso.** El equipo ya había modelado
+`bdfacturas` en Bases de Datos: las entidades, las relaciones, las llaves y las
+restricciones. Ese trabajo **se reusa tal cual** y no se vuelve a hacer.
 
-> **Artículo 5 de la constitución — «La base de datos viene DADA».**
->
-> *«La BD `bdfacturas` se crea COMPLETA (12 tablas, triggers, SPs, datos de
-> ejemplo) desde la v1, con los scripts provistos en `db/` — se copian, no se
-> generan. Lo que crece por versiones es la API.»*
+**Pero ahí no había un sistema de facturación: había un modelo.** Todo lo que
+convierte ese modelo en un sistema que defiende sus propias reglas **se escribió
+en ESTE proyecto, en la fase 0**, antes de la versión 1.
 
-Es decir: **el modelo de datos llegó hecho**, 1 540 líneas de SQL, con sus tres
-disparadores y sus dieciséis procedimientos. Nadie lo elicitó, nadie lo negoció
-con un usuario. Estaba, y el trabajo fue construirle una API y una interfaz
-encima.
+### Y la diferencia se puede medir
 
-### Y eso invierte el orden normal de la ingeniería
+```powershell
+# Las tablas y sus restricciones, contra todo lo demás
+Select-String -Path dbdfacturas.sql -Pattern 'CREATE (TABLE|TRIGGER|PROCEDURE)' |
+  Group-Object { $_.Matches[0].Groups[2].Value } | Select-Object Count, Name
+```
 
-| Lo normal | Lo que pasó aquí |
+| | | Líneas | De dónde viene |
+|---|---|---|---|
+| **12 tablas** con sus restricciones | | **169** | **del curso de Bases de Datos** |
+| **3 disparadores** | `trg_prodfact_insert` · `_update` · `_delete` | | |
+| **16 procedimientos** | los 6 de `factura`, los de usuario y roles, `verificar_acceso_ruta` | **1 371** | **de este proyecto** |
+| Los datos de ejemplo | | | |
+
+> **El 11 % del script llegó hecho. El 89 % se escribió aquí.** Y no es un
+> detalle de contabilidad: **las tablas no deciden nada**. Que el stock no quede
+> negativo, que el total cuadre con sus renglones, que una factura se anule en
+> vez de corregirse y que no se pueda anular dos veces —**todas las reglas del
+> negocio**— viven en los disparadores y los procedimientos, y **ninguno existía
+> antes de este proyecto**.
+
+### De dónde salieron esas reglas: de la fase 0
+
+```
+elicitación  →  reglas de negocio  →  disparadores y procedimientos
+```
+
+| Paso | Dónde quedó |
 |---|---|
-| Se habla con el usuario | No hubo usuario |
-| Salen requisitos | Salieron del **esquema** y del curso |
-| De los requisitos sale el modelo de datos | El modelo **ya estaba** |
-| Del modelo sale el código | Del modelo salió el código |
+| **1 · Se habla con el usuario experto** | [`elicitacion/`](elicitacion/1_PREGUNTAS.md) |
+| **2 · Salen las reglas** | [`REGLAS_DE_NEGOCIO.md`](REGLAS_DE_NEGOCIO.md) — las 22, con quién defiende cada una |
+| **3 · Cada regla se implementa donde protege a más gente** | el disparador, el procedimiento, o el servicio |
+| **4 · Y recién entonces, la API** | las cinco versiones |
 
-> **Por qué está bien así, en ESTE proyecto, y por qué no lo estaría en otro.**
+> **Ejemplo, y se puede seguir completo:** don Hernán dice *«no se puede vender
+> lo que no tengo, eso es sagrado»* → nace la regla **RN-10** → y se implementa
+> en `trg_prodfact_insert` con un `THROW 50001`. **No en C#**, porque la regla
+> tiene que valer también para quien entre por SSMS.
 >
-> Esto es material de clase, y el objeto de la clase es **aprender a construir
-> una API en capas sobre una base que no se diseñó uno**. Darle a un estudiante
-> un esquema hecho es realista —es lo que le va a pasar en su primer trabajo— y
-> le quita del camino una discusión que no es la de este curso.
->
-> **Pero en el proyecto de aula NO se vale**, y por eso ahí el orden es el
-> correcto: primero se elicita, después se modela. Si alguien copia el orden de
-> este repositorio en su proyecto, está copiando una decisión pedagógica como si
-> fuera una buena práctica, y no lo es.
+> Las tres cosas se pueden abrir y comparar. Eso es lo que significa que una
+> decisión **tenga autor**.
+
+### Por qué el modelo no se rehace en cada versión
+
+> **Artículo 5: «La base de datos se diseña UNA VEZ, en la fase 0.»** Desde la
+> v1 en adelante **viene dada al código**: se copia, no se genera.
+
+| | |
+|---|---|
+| **Por qué una sola vez** | Un modelo que cambia en cada entrega obliga a migrar datos, rehacer disparadores y reescribir procedimientos — y nada de eso es lo que el curso enseña |
+| **Por qué ninguna IA lo genera** | Porque ya está hecho, y la IA **no estuvo en la elicitación**. Si propone un `CREATE TABLE`, está rehaciendo a ciegas un trabajo que tiene autores |
 
 ---
 
@@ -105,49 +131,54 @@ encima.
 
 ---
 
-## 4. Lo que aquí NO hubo, dicho con nombre propio
+## 4. La elicitación es SIMULADA, y eso hay que decirlo
 
-| No hubo | Y en su lugar |
+**No hubo un cliente de verdad.** «Comercial Los Andes S.A.» es una empresa
+ficticia y «don Hernán», el jefe de ventas que responde en
+[`2_RESPUESTAS.md`](elicitacion/2_RESPUESTAS.md), **no existe**.
+
+| Lo que sí es verdad | Lo que está simulado |
 |---|---|
-| **Reunión con un usuario experto** | El curso y el esquema |
-| **Transcripción, grabación, acta** | Nada: no hay fuente oral que citar |
-| **Un cliente que aprobara nada** | Las compuertas del spec kit, firmadas por una persona |
-| **Historias de usuario firmadas** | Requisitos funcionales derivados del esquema y del spec |
+| El **orden**: primero se preguntó, después se modeló | **Las personas** y la empresa |
+| Que cada decisión del modelo **tiene una razón escrita** | Las **citas**, que son un recurso de redacción |
+| Que esa razón se puede rastrear | Que alguien las haya dicho en voz alta |
 
-> **Y entonces, ¿qué es `elicitacion/`?** Es **simulada, y lo dice en su primera
-> línea**. Se escribió **al final**, no al principio, con un propósito concreto:
-> hacer que las preguntas de un usuario imaginario **expliquen las decisiones que
-> el sistema de verdad tomó** — por qué `cliente` y `vendedor` son tablas
-> aparte, por qué una factura se anula y no se corrige, por qué el stock lo
-> defiende un disparador.
+> **Para qué sirve así:** un estudiante puede leer la pregunta y el esquema al
+> lado, y ver **cómo una frase de negocio se convierte en una columna**. Ése es
+> el ejercicio, y se puede hacer aunque la persona sea inventada.
 >
-> **Para qué sirve escrita así:** un estudiante puede leer la pregunta y el
-> esquema al lado, y ver **cómo una frase de un usuario se convierte en una
-> columna**. Ése es el ejercicio.
->
-> **Para qué NO sirve:** como ejemplo de *cómo se hace* una elicitación, porque
-> una de verdad se hace **antes** y no sabe cómo va a terminar el sistema. El
-> ejemplo de eso está en `proyecto_catedras2`, donde la reunión fue real y la
-> transcripción existe. Ver
-> [`CONCEPTOS_ELICITACION.md`](../conceptos/CONCEPTOS_ELICITACION.md).
+> **Para qué NO sirve:** como ejemplo de **cómo se conduce** una elicitación
+> real, con su incomodidad, sus silencios y sus contradicciones. Para eso está
+> `proyecto_catedras2`, donde la reunión ocurrió y la transcripción existe.
+
+> **Y la señal que vale para el proyecto de aula: si su elicitación se lee
+> demasiado limpia, sospeche de ella.** Una de verdad tiene tramos confusos,
+> cosas que el usuario dice sin darse cuenta de que son requisitos, y cosas que
+> reconoce no saber. **Ese ruido es la prueba de que la fuente existió.**
 
 ---
 
-## 5. Una advertencia sobre el esquema que no se pudo comprobar
+## 5. El límite honesto: lo que la elicitación no alcanzó a preguntar
 
-El esquema llegó con decisiones que **no tienen autor consultable**: por qué
-`usuario` se identifica por el correo y no por un `id`, por qué el `estado` es
-un texto de diez caracteres y no un booleano, por qué hay dos procedimientos
-—`sp_actualizar_factura_…` y `sp_borrar_…`— que la API nunca expone.
+El modelo salió de la fase 0, **y la fase 0 tuvo huecos**. Están declarados:
 
-> **Están razonados en [`DISENO_BD.md`](DISENO_BD.md), y ese razonamiento es
-> reconstruido, no heredado.** Es decir: son las razones que **sostienen** la
-> decisión, no necesariamente las que la tomaron. Donde esa diferencia importa,
-> el documento lo dice.
+| No se preguntó | Y se nota en que… |
+|---|---|
+| **Quién hace cada movimiento** | `factura` **no guarda qué usuario la emitió ni quién la anuló**. Hay `fkidvendedor`, pero eso es atribución comercial, no auditoría |
+| Cuántas facturas al día, en el pico | El sistema no promete ningún tiempo de respuesta |
+| Si hay sedes o bodegas distintas | El stock es **uno**, global por producto |
+| Cuánto tiempo se guardan las facturas | Para siempre: no hay archivado |
+
+> **El primero es grave, y es el mejor argumento del curso a favor de elicitar
+> bien.** La pregunta *«¿quién anuló la factura 143?»* **no tiene respuesta
+> posible** — no porque sea difícil de consultar, sino porque **el dato nunca se
+> guardó**. Y no se guardó porque nadie preguntó.
 >
-> **Es el límite honesto de este documento**, y vale decirlo: cuando la fuente
-> es un archivo y no una persona, hay preguntas que ya no se le pueden hacer a
-> nadie.
+> **Nadie echa de menos la pregunta que no se hizo**, hasta el día en que hay
+> que responderla. Para entonces ya no hay dónde buscar.
+
+Los cuatro están en [`3_HISTORIAS_PROPUESTAS.md`](elicitacion/3_HISTORIAS_PROPUESTAS.md),
+escritos como historias que **no están construidas**.
 
 ---
 

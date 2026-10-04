@@ -279,9 +279,9 @@ proyecto_aplicacion_y_servicios_web4/
 │   ├── conceptos/               # QUÉ HAY QUE SABER: 22 .md con sus ilustraciones
 │   │                            #   propias — POO, SOLID y patrones, ACID, Docker,
 │   │                            #   asincronía, pruebas, SDD, los dos tutoriales de BD
-│   └── dominio/                 # QUÉ ES ESTE SISTEMA: 17 .md — glosario, reglas de
-│                                #   negocio, diseño de BD, arquitectura, requisitos,
-│                                #   manual de marca, cronograma, sustentación
+│   └── dominio/                 # QUÉ ES ESTE SISTEMA: 18 .md — el plan del equipo,
+│                                #   glosario, reglas de negocio, diseño de BD,
+│                                #   arquitectura, requisitos, marca, cronograma,
 │                                #   y elicitacion/ (SIMULADA, lo dice en su primera línea)
 │
 ├── .gitignore / .gitattributes  # Higiene del repo (bin/, obj/, .session.sql; .sh con LF)
@@ -344,12 +344,13 @@ ilustraciones propias.** Los que conviene leer primero:
 
 ## 6. El dominio: qué ES este sistema
 
-Los 21 de arriba explican **los conceptos**. Estos 17, en
+Los 22 de arriba explican **los conceptos**. Estos 18, en
 [`docs/dominio/`](docs/dominio/), describen **este sistema concreto** — y están
 escritos desde el código, el esquema y la API corriendo, no de memoria.
 
 | Documento | Qué cubre |
 |---|---|
+| [**PLAN_DE_TRABAJO**](docs/dominio/PLAN_DE_TRABAJO.md) | **El acta donde los tres acuerdan quién hace qué**: quién integra, qué herramienta usa cada uno, cómo se reparten el código **y los documentos del spec kit**. Es el segundo commit del repositorio, antes de cualquier código |
 | [GLOSARIO](docs/dominio/GLOSARIO.md) | Cada palabra del dominio, y las que se confunden entre sí |
 | [REGLAS_DE_NEGOCIO](docs/dominio/REGLAS_DE_NEGOCIO.md) | Las 22 reglas, **con quién las defiende** — y lo que nada defiende |
 | [DISENO_BD](docs/dominio/DISENO_BD.md) | El modelo en sus cuatro etapas, y **por qué** quedó así |
@@ -373,6 +374,7 @@ escritos desde el código, el esquema y la API corriendo, no de memoria.
 > | no entiende **por qué** algo quedó así | [DISENO_BD](docs/dominio/DISENO_BD.md) y [FUENTES](docs/dominio/FUENTES.md) |
 > | va a **probar** el sistema | [DATOS_DE_PRUEBA](docs/dominio/DATOS_DE_PRUEBA.md) |
 > | va a **tocar** el código | [ARQUITECTURA](docs/dominio/ARQUITECTURA.md), por las prohibiciones |
+> | quiere saber **quién hizo qué** | [PLAN_DE_TRABAJO](docs/dominio/PLAN_DE_TRABAJO.md), y [CRONOGRAMA](docs/dominio/CRONOGRAMA.md) para lo que de verdad pasó |
 
 > **Y una advertencia sobre copiar de aquí.** Este ejemplo toma decisiones que en
 > el **proyecto de aula NO se valen**, y están señaladas donde aparecen: el

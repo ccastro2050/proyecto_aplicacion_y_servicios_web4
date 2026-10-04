@@ -1,184 +1,157 @@
-# Guía de IA — Versión 4: el aplicativo completo
+# Versión 4 con IA — índice de las tres guías
 
-> Guía de la **v4** (acumulativa: se construye encima de su proyecto con la
-> **v3** cerrada). Dos caminos, el mismo resultado: **A** con un chat web,
-> **B** con un agente en el IDE. Lea el que vaya a usar.
+> **La versión del aplicativo**, y la primera en la que **los tres trabajan con
+> agente**.
 >
-> **Sus puertos:** API 8135 · interfaz gráfica 8199 (los del curso
-> +100, para que los dos proyectos convivan).
->
-> Novedad de esta versión: por primera vez el sistema **responde preguntas** en
-> vez de guardar filas.
+> Hasta aquí el sistema sabía *guardar* y *proteger*. Lo que no sabía era
+> **responder preguntas del negocio**.
 
 ---
 
-## LO PRIMERO: la IA tiene que COMENTAR lo que escribe
+## 1. Quién hace qué — y todos con la misma herramienta
 
-Esto va antes que todo lo demás porque aplica a los dos caminos —el chat y el
-IDE agéntico— y a cada archivo que la IA entregue.
+| | Su guía | Su camino | Lo que le toca |
+|---|---|---|---|
+| **Carlos** | [`GUIA_IA4_CARLOS.md`](GUIA_IA4_CARLOS.md) | **B · agéntico** | El tablero + las 4 consultas de ventas |
+| **Paco** | [`GUIA_IA4_PACO.md`](GUIA_IA4_PACO.md) | **B · agéntico** ← cambia | 3 consultas + **el manual de marca** |
+| **Luis** | [`GUIA_IA4_LUIS.md`](GUIA_IA4_LUIS.md) | **B · agéntico** ← cambia | 3 consultas + las pantallas |
 
-**Exíjaselo en el prompt y recháceselo cuando no lo cumpla:**
+> **Paco y Luis cambian de herramienta aquí**, y está acordado en
+> [`PLAN_DE_TRABAJO.md`](../../../dominio/PLAN_DE_TRABAJO.md) §3. La razón es
+> concreta: **un agente lee el repositorio**, y a estas alturas hay cuatro
+> capas, quince controladores y un front entero. Subirle treinta archivos a un
+> chat en cada conversación dejó de tener sentido.
 
-> Comenta todo el código que generes, en español. Cada archivo empieza con un
-> bloque que dice QUÉ ES y QUÉ PAPEL cumple en la arquitectura. Cada método no
-> evidente lleva su comentario. Y los comentarios dicen **por qué** está escrito
-> así, no **qué** hace la línea: `// suma uno al contador` no le sirve a nadie;
-> `// el límite es 1000 porque es el ancho de la columna en la base` sí.
+> **Y el orden importa:** llegan al agente **después** de tres versiones a mano.
+> Con chat hay que leer cada archivo antes de pegarlo — es lento, y por eso se
+> aprende. Ahora ya saben qué debe salir, **que es lo único que permite juzgar
+> lo que un agente escribe** en vez de aceptarlo.
 
-**Por qué esto no es un capricho de estilo:**
+---
 
-| | |
+## 2. Quién escribe cada documento de ESTA carpeta
+
+| Documento | Lo redacta |
 |---|---|
-| **Usted va a tener que explicarlo** | Desde la v2, la **interpretabilidad se califica**: el profesor le va a pedir que cuente, en voz alta, qué hace el código que entregó y por qué está así. Un archivo sin comentarios es un archivo que usted va a tener que reconstruir de memoria enfrente de él |
-| **El código generado se olvida más rápido que el escrito** | Lo que uno escribe a mano deja rastro en la cabeza. Lo que aceptó de un chat, no. El comentario es lo que queda cuando el recuerdo de la conversación se fue |
-| **Es la prueba de que usted entendió, no de que la IA produjo** | Un comentario que explica el porqué solo lo puede revisar quien entendió la decisión. Si usted no puede juzgar si el comentario es cierto, no entendió el código |
-
-> **Y una advertencia sobre los comentarios que la IA inventa.** A veces
-> comenta lo que *cree* que hace el código, no lo que hace. Léalos: un
-> comentario equivocado es peor que ninguno, porque el siguiente que lo lea le
-> va a creer. Corregirlos es trabajo suyo, y de los buenos: es exactamente el
-> tipo de corrección que la `GUIA_IA` le pide guardar.
+| [`2_spec.md`](2_spec.md) · [`4_research.md`](4_research.md) · [`7_quickstart.md`](7_quickstart.md) | **Paco** |
+| [`3_plan.md`](3_plan.md) · [`5_data_model.md`](5_data_model.md) · [`6_contracts.md`](6_contracts.md) · [`8_tasks.md`](8_tasks.md) | **Luis** |
+| [`9_checklist.md`](9_checklist.md) · este índice | **Carlos** |
+| `GUIA_IA4_<NOMBRE>` | **cada quien la suya** |
 
 ---
 
-## A.1 Qué subirle al chat: los 8 archivos de la v4
+## 3. Qué define esta versión: lo que un CRUD no puede responder
 
-`docs/spec_kit/1_constitution.md` + los **siete** documentos de
-`docs/spec_kit/versiones/v4_aplicativo/` (2_spec a 8_tasks).
+Un CRUD responde *«dame las filas de `factura`»*. **Ninguna de las diez
+consultas es eso:**
 
-> **Y el `9_checklist.md` no se sube, a propósito.** Es la compuerta que usted
-> pasa ANTES de abrir la IA —revisa la especificación, no el código—, así que
-> la IA no tiene nada que hacer con él. Por eso son siete documentos y no ocho.
+```
+ventas-por-vendedor      ventas-por-cliente       ventas-por-producto
+ventas-por-empresa       ticket-por-vendedor      anulaciones-por-cliente
+credito-contra-consumo   productos-sin-vender     alcance-de-usuarios
+interfaces-sin-usuarios
+```
 
+> Son `JOIN` con `GROUP BY`, y **no caben en `GET /api/{tabla}`**. Por eso la v4
+> existe y no es «la v2 con más pantallas».
 
-**Y los de las versiones anteriores**, porque la v4 las incluye: los
-`6_contracts.md` de v1, v2 y v3 — son los 70 endpoints que **no se pueden
-tocar**.
+| El reparto | |
+|---|---|
+| **Carlos** | `ventas-por-vendedor` · `ventas-por-cliente` · `ventas-por-producto` · `ventas-por-empresa` |
+| **Paco** | `ticket-por-vendedor` · `anulaciones-por-cliente` · `credito-contra-consumo` |
+| **Luis** | `productos-sin-vender` · `alcance-de-usuarios` · `interfaces-sin-usuarios` |
 
-## A.2 Cree los archivos vacíos
+> **Las tres de Luis no son de ventas: son del propio sistema.** Preguntan
+> *«¿qué producto no se ha vendido nunca?»*, *«¿quién alcanza qué?»* y *«¿qué
+> pantalla no alcanza nadie?»*. La última es la más útil para administrar: **una
+> interfaz que ningún rol alcanza está construida y nadie la ve**.
+
+---
+
+## 4. Lo que los tres tienen que saber
+
+### El sobre de las consultas NO es el del CRUD
+
+```json
+CRUD       { "tabla": "...", "limite": 50, "total": 8, "datos": [...] }
+Consultas  { "consulta": "...",            "total": 3, "datos": [...] }
+```
+
+> **No tiene `limite`, y el nombre del primer campo cambia.** Una consulta no se
+> pagina: devuelve el resultado del agrupamiento, que ya viene resumido. Si el
+> front espera `tabla`, la pantalla sale vacía **sin un solo error**.
+
+### Una consulta que devuelve CERO filas no está rota
+
+Con los datos sembrados, **dos de las diez responden vacío**:
+
+| | Y eso significa |
+|---|---|
+| `productos-sin-vender` → `total: 0` | **todos** los productos se han vendido alguna vez |
+| `interfaces-sin-usuarios` → `total: 0` | **todas** las pantallas las alcanza algún rol |
+
+> **Son el resultado correcto, y es la lección de la versión.** «Vacío» y «roto»
+> se ven **exactamente igual** en una pantalla. La única forma de distinguirlos
+> es **provocar el caso**: cree un producto nuevo, no lo venda, y vuelva a
+> consultar. Si sigue en cero, **ahora sí** está rota.
+>
+> **Una consulta que nunca se vio devolver algo no está probada.**
+
+### Las consultas también exigen permiso
+
+No porque sean peligrosas de escribir, sino porque **contestan preguntas del
+negocio**: cuánto vendió cada quien no lo puede ver cualquiera.
+
+---
+
+## 5. Lo que cambia al trabajar con agente
+
+**Para Paco y Luis esto es nuevo.** Lo esencial, y está en sus guías:
+
+| Con chat | Con agente |
+|---|---|
+| Usted pega cada archivo | **Él los escribe, sin preguntar** |
+| Usted ve cada línea antes de que entre | Usted ve **el resultado** |
+| El error aparece donde usted pegó | El error puede estar en un archivo que usted no abrió |
+
+> **La regla que reemplaza a «pegar de a un archivo»:** el prompt empieza
+> pidiéndole al agente que **lea, resuma y espere confirmación** antes de tocar
+> nada. Si el resumen está mal, el código va a estar mal — y es mucho más barato
+> descubrirlo ahí.
+>
+> **Y la segunda: acote qué carpetas puede escribir.** Un agente sin alcance
+> definido es capaz de reorganizarle el proyecto entero con la mejor intención.
+
+---
+
+## 6. Lo que vale para los tres
+
+**Comentar, identidad, ramas** — igual que siempre:
 
 ```powershell
-New-Item api_facturas\Modelos\Consultas.cs,`
-  api_facturas\Repositorios\IRepositorioConsultas.cs,`
-  api_facturas\Repositorios\RepositorioConsultasSqlServer.cs,`
-  api_facturas\Servicios\IServicioConsultas.cs,`
-  api_facturas\Servicios\ServicioConsultas.cs,`
-  api_facturas\Controllers\ConsultasController.cs,`
-  front_blazor\Servicios\ServicioConsultas.cs, front_blazor\Components\Pages\Tablero.razor
+git switch main ; git pull origin main
+git switch -c rama-<nombre>-v4
+git config user.name "su-usuario" ; git config user.email "su-correo"
+git config user.name ; git config user.email
 ```
 
-**Dos archivos EXISTENTES crecen:**
-
-| | |
-|---|---|
-| `api_facturas\Program.cs` | El registro del repositorio y del servicio |
-| La fábrica, si la hay | `CrearRepositorioConsultas()` en la interfaz **y en las dos implementaciones** |
+**La interpretabilidad se califica** hablando y en persona. Con agente eso pesa
+más: es código que usted no tecleó.
 
 ---
 
-## A.3 El prompt
+## 7. Cuándo está terminada
 
-```
-Vas a construir la VERSION 4 de un proyecto que ya tiene las versiones 1, 2 y
-3 cerradas y funcionando. ESTE PROYECTO USA DOS LENGUAJES, uno por proceso: la
-API en C# / ASP.NET Core, y la interfaz gráfica en Blazor Server. Si en tu respuesta
-la API aparece en otro lenguaje, o la interfaz gráfica en otro framework,
-significa que no leíste los documentos adjuntos: detente y dímelo.
-
-LA v4 NO AGREGA NI UNA TABLA. Agrega DIEZ CONSULTAS que cruzan cuatro o más
-tablas cada una, y el TABLERO donde se ven. Los 70 endpoints de v1 a v3 no se
-tocan: sus contratos siguen vigentes tal cual.
-
-1. LAS DIEZ CONSULTAS, con estos nombres exactos de ruta:
-   ventas-por-producto, ventas-por-cliente, ventas-por-vendedor,
-   ventas-por-empresa, ticket-por-vendedor, productos-sin-vender,
-   anulaciones-por-cliente, alcance-de-usuarios, interfaces-sin-usuarios,
-   credito-contra-consumo.
-   Todas bajo [Route("api/consultas")], todas GET, todas sin parámetros.
-
-2. DIEZ ENDPOINTS CON NOMBRE, NO UNO CON PARAMETRO. Si propones
-   /api/consultas?nombre=x, recházalo tú mismo: cada consulta devuelve una
-   forma distinta, y un contrato que dice «depende» no es un contrato.
-
-3. EL SQL VA EN EL REPOSITORIO, no en vistas ni en procedimientos: la
-   constitución exige el SQL a la vista.
-
-4. CADA CONSULTA CRUZA 4 TABLAS O MAS. Dos cruzan cinco
-   (alcance-de-usuarios). Las de ausencia —productos-sin-vender e
-   interfaces-sin-usuarios— necesitan LEFT JOIN: un INNER JOIN no puede
-   responder una ausencia.
-
-5. CAST(... AS INT) EN TODAS LAS COLUMNAS DE CONTEO, y esto no es cosmético:
-   en PostgreSQL COUNT() devuelve bigint y el modelo con int revienta al
-   deserializar; en SQL Server devuelve int y un SUM(decimal)/COUNT(*) TRUNCA
-   el promedio sin quejarse. El CAST deja las dos respuestas idénticas.
-
-6. ALIAS EN CADA COLUMNA, coincidiendo con la propiedad del record. Dapper
-   mapea POR NOMBRE: sin alias el campo llega vacío y la API responde 200 con
-   el dato en blanco.
-
-7. DIEZ RECORD CON NOMBRE en Modelos/Consultas.cs. No un
-   Dictionary<string, object>: el nombre de cada propiedad ES la
-   documentación.
-
-8. EL SERVICIO EXISTE AUNQUE NO VALIDE NADA. El controlador no le habla al
-   repositorio. La capa no se salta porque hoy esté vacía.
-
-9. EL SOBRE ES { consulta, total, datos[] } — no el { tabla, limite, total,
-   datos[] } del CRUD. Una consulta no sale de una tabla ni tiene límite.
-
-10. CERO FILAS ES 200, NO 404. La 6 y la 9 pueden venir vacías, y eso es la
-    respuesta: el 404 diría que la consulta no existe, que es otra cosa.
-
-11. EL CONTROLADOR LLEVA [Authorize] Y [ExigePermiso("interfaz.inicio")].
-
-12. EL REGISTRO EN Program.cs NO SE PUEDE OLVIDAR:
-    builder.Services.AddScoped<IRepositorioConsultas>(_ => fabrica.CrearRepositorioConsultas());
-    builder.Services.AddScoped<IServicioConsultas, ServicioConsultas>();
-    Sin esas dos líneas el proyecto COMPILA, arranca, y el endpoint responde
-    500 «Unable to resolve service» cuando alguien lo pide.
-
-13. CADA VERSION ES API + INTERFAZ GRAFICA, y la v4 no cierra sin el tablero:
-   - Las diez se piden A LA VEZ con Task.WhenAll, no en fila.
-   - El tablero va PRIMERO en el MenuApp, con permiso interfaz.inicio.
-   - Si una consulta falla, las otras nueve se dibujan, y el aviso dice CUAL.
-   - Los gráficos van SIN LIBRERIA Y SIN CDN: una barra es un div con su
-     width en porcentaje. La regla del proyecto es «sin CDN» y su razón está
-     escrita: un front que necesita internet para verse bien no arranca en un
-     salón sin red.
-   - Cero filas se muestra CON PALABRAS, no como una tabla vacía.
-
-14. NO HAGAS: caché de resultados, filtros por fecha, exportación a Excel, ni
-    una librería de gráficos. Y NO toques la marca, las páginas corporativas,
-    la PWA ni la publicación: están declaradas PENDIENTES en 2_spec.md §5.
-
-Al final, la versión 4 está TERMINADA solo cuando pasan los 8 criterios de
-aceptación de 2_spec.md, verificados con el smoke test de 7_quickstart.md —
-incluida la REGRESION de v1, v2 y v3.
-```
-
----
-
-## B. Camino B — el agente en el IDE
-
-Mismo prompt, y además:
-
-| | |
+| Qué | Cómo |
 |---|---|
-| **Déjelo leer el repositorio** | Los repositorios de v1–v3 ya tienen el patrón: que copie **ese**, no uno inventado |
-| **Pídale que ejecute** | Las diez consultas, una por una, con token. «Debería funcionar» no es una verificación |
-| **Y la regresión** | Es el criterio 1, y es el que un agente se salta más seguido |
+| Las diez consultas responden | `/api/consultas/*` |
+| Las dos que dan vacío **se probaron provocando el caso** | §4 |
+| El tablero muestra indicadores, no listados | `http://localhost:8099/` |
+| **Ni un color escrito a mano** fuera de `marca.css` | Buscar `#rrggbb` |
+| La interfaz no habla en jerga | Recorrer las pantallas |
+| **La regresión de v1, v2 y v3** | Todo lo anterior, con token |
 
-## C. Lo que hay que rechazarle
-
-| Si la IA… | Qué hacer |
-|---|---|
-| **Propone `/api/consultas?nombre=x`** | Recházelo. Punto 2 del prompt |
-| **Crea vistas o procedimientos** | Recházelo. La constitución exige el SQL a la vista |
-| **Agrega una tabla** | Recházelo: la v4 no agrega ninguna |
-| **Devuelve `Dictionary<string, object>`** | Recházelo. Punto 7 |
-| **Olvida el `CAST`** | Pídale que lo ponga **antes** de ejecutar: el síntoma en PostgreSQL es un error de constructor con `System.Int64` |
-| **Olvida el registro en `Program.cs`** | Es el que más se olvida, y **compila igual**. Pídale la salida de los diez endpoints |
-| **Mete Chart.js por CDN** | Recházelo. Si quiere la librería, va servida desde el repositorio |
-| **Dice «listo» sin ejecutar** | Pídale la salida real de las diez, y la de la regresión |
-| **Describe la marca o la publicación como hechas** | Recházelo: están **pendientes**, y el spec lo dice |
+```powershell
+git tag -a v4 -m "Version 4: el aplicativo"
+git push origin v4
+```

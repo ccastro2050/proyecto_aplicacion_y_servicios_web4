@@ -71,6 +71,16 @@ versión que el contrato era incómodo de pintar.
   no aparece la pregunta de si conviene un genérico.
 - **Una INTERFAZ GRÁFICA por recurso**, con dirección propia (`/productos`,
   `/empresas`, …), nunca una ruta con el nombre de la tabla como parámetro.
+
+  > **«Una dirección por RECURSO», no una por vista.** Dentro de `/productos`
+  > conviven la lista y el formulario, y se alterna entre ellos con **un campo y
+  > unos `@if`**, no con rutas nuevas. Es la forma del tutorial de Blazor del
+  > curso, y está razonada en el [`4_research.md` de la
+  > v2](../v2_con_fk/4_research.md) (D9).
+  >
+  > Lo que la regla prohíbe es `/tabla/{nombre}`: una ruta genérica donde el
+  > recurso es un parámetro. Eso deja un front que no se puede enlazar ni
+  > proteger por pantalla.
 - **Modelo entidad** (`Producto`): la clase con las 4 propiedades tipadas
   (en C#, las propiedades `{ get; set; }` SON los getters/setters del
   lenguaje).

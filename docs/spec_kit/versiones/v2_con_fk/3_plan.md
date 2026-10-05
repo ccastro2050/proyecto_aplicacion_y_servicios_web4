@@ -172,9 +172,7 @@ repetido:** registrar dos veces la misma interfaz no rompe nada —gana el
 |---|---|
 | `Clientes.razor` | **Dos** desplegables, uno **opcional** con «(ninguna)» → `null` |
 | `Vendedores.razor` | Uno obligatorio: el mismo patrón, sin la opción vacía |
-| `Facturas.razor` | La **tabla** de facturas, con «Ver» y «Anular» |
-| `EmitirFactura.razor` | **El maestro-detalle.** La pieza central — y por eso tiene pantalla propia |
-| `FacturaDetalle.razor` | Una factura con sus renglones, **con los subtotales que calculó la base** |
+| `Facturas.razor` | **El recurso entero en un archivo**: la tabla, el maestro-detalle y el ver. Tres `@if` sobre un campo `vista`, y botones para alternar — ver **D9** |
 | `UsuariosYRoles.razor` | El mismo patrón con **casillas** |
 | `RolesPorUsuario.razor` | La puente cruda: **sin editar**, y el quitar con dos claves |
 | `PermisosPorRol.razor` | La otra puente, **con el aviso de que todavía no aplica nada** |

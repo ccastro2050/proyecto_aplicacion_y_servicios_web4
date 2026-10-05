@@ -113,7 +113,7 @@ Invoke-RestMethod http://localhost:8035/api/producto
 | Puede escribir | NO puede tocar |
 |---|---|
 | `api_facturas/**` — lo de `factura` | `docs/` — **solo lectura** |
-| `front_blazor/**` — las dos pantallas de factura | `db/bdfacturas.sql` — **viene dado** |
+| `front_blazor/**` — **la pantalla** de factura (una sola) | `db/bdfacturas.sql` — **viene dado** |
 | | Los recursos de Paco y Luis (§5) |
 
 ---
@@ -199,7 +199,20 @@ REGLAS QUE SIGUEN VIGENTES DE LA V1:
   · TODO EN ESPAÑOL.
   · El front NO habla con la base: solo con la API por HTTP.
 
-LA INTERFAZ GRÁFICA, que son DOS pantallas:
+LA INTERFAZ GRÁFICA, QUE ES UNA SOLA PANTALLA CON TRES VISTAS:
+
+  Un unico archivo Facturas.razor con UNA ruta (@page "/facturas") y un
+  campo que decide que se ve:
+
+      private string vista = "listar";
+      @if (vista == "listar")     la tabla
+      @if (vista == "formulario") el maestro-detalle
+      @if (vista == "ver")        una factura, de solo lectura
+
+  Se alterna con BOTONES, no con direcciones. NO uses una ruta por vista
+  ni varios @page en el mismo componente: asi es como lo hace el tutorial
+  de Blazor del curso, y la razon esta en D9 del 4_research.
+
   · El listado de facturas, con su estado (activa / anulada) y el botón
     de anular.
   · El formulario de emisión, que es MAESTRO-DETALLE: se escogen cliente

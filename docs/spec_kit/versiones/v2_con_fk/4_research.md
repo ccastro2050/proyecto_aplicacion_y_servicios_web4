@@ -148,7 +148,56 @@ un fallo a mitad deja una factura incompleta que nadie pidió.
 > tabla. Ahora lee el servicio que la interfaz inyecta
 > —`@inject ServicioRolUsuario Servicio`—, que es un dato y no una suposición.
 
-## D9 — Lo que NO se investigó, y por qué
+## D9 — El maestro-detalle en el front: ¿una ruta por vista, o un campo?
+
+**Un campo.** El recurso entero vive en **una sola dirección**, y lo que se ve
+—la lista, el formulario o una factura— lo decide una variable que cambian los
+botones.
+
+```razor
+@page "/facturas"                    ← UNA ruta
+private string vista = "listar";     ← un campo decide
+@if (vista == "listar")     { … }
+@if (vista == "formulario") { … }    ← el maestro-detalle
+@if (vista == "ver")        { … }
+```
+
+| Opción | Argumento |
+|---|---|
+| **Una ruta por vista** — `/facturas`, `/facturas/nueva`, `/facturas/7` | Cada vista se puede **enlazar y marcar**, y el botón «atrás» del navegador funciona |
+| **Un campo `vista`** ✅ | La pantalla **se lee de arriba abajo** sin saber nada de enrutado |
+
+**Lo que decide, y es pedagógico antes que técnico:** una ruta por vista obliga
+a entender **parámetros de ruta**, `OnParametersSetAsync` y qué pasa cuando
+Blazor **reusa** el componente al navegar entre dos rutas suyas. Son tres
+conceptos que el curso no ha enseñado todavía, y que no son el tema de esta
+versión — **el tema es que el maestro y el detalle viajen juntos**.
+
+> **Y hay un argumento que pesa más que la comodidad: es la forma del tutorial
+> de Blazor del curso.** `Factura.razor` del tutorial usa exactamente este
+> mecanismo. **Un ejemplo que usa algo que el tutorial no explica deja de servir
+> como ejemplo**, por bueno que sea.
+
+**Lo que se pierde, y se acepta a sabiendas:**
+
+| | |
+|---|---|
+| `/facturas/7` no existe | una factura **no se puede enlazar ni marcar** |
+| El botón «atrás» | no vuelve a la lista: saca de la pantalla |
+| F5 | vuelve a la lista y pierde lo que se estuviera viendo |
+
+> **Cuándo esta decisión sería la equivocada:** en algo **público** donde la
+> gente comparte enlaces —una tienda, un catálogo—, poder mandar
+> `/producto/44` por correo vale más que la simplicidad. Aquí el sistema es
+> interno y se usa con la sesión abierta de corrido, así que no cuesta nada.
+
+> **Aplica a los DOS maestro-detalle del sistema**, `factura` y
+> `usuario-con-roles`, y a las demás pantallas. Que se lean igual es parte de la
+> decisión: quien entienda una entiende las otras.
+
+---
+
+## D10 — Lo que NO se investigó, y por qué
 
 | | |
 |---|---|

@@ -103,7 +103,7 @@ escrita. Una fase que no se puede comprobar no es una fase: es una esperanza.
 
 | | |
 |---|---|
-| **Archivos** | `Facturas.razor` (la tabla) · `EmitirFactura.razor` (el formulario) · `FacturaDetalle.razor` · `ServicioFactura.cs` del front |
+| **Archivos** | `Facturas.razor` — **uno solo**: la tabla, el formulario maestro-detalle y el ver, con un campo `vista` que decide (D9) · `ServicioFactura.cs` del front |
 | **Lo que importa** | **Agregar un renglón NO llama a la API.** El total se muestra y **no se envía**. El botón dice **anular** |
 | **Verificación** | **Agregar tres renglones, quitar uno, emitir → llegan DOS.** Y el JSON que sale **no lleva** `total` |
 

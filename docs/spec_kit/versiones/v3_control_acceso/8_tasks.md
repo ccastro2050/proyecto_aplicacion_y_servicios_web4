@@ -82,7 +82,7 @@ entender:
 | **Verificación** | La matriz de los tres roles: `admin` todo 200 · `vendedor1` **403** en usuarios y **200** en clientes · `cliente1` al revés |
 
 > **Y el que decide si la versión está bien hecha:** quítele el permiso a un rol
-> en la base y pida otra vez **con el mismo token**. Tiene que responder
+> en la base de datos y pida otra vez **con el mismo token**. Tiene que responder
 > **403** sin que nadie vuelva a identificarse. Si responde 200, los permisos
 > están en el token.
 

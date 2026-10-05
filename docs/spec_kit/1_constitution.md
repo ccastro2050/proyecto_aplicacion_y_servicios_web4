@@ -85,7 +85,7 @@ Ese trabajo está en
 > factura no se anule dos veces vive en los disparadores y los procedimientos —
 > y ninguno existía antes de este proyecto.
 
-**Desde la v1 en adelante, la base VIENE DADA al código.** Se crea COMPLETA
+**Desde la v1 en adelante, la base de datos VIENE DADA al código.** Se crea COMPLETA
 —12 tablas, disparadores, procedimientos y datos de ejemplo— con los scripts
 de `db/`: **se copian, no se generan**. Lo que crece por versiones es la API.
 El código de cada versión solo puede nombrar las tablas que su spec le

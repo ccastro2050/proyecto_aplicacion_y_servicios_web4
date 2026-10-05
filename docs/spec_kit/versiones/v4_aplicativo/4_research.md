@@ -23,7 +23,7 @@
 
 | Opción | Argumento |
 |---|---|
-| **Una vista por consulta** | El cruce queda en la base, versionado con el esquema. Y **diez vistas más** que mantener en los dos dialectos de la v5 |
+| **Una vista por consulta** | El cruce queda en la base de datos, versionado con el esquema. Y **diez vistas más** que mantener en los dos dialectos de la v5 |
 | **Un procedimiento por consulta** | Igual, y encima esconde el SQL justo en la versión que existe para mostrarlo |
 | **SQL en el repositorio** ✅ | Se lee al lado del código que lo usa, y el dialecto queda confinado a **un archivo por motor** |
 

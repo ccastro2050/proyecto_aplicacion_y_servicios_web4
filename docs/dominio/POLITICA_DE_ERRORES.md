@@ -29,7 +29,7 @@
 | **405** | La ruta existe, pero **no con ese verbo** | el enrutador | `PUT /api/factura/3` |
 | **409** | La petición está bien y **choca con el estado** | el servicio, con `ConflictoExcepcion` | anular una factura ya anulada |
 | **422** | El **body no tiene la forma** pedida | ASP.NET, antes del controlador | `POST /api/producto` sin `nombre` |
-| **500** | Algo se rompió, o la base rechazó | el `catch` final | stock insuficiente |
+| **500** | Algo se rompió, o la base de datos rechazó | el `catch` final | stock insuficiente |
 
 ---
 
@@ -63,7 +63,7 @@
 
 | | 409 | 500 |
 |---|---|---|
-| Qué pasó | Choca con el **estado** del recurso, y el sistema lo **esperaba** | La base rechazó y nadie lo tradujo |
+| Qué pasó | Choca con el **estado** del recurso, y el sistema lo **esperaba** | La base de datos rechazó y nadie lo tradujo |
 | Ejemplo | Anular una factura ya anulada | Stock insuficiente · llave duplicada |
 
 > **Y aquí hay una decisión deliberada que conviene no «arreglar»:** en la v1 una
@@ -122,7 +122,7 @@
 | Nunca | Por qué |
 |---|---|
 | Una contraseña o un hash | Ver [`REGLAS_DE_NEGOCIO.md`](REGLAS_DE_NEGOCIO.md) RN-18 |
-| La cadena de conexión | Trae la clave de la base |
+| La cadena de conexión | Trae la clave de la base de datos |
 | El *stack trace* completo | Le dice a un desconocido qué biblioteca y qué versión corren |
 | Si un correo **existe** | El login responde lo mismo para «no existe» y «clave mala» — ver §5 |
 
@@ -150,7 +150,7 @@ la contraseña está mal     → 401 "El correo o la contrasena no son correctos
 
 ## 6. Cómo se traduce un error del motor
 
-La base habla en números. El repositorio los traduce, y **nadie por encima de él
+La base de datos habla en números. El repositorio los traduce, y **nadie por encima de él
 conoce `SqlException`**.
 
 | El motor dice | Se traduce a | Dónde |

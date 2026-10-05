@@ -5,7 +5,7 @@
 > el lenguaje para no hacerlo?**
 
 
-![Con await el hilo atiende a otra persona mientras la base trabaja; sin await se queda parado](img/sincronico_contra_asincronico.svg)
+![Con await el hilo atiende a otra persona mientras la base de datos trabaja; sin await se queda parado](img/sincronico_contra_asincronico.svg)
 
 ---
 

@@ -61,7 +61,7 @@
 - [ ] `docker compose up -d --build` levanta la v1 **y la prueba de humo de la
       v1 pasa**.
 - [ ] Los **puertos** del proyecto no chocan con nada —se revisó el registro—.
-- [ ] La base trae **las 12 tablas**, los **procedimientos** y el
+- [ ] La base de datos trae **las 12 tablas**, los **procedimientos** y el
       **disparador**: se comprueba, no se supone.
 
 ---

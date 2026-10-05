@@ -40,7 +40,7 @@ ruta       id (IDENTITY, PK)   · ruta · descripcion
 ```
 
 Mire la diferencia: `producto` tiene una llave **de texto que usted escribe**;
-las suyas tienen una llave **numérica que pone la base**. De ahí salen las dos
+las suyas tienen una llave **numérica que pone la base de datos**. De ahí salen las dos
 diferencias de la §2.
 
 ---
@@ -51,7 +51,7 @@ diferencias de la §2.
 reconocerlas cuando el chat se equivoque — porque se va a equivocar, y va a
 equivocarse **precisamente por calcar bien**.
 
-### 1 · La llave la pone la base, no usted
+### 1 · La llave la pone la base de datos, no usted
 
 `id INT IDENTITY(1,1)` significa que **SQL Server genera el número**. Y eso
 cambia dos archivos respecto al molde:
@@ -64,7 +64,7 @@ cambia dos archivos respecto al molde:
 > **Qué pasa si el chat lo calca tal cual, que es lo que va a hacer.** Le va a
 > poner `[Required] public int? Id` en `RolCrear`, porque así está en
 > `ProductoCrear`. Y entonces el `POST` **exige que usted le invente una llave a
-> la base** — que es justo lo que la base existe para evitar. El resultado es un
+> la base de datos** — que es justo lo que la base de datos existe para evitar. El resultado es un
 > 422 pidiéndole un campo que nadie debería mandar.
 >
 > **Y si lo deja pasar, el error sobrevive:** compila, Swagger lo muestra, y solo
@@ -86,7 +86,7 @@ sabría cuál mirar.
 > intente crear una ruta repetida, la API va a responder **500**, no un error
 > bonito. **Está bien así, y es a propósito.**
 >
-> En la v1, **la llave la defiende la base, no la API**. Convertir ese choque en
+> En la v1, **la llave la defiende la base de datos, no la API**. Convertir ese choque en
 > un 409 con mensaje claro es **la lección de la v2**, y adelantarla rompe el
 > Artículo 1 (YAGNI). Está declarado en el `2_spec.md` de esta versión.
 >
@@ -197,15 +197,15 @@ los mismos nombres de archivo cambiando solo el del recurso:
 
 ATENCIÓN — DOS COSAS QUE NO SE CALCAN IGUAL, Y SON LAS IMPORTANTES:
 
-  1. MIS DOS TABLAS TIENEN LLAVE IDENTITY: el id lo genera la base, no el
+  1. MIS DOS TABLAS TIENEN LLAVE IDENTITY: el id lo genera la base de datos, no el
      cliente. Por lo tanto:
        · La petición de CREAR (RolCrear, RutaCrear) NO lleva el campo id.
          Ni como obligatorio ni como opcional: no lo lleva.
        · El modelo NO marca el Id como `required`.
-       · El POST devuelve el id que la base generó.
+       · El POST devuelve el id que la base de datos generó.
      El molde `producto` tiene llave de TEXTO que manda el cliente, así que
      en esto NO lo copies: si me pides el id al crear, el POST estaría
-     exigiéndome inventarle una llave a la base.
+     exigiéndome inventarle una llave a la base de datos.
 
   2. LA TABLA `ruta` TIENE UNA RESTRICCIÓN UNIQUE sobre la columna `ruta`:
      no puede haber dos filas con el mismo nombre de interfaz.
@@ -273,7 +273,7 @@ Un archivo a la vez, y `ruta` solo cuando `rol` funcione.
 > **Vigile la diferencia 1 en el archivo 2.** Cuando le entregue `RolCrear.cs`,
 > **mírelo antes de pegarlo**: si tiene un campo `Id`, el chat calcó cuando no
 > debía. Dígaselo así: *«RolCrear no lleva id: la llave es IDENTITY y la genera
-> la base. Quítalo.»*
+> la base de datos. Quítalo.»*
 >
 > Encontrarlo ahí cuesta diez segundos. Encontrarlo cuando el `POST` falle, media
 > hora.
@@ -291,7 +291,7 @@ Start-Process http://localhost:8035/swagger
 
 # 3 · LA PRUEBA DE LA DIFERENCIA 1: crear un rol SIN mandar id.
 #     Si responde 422 pidiéndole el id, su RolCrear quedó mal.
-#     Y fíjese en el id que le devuelve: lo generó la base, no usted.
+#     Y fíjese en el id que le devuelve: lo generó la base de datos, no usted.
 Invoke-RestMethod http://localhost:8035/api/rol -Method Post `
   -ContentType 'application/json' -Body '{"nombre":"RolDePruebaLuis"}'
 
@@ -313,7 +313,7 @@ Invoke-RestMethod http://localhost:8035/api/rol/99 -Method Delete
 > **El paso 5 es el único de todo el curso donde un 500 es el resultado
 > correcto**, y por eso es la pregunta de sustentación más probable de su parte:
 > *«¿por qué esto responde 500 y no 409?»*. La respuesta: porque en la v1 **la
-> llave la defiende la base y nadie la traduce**, y verlo sin traducir es lo que
+> llave la defiende la base de datos y nadie la traduce**, y verlo sin traducir es lo que
 > hace que el 409 de la v2 se entienda.
 >
 > Está escrito dos veces en el `2_spec.md` de esta versión — en el RF3 y en el
@@ -352,7 +352,7 @@ git status
 
 # 2 · Commits pequeños, uno por pieza.
 git add api_facturas/Modelos/Rol.cs api_facturas/Peticiones/Rol*.cs
-git commit -m "feat: rol, el modelo y sus peticiones (la llave la pone la base)"
+git commit -m "feat: rol, el modelo y sus peticiones (la llave la pone la base de datos)"
 #    ... capa por capa, y luego ruta.
 
 # 3 · Suba su rama.

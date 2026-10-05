@@ -32,7 +32,7 @@ productosporfactura    fknumfactura + fkcodproducto  (llave COMPUESTA)
 ```
 
 > **Insertar una factura con tres renglones son cuatro escrituras.** Desde C#
-> serían cuatro viajes a la base y **cuatro oportunidades de quedar a medias**.
+> serían cuatro viajes a la base de datos y **cuatro oportunidades de quedar a medias**.
 > Dentro del procedimiento hay **una transacción**: o entran las cuatro, o no
 > entra ninguna.
 
@@ -47,7 +47,7 @@ sp_borrar_factura_y_productosporfactura         ← existe, NO se expone
 sp_anular_factura
 ```
 
-> **Están en la base desde la v1** (Artículo 5). El agente **no los escribe**:
+> **Están en la base de datos desde la v1** (Artículo 5). El agente **no los escribe**:
 > los llama. Si propone un `CREATE PROCEDURE`, párelo.
 
 > **Y dos de ellos existen y NO se exponen, a propósito.** La operación del
@@ -69,7 +69,7 @@ Y saber **quién las defiende** es la pregunta de sustentación de esta versión
 | El total es la suma de los subtotales | un **disparador**, que lo recalcula |
 | Una factura no se anula dos veces | el **procedimiento**, que mira el estado |
 
-> **Por qué en la base y no en la aplicación: porque la regla tiene que valer
+> **Por qué en la base de datos y no en la aplicación: porque la regla tiene que valer
 > también para quien entre por SSMS.** Una validación que solo vive en C#
 > protege a quien pasa por la API — y en la vida real siempre hay alguien que no
 > pasa por ahí.
@@ -162,22 +162,22 @@ Con CUATRO operaciones, y solo cuatro:
 ESTO ES LO QUE HACE DISTINTO A ESTE RECURSO, Y NO SE NEGOCIA:
 
   1. EL REPOSITORIO DE FACTURA NO ESCRIBE SQL DE TABLAS. Llama a los
-     procedimientos que YA EXISTEN en la base:
+     procedimientos que YA EXISTEN en la base de datos:
         sp_listar_facturas_y_productosporfactura
         sp_consultar_factura_y_productosporfactura
         sp_insertar_factura_y_productosporfactura
         sp_anular_factura
-     NO escribas CREATE PROCEDURE ni CREATE TABLE: la base viene dada
+     NO escribas CREATE PROCEDURE ni CREATE TABLE: la base de datos viene dada
      (Artículo 5). Si crees que falta un procedimiento, PREGÚNTAME.
 
   2. NO EXPONGAS PUT, PATCH NI DELETE de factura. Existen dos
-     procedimientos para eso en la base y NO se usan: la operación del
+     procedimientos para eso en la base de datos y NO se usan: la operación del
      negocio es ANULAR, no corregir. Escribe los tres métodos en el
      controlador pero DÉJALOS COMENTADOS, con un comentario que explique
      por qué están apagados.
 
   3. EL TOTAL Y EL SUBTOTAL NO VIAJAN EN LA PETICIÓN. Los calcula un
-     disparador en la base. Si llegan en el body, se ignoran. La petición
+     disparador en la base de datos. Si llegan en el body, se ignoran. La petición
      de crear lleva: fkidcliente, fkidvendedor, y una lista de productos
      con `codigo` y `cantidad`. NADA MÁS.
 
@@ -197,7 +197,7 @@ REGLAS QUE SIGUEN VIGENTES DE LA V1:
     códigos de estado.
   · SIN ORM de entidades. Dapper, y siempre parametrizado.
   · TODO EN ESPAÑOL.
-  · El front NO habla con la base: solo con la API por HTTP.
+  · El front NO habla con la base de datos: solo con la API por HTTP.
 
 LA INTERFAZ GRÁFICA, QUE ES UNA SOLA PANTALLA CON TRES VISTAS:
 

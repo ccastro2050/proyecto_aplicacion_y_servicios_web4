@@ -82,7 +82,7 @@ corta.
 
 ```
 09:00  Ana recibe un token que dice: puede entrar a interfaz.usuarios
-09:30  se le quita ese permiso a su rol, en la base
+09:30  se le quita ese permiso a su rol, en la base de datos
 09:31  Ana sigue entrando: su token todavia dice que puede
        ...hasta que venza, una hora despues
 ```
@@ -94,12 +94,12 @@ olvidadiza: es alguien a quien se le retiró el acceso por una razón.
 > permiso a un rol surte efecto sin volver a identificarse»*. Con los permisos
 > en el token, ese criterio **no se puede cumplir**.
 >
-> **Lo que cuesta:** una consulta a la base por operación. Es el precio, y es
+> **Lo que cuesta:** una consulta a la base de datos por operación. Es el precio, y es
 > barato: el procedimiento son tres `JOIN` sobre tablas con índice.
 
 ## D5 — El permiso: ¿el `JOIN` en C#, o el procedimiento?
 
-**El procedimiento**, `verificar_acceso_ruta`, que **ya existía en la base
+**El procedimiento**, `verificar_acceso_ruta`, que **ya existía en la base de datos
 desde el primer día** sin que nadie lo llamara.
 
 | Opción | Argumento |
@@ -159,5 +159,5 @@ servidor** y no bajar nunca al navegador.
 |---|---|
 | **Refrescar el token** | Trae su propio problema sin resolver: cómo se revoca el *refresh token*. Con una hora, volver a identificarse alcanza |
 | **OAuth / OpenID Connect** | Delegar la identidad a Google o Microsoft es lo que se hace en producción, y **esconde exactamente lo que esta versión existe para enseñar** |
-| **Permisos por operación** | La tabla `ruta` trae `permiso.crear` y `permiso.eliminar`, así que la base lo soportaría. Los diez criterios piden protección **por interfaz** |
+| **Permisos por operación** | La tabla `ruta` trae `permiso.crear` y `permiso.eliminar`, así que la base de datos lo soportaría. Los diez criterios piden protección **por interfaz** |
 | **Auditoría** (quién hizo qué) | Es un requisito real que el curso no plantea |

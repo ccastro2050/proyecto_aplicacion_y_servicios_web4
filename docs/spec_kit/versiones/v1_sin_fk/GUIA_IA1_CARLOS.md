@@ -236,7 +236,7 @@ Select-String -Path api_facturas\Servicios\*.cs `
 Select-String -Path api_facturas\Controllers\*.cs -Pattern 'SqlConnection' |
   Measure-Object | Select-Object Count
 
-# 3 · El front NO toca la base. Tiene que dar 0.
+# 3 · El front NO toca la base de datos. Tiene que dar 0.
 Select-String -Path front_blazor\*.cs,front_blazor\**\*.razor `
   -Pattern 'SqlConnection' | Measure-Object | Select-Object Count
 
@@ -254,7 +254,7 @@ Get-ChildItem api_facturas\Peticiones\Producto*.cs
 
 ```powershell
 # 1 · LEVANTAR EL SISTEMA ENTERO con un solo comando (Artículo 4).
-#     La primera vez tarda: descarga SQL Server y siembra la base.
+#     La primera vez tarda: descarga SQL Server y siembra la base de datos.
 docker compose up -d --build
 
 # 2 · ¿La API responde? Debe decir la versión.

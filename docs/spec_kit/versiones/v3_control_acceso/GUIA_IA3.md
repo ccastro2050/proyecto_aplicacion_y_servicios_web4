@@ -87,7 +87,7 @@ verificar_acceso_ruta(@p_email, @p_fkidruta)
 > token, habría que esperar a que expire — y el jefe que quita un acceso
 > tendría que pedirle a esa persona que vuelva a entrar.
 >
-> **Qué cuesta:** una consulta a la base por petición. Se paga a sabiendas.
+> **Qué cuesta:** una consulta a la base de datos por petición. Se paga a sabiendas.
 
 ---
 

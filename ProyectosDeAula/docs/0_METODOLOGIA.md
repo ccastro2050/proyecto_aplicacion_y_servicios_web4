@@ -284,7 +284,7 @@ De ahí salen seis consecuencias concretas:
 **Sí existen APIs genéricas en producción**, y buenas: PostgREST, Hasura, los
 paneles de administración que exponen tablas. La diferencia es que en esos
 casos **lo genérico es el producto entero**: publican un esquema completo
-—generado de la base—, tienen su modelo de permisos por fila y por columna, y
+—generado de la base de datos—, tienen su modelo de permisos por fila y por columna, y
 su contrato *es* «esto expone la base de datos».
 
 Lo que no funciona es **la mitad**: una API de dominio, escrita a mano, con un
@@ -429,7 +429,7 @@ es donde se ve quién entendió lo que entregó.
 |---|---|
 | **Qué hace** | Lea esta función y cuéntemela sin leerla línea por línea |
 | **Por qué así** | ¿Por qué este verbo y no otro? ¿Por qué esta validación está en el servicio y no en el controlador? |
-| **Qué pasa si falla** | Si la base rechaza aquí, ¿qué recibe quien llamó? ¿Y qué ve la persona en la pantalla? |
+| **Qué pasa si falla** | Si la base de datos rechaza aquí, ¿qué recibe quien llamó? ¿Y qué ve la persona en la pantalla? |
 | **Qué cambiaría** | Si mañana hubiera que agregar un campo, ¿dónde se toca? |
 
 > **Vale para el código escrito a mano y para el generado con IA, igual.** De

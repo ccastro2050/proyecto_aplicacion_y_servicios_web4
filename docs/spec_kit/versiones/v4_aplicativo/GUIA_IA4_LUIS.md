@@ -104,7 +104,7 @@ consultas que mis compañeros acaban de agregar. Después resume en máximo
 un solo archivo.
 
 PUEDES ESCRIBIR EN: api_facturas/ y front_blazor/
-NO TOQUES: docs/ (solo lectura) ni db/ (la base viene dada)
+NO TOQUES: docs/ (solo lectura) ni db/ (la base de datos viene dada)
 
 LAS TRES CONSULTAS QUE ME TOCAN, y no son de ventas:
 
@@ -148,7 +148,7 @@ REGLAS QUE SIGUEN VIGENTES:
   · Las TRES CAPAS. El servicio NO nombra nada de HTTP.
   · SIN ORM. SQL a mano con Dapper, parametrizado.
   · TODO EN ESPAÑOL, y la interfaz NO habla en jerga.
-  · El front NO habla con la base: solo HTTP contra la API.
+  · El front NO habla con la base de datos: solo HTTP contra la API.
   · NO toques las consultas de mis compañeros ni el tablero.
 
 COMENTA TODO, en español, diciendo POR QUÉ. En una consulta el comentario

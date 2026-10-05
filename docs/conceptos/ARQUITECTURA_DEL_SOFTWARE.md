@@ -87,7 +87,7 @@ hay colas, y no hay despliegue independiente de partes de la API.
 **Una unidad desplegable, tres capas por dentro.**
 
 ```
-Controlador  →  Servicio  →  Repositorio  →  la base
+Controlador  →  Servicio  →  Repositorio  →  la base de datos
    (HTTP)       (reglas)       (SQL)
 ```
 
@@ -95,11 +95,11 @@ Controlador  →  Servicio  →  Repositorio  →  la base
 |---|---|---|
 | `Controllers/` | **15** | uno por recurso. Traduce HTTP ↔ negocio |
 | `Servicios/` | **28** | 14 implementaciones + sus 14 interfaces |
-| `Repositorios/` | **43** | 29 implementaciones + 14 interfaces — **dos por recurso** |
+| `Repositorios/` | **43** | 28 repositorios —**dos por recurso**— + 14 interfaces + el traductor de errores |
 | `Peticiones/` | **37** | una clase por verbo: lo que se acepta de afuera |
 | `Fabricas/` | **3** | la que decide el motor |
 
-> **Esos 29 contra 14 son la arquitectura en un número:** cada contrato tiene
+> **Esos 28 contra 14 son la arquitectura en un número:** cada contrato tiene
 > **dos** implementaciones —SQL Server y PostgreSQL— y **arriba nadie sabe cuál
 > está puesta**, porque arriba se usa siempre la interfaz.
 
@@ -132,14 +132,14 @@ HTML y mantiene un **circuito** abierto.
 ### La regla que no se negocia
 
 > **En el front no puede haber un solo `SqlConnection`.** Si el front puede
-> llegar a la base, **la separación existe en el diagrama y no en el sistema**:
+> llegar a la base de datos, **la separación existe en el diagrama y no en el sistema**:
 > queda como una intención de quien lo dibujó, no como algo que el código
 > obligue a respetar.
 >
 > Y el día que alguien tenga afán, va a hacer la consulta directa «solo esta
 > vez» — porque **nada se lo impide**.
 >
-> **Y se comprueba:** apague la API con la base encendida. El front tiene que
+> **Y se comprueba:** apague la API con la base de datos encendida. El front tiene que
 > seguir en pie, con su menú y **sin una sola fila**.
 
 ### Qué cuesta Blazor Server, dicho de frente
@@ -149,11 +149,11 @@ HTML y mantiene un **circuito** abierto.
 | No hay que escribir JavaScript; el estado de la pantalla vive en C# | Si el circuito se corta —un F5, la red— **la pantalla pierde su estado** |
 
 > **Eso se nota al emitir una factura:** los renglones que se van agregando viven
-> **en el circuito**, no en la base. Oprimir F5 a mitad **los pierde**.
+> **en el circuito**, no en la base de datos. Oprimir F5 a mitad **los pierde**.
 >
 > **No es un defecto del código: es lo que se escogió al escoger Blazor Server.**
 > Si hiciera falta que el borrador sobreviviera, habría que guardarlo en otra
-> parte —la sesión, el navegador o la base— y eso es trabajo aparte. Está
+> parte —la sesión, el navegador o la base de datos— y eso es trabajo aparte. Está
 > declarado como historia propuesta, sin construir, en
 > [`3_HISTORIAS_PROPUESTAS.md`](../dominio/elicitacion/3_HISTORIAS_PROPUESTAS.md).
 
@@ -170,10 +170,10 @@ Con tres niveles, una validación puede ir en tres sitios. **Y no da igual.**
 | La regla | Dónde vive | Por qué no más arriba |
 |---|---|---|
 | Falta el campo `nombre` | **la petición** (anotaciones) | Es **forma**, y la forma se rechaza antes de entrar |
-| El `{}` del PATCH no actualiza nada | **el servicio** | Es una decisión de negocio, no de la base |
+| El `{}` del PATCH no actualiza nada | **el servicio** | Es una decisión de negocio, no de la base de datos |
 | El stock no queda negativo | **un disparador** | Porque también vale **para quien entre por SSMS** |
 | El total es la suma de subtotales | **un disparador** | Igual — y así no puede desactualizarse |
-| Una factura no se anula dos veces | **el procedimiento** | Es una condición sobre el estado, y el estado está en la base |
+| Una factura no se anula dos veces | **el procedimiento** | Es una condición sobre el estado, y el estado está en la base de datos |
 
 > **El criterio es uno solo: cuanto más abajo vive una regla, a más gente
 > protege.** Una validación que solo está en C# protege a quien pasa por la
@@ -197,7 +197,7 @@ docker compose up -d --build
 | `sqlserver-init` | **se ejecuta una vez** y siembra el esquema | — |
 | `postgres` | el segundo motor (v5) | 15462 |
 
-Y **dos volúmenes** —`mssqldata` y `pgdata`— que son la memoria de las bases: lo
+Y **dos volúmenes** —`mssqldata` y `pgdata`— que son la memoria de las bases de datos: lo
 que sobrevive a apagar los contenedores.
 
 > **El interruptor `MOTOR_BD`** decide cuál motor atiende, **sin recompilar**:
@@ -249,7 +249,7 @@ Decirlo evita que alguien lo busque:
 | No hay | Y en su lugar |
 |---|---|
 | Entity Framework ni ningún ORM | SQL escrito a mano, con **Dapper** como micro-ejecutor |
-| Caché | Cada petición va a la base |
+| Caché | Cada petición va a la base de datos |
 | Colas, eventos, mensajería | Todo es **síncrono** dentro de la petición |
 | Microservicios | **Dos monolitos** y una base compartida |
 | API gateway, balanceador, réplicas | Un contenedor por servicio |
@@ -275,7 +275,7 @@ Select-String api_facturas\Servicios\*.cs   -Pattern 'StatusCode|NotFound|IActio
 Select-String api_facturas\Controllers\*.cs -Pattern 'SqlConnection'                     | Measure-Object
 Select-String front_blazor\**\*.cs,front_blazor\**\*.razor -Pattern 'SqlConnection|Npgsql' | Measure-Object
 
-# §2 — las reglas que viven en la base
+# §2 — las reglas que viven en la base de datos
 Select-String db\bdfacturas.sql -Pattern 'CREATE (TRIGGER|PROCEDURE)' | Measure-Object
 
 # §7 — los cinco servicios
@@ -295,6 +295,6 @@ docker compose ps
 | Los patrones que usa este código, con su nombre | [`SOLID_CAPAS_PATRONES.md`](SOLID_CAPAS_PATRONES.md) |
 | Docker de verdad: imagen, volumen, red, el `.yml` | [`CONCEPTOS_DOCKER.md`](CONCEPTOS_DOCKER.md) |
 | El viaje de cada verbo, con diagramas | [`FLUJO_DE_UNA_PETICION.md`](FLUJO_DE_UNA_PETICION.md) |
-| Por qué la base defiende las reglas | [`PRINCIPIOS_ACID.md`](PRINCIPIOS_ACID.md) |
+| Por qué la base de datos defiende las reglas | [`PRINCIPIOS_ACID.md`](PRINCIPIOS_ACID.md) |
 | Qué tabla hay y por qué | [`DISENO_BD.md`](../dominio/DISENO_BD.md) |
 | Las 22 reglas, con quién defiende cada una | [`REGLAS_DE_NEGOCIO.md`](../dominio/REGLAS_DE_NEGOCIO.md) |

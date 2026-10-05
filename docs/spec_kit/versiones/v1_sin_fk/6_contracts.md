@@ -35,7 +35,7 @@
 > | `usuario` | `/api/usuario` | `email` (texto) | `contrasena` |
 >
 > **Las dos de llave `IDENTITY` tienen una diferencia que importa:** el `POST`
-> **no manda el `id`** —lo genera la base—, así que su petición de creación no
+> **no manda el `id`** —lo genera la base de datos—, así que su petición de creación no
 > lo lleva. Pedirlo obligaría al cliente a inventar una llave.
 >
 > **Son 36 endpoints** (seis recursos × seis verbos) más el de diagnóstico.

@@ -92,7 +92,7 @@ máximo 10 líneas qué vas a construir y ESPERA MI CONFIRMACIÓN antes de
 escribir un solo archivo.
 
 PUEDES ESCRIBIR EN: api_facturas/ y front_blazor/
-NO TOQUES: docs/ (solo lectura) ni db/ (la base viene dada)
+NO TOQUES: docs/ (solo lectura) ni db/ (la base de datos viene dada)
 
 LAS CUATRO CONSULTAS QUE ME TOCAN:
 
@@ -138,7 +138,7 @@ REGLAS QUE SIGUEN VIGENTES:
   · Las TRES CAPAS con interfaces. El servicio NO nombra nada de HTTP.
   · SIN ORM. SQL a mano con Dapper, parametrizado.
   · TODO EN ESPAÑOL, y la interfaz no habla en jerga.
-  · El front NO habla con la base: solo HTTP contra la API.
+  · El front NO habla con la base de datos: solo HTTP contra la API.
 
 COMENTA TODO, en español, diciendo POR QUÉ. En una consulta el comentario
 más útil es QUÉ PREGUNTA DEL NEGOCIO responde — el SQL ya dice el cómo.

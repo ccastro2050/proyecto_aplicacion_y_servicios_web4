@@ -17,7 +17,7 @@
 | | Qué hace | Responde |
 |---|---|---|
 | **El hash** | La contraseña deja de guardarse en claro | — |
-| **El permiso** | `[ExigePermiso]` pregunta a la base antes de dejar pasar | **403** |
+| **El permiso** | `[ExigePermiso]` pregunta a la base de datos antes de dejar pasar | **403** |
 
 ---
 
@@ -70,7 +70,7 @@ verificar_acceso_ruta(@p_email, @p_fkidruta)
 
 **El procedimiento ya existe.** Usted no escribe el `JOIN` en C#: lo llama.
 
-> **Por qué la consulta está en la base y no armada en C#.** Porque la pregunta
+> **Por qué la consulta está en la base de datos y no armada en C#.** Porque la pregunta
 > *«¿este correo alcanza esta ruta?»* es un cruce de tres tablas, y si se arma en
 > la aplicación, cada quien lo arma a su manera. Con el procedimiento hay **una
 > sola respuesta posible**, y vale también para quien consulte por SSMS.
@@ -83,7 +83,7 @@ verificar_acceso_ruta(@p_email, @p_fkidruta)
 > viviera en el token, el jefe que quita un acceso tendría que pedirle a esa
 > persona que vuelva a entrar.
 >
-> **Qué cuesta:** una consulta a la base por petición. Se paga a sabiendas, y
+> **Qué cuesta:** una consulta a la base de datos por petición. Se paga a sabiendas, y
 > está declarado en **RN-21**.
 
 ### Y las rutas no son direcciones de la API
@@ -173,7 +173,7 @@ PARTE 2 — EL PERMISO
     1. Lee el correo del token (ya está ahí, lo puso mi compañero).
     2. Busca el id de esa ruta en la tabla `ruta`.
     3. Llama al procedimiento verificar_acceso_ruta(@p_email, @p_fkidruta)
-       — YA EXISTE en la base, NO escribas el JOIN en C#.
+       — YA EXISTE en la base de datos, NO escribas el JOIN en C#.
     4. Si tiene_acceso es 0, responde 403. Si es 1, deja pasar.
 
   Y pónselo a los controladores que lo necesiten, con el nombre de ruta
@@ -200,7 +200,7 @@ REGLAS QUE SIGUEN VIGENTES:
     HTTP, no en el servicio.
   · SIN ORM. Dapper, parametrizado.
   · TODO EN ESPAÑOL.
-  · NO toques la base: el procedimiento ya existe.
+  · NO toques la base de datos: el procedimiento ya existe.
   · NO toques el token ni el menú del front: son de mis compañeros.
 
 COMENTA TODO, en español, diciendo POR QUÉ. En este código la razón
@@ -235,7 +235,7 @@ diga que el hash funciona.
 
 ```powershell
 # --- EL HASH ---
-# 1 · Cree un usuario y mire la base: NO debe verse la contraseña.
+# 1 · Cree un usuario y mire la base de datos: NO debe verse la contraseña.
 docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa `
   -P "Paradigmas123!" -C -d bdfacturas_sqlserver_local `
   -Q "SELECT TOP 3 email, contrasena FROM usuario;"
@@ -260,7 +260,7 @@ Invoke-RestMethod http://localhost:8035/api/factura `
 Invoke-RestMethod http://localhost:8035/api/factura
 #    espera: 401
 
-# 5 · QUE SURTE EFECTO YA: quítele un permiso a un rol desde la base o la
+# 5 · QUE SURTE EFECTO YA: quítele un permiso a un rol desde la base de datos o la
 #     pantalla, y repita el paso 3 CON EL MISMO TOKEN. Debe cambiar.
 ```
 
@@ -290,7 +290,7 @@ Select-String -Path api_facturas\Modelos\Usuario.cs -Pattern 'ontrasena' |
 ```powershell
 git status                      # SOLO sus archivos
 git add api_facturas/Autorizacion/ExigePermisoAttribute.cs
-git commit -m "feat: ExigePermiso, que pregunta a la base antes de dejar pasar"
+git commit -m "feat: ExigePermiso, que pregunta a la base de datos antes de dejar pasar"
 git push -u origin rama-paco-v3
 #   y el PR. Avísele a Luis: sin sus permisos él no puede armar el menú.
 ```

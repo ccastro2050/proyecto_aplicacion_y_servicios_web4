@@ -103,7 +103,7 @@ una línea de código. No los redacta el integrador solo:
 | **Carlos lleva el montaje** porque es el integrador | El que va a fusionar necesita conocer el esqueleto mejor que nadie |
 | **Carlos lleva `usuario`** | Es la tabla con la contraseña. En la v1 se guarda **en texto plano**, y eso cambia en la v3 — conviene que la toque quien va a hacer ese cambio |
 | **Paco lleva `persona` y `empresa`** | Son las dos más parecidas al molde: calcar bien es lo que hay que aprender primero |
-| **Luis lleva `rol` y `ruta`** | Son las dos **con llave IDENTITY**: la llave la pone la base. Son las únicas que **no se calcan igual**, y su guía dice en qué |
+| **Luis lleva `rol` y `ruta`** | Son las dos **con llave IDENTITY**: la llave la pone la base de datos. Son las únicas que **no se calcan igual**, y su guía dice en qué |
 
 > **Nadie toca el archivo de otro.** Ni para arreglarle algo. Si usted ve un
 > error en el recurso de un compañero, se lo dice — no lo corrige en su rama.

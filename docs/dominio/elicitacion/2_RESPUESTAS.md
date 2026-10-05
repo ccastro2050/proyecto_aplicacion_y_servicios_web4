@@ -53,7 +53,7 @@ trg_prodfact_insert   -- al agregar un renglón: comprueba stock y lo BAJA
 trg_prodfact_delete   -- al quitarlo: lo DEVUELVE
 ```
 
-> **Y por eso están en la base y no en C#** (→ **RN-10**, **RN-11**): si el
+> **Y por eso están en la base de datos y no en C#** (→ **RN-10**, **RN-11**): si el
 > descuento viviera en la aplicación, un `INSERT` desde SSMS vendería sin
 > descontar — y el problema del cuaderno estaría de vuelta, con más pasos.
 
@@ -171,7 +171,7 @@ cambio tiene que surtir efecto **ya**.
 > consecuencia técnica.** Si el permiso viajara dentro del token, quitarle un
 > permiso a alguien no surtiría efecto hasta que el token expire — y don Hernán
 > tendría que pedirle a esa persona que vuelva a entrar. Consultarlo cada vez
-> cuesta una llamada a la base, y compra que el cambio sea inmediato.
+> cuesta una llamada a la base de datos, y compra que el cambio sea inmediato.
 
 ---
 
@@ -219,12 +219,12 @@ POST /api/factura  {"productos":[{"codigo":"PR005","cantidad":50}]}
 
 > **Ese 500 sorprende, y es deliberado.** Un «no hay stock» parece un 400 — es
 > una regla de negocio, no una falla del servidor. Pero aquí la regla **la
-> defiende la base**, no la API: el `catch` final recibe una `SqlException` que
+> defiende la base de datos**, no la API: el `catch` final recibe una `SqlException` que
 > nadie tradujo, y responde 500 **pasando el mensaje del disparador tal cual**.
 >
 > Está declarado en [`POLITICA_DE_ERRORES.md`](../POLITICA_DE_ERRORES.md) §7 y en
 > el `6_contracts.md` de la v2, y es el mismo criterio por el que una llave
-> repetida da 500 en la v1: **lo que la base rechaza y nadie tradujo, es un
+> repetida da 500 en la v1: **lo que la base de datos rechaza y nadie tradujo, es un
 > 500** — y verlo sin traducir es lo que enseña que alguien tiene que traducirlo.
 
 ### Y la prueba que de verdad demuestra la transacción
@@ -241,7 +241,7 @@ GET  /api/producto/PR003 →  stock: 42    (sembrado:  42)
 ```
 
 > **El primer renglón NO se quedó, y el stock de PR003 no se movió.** Eso es la
-> atomicidad, vista en vez de creída: la base alcanzó a procesar el primer
+> atomicidad, vista en vez de creída: la base de datos alcanzó a procesar el primer
 > renglón, falló en el segundo, y **deshizo el primero**.
 >
 > **Si PR003 hubiera quedado en 41, la transacción no existiría** aunque el
@@ -286,7 +286,7 @@ estado **y devuelve el stock** (→ **RN-05**, **RN-12**, **RN-14**).
 
 | | |
 |---|---|
-| En la base | `sp_actualizar_factura_…` y `sp_borrar_…` **existen** |
+| En la base de datos | `sp_actualizar_factura_…` y `sp_borrar_…` **existen** |
 | En la API | **no se exponen** |
 | En el controlador | `PUT`, `PATCH` y `DELETE` están **escritos y apagados**, con su razón al lado |
 

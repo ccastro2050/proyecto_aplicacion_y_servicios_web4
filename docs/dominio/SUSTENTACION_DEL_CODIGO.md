@@ -77,7 +77,7 @@ POST /api/cliente  {"fkcodpersona":"PZZZ","fkcodempresa":"","credito":100}
 ```
 
 > **El 409 nunca llega, porque la anotación atrapa el `""` antes.**
-> `[StringLength(10, MinimumLength = 1)]` lo rechaza **en la petición**, y la base
+> `[StringLength(10, MinimumLength = 1)]` lo rechaza **en la petición**, y la base de datos
 > no se entera. Las dos respuestas son defendibles, y la que da es la mejor: se
 > rechaza sin consultar nada.
 >
@@ -153,7 +153,7 @@ Select-String -Path api_facturas\Servicios\*.cs `
 
 ---
 
-## 5 · Si mañana la base fuera PostgreSQL, ¿qué cambiaría?
+## 5 · Si mañana la base de datos fuera PostgreSQL, ¿qué cambiaría?
 
 **Nada de lo que está arriba. Y no es una promesa: ya pasó, y está medido.**
 
@@ -179,7 +179,7 @@ git diff --stat v4..v5 -- api_facturas/
 > *«regresión doble 77/77 en cada motor sin recompilar»*. Ver
 > [`CRONOGRAMA.md`](CRONOGRAMA.md) §2.
 
-> **La cuenta que lo resume:** `Repositorios/` tiene **29 implementaciones** para
+> **La cuenta que lo resume:** `Repositorios/` tiene **28 implementaciones** para
 > **14 interfaces**. Dos por recurso, y arriba **nadie sabe cuál está puesta** —
 > porque arriba se usa siempre la interfaz.
 
@@ -283,7 +283,7 @@ var producto = await _repositorio.ObtenerPorCodigoAsync(codigo);
 
 | Lo que mucha gente cree | Lo que pasa |
 |---|---|
-| El hilo se queda esperando la respuesta de la base | El hilo **se devuelve al grupo** y atiende **otra petición** |
+| El hilo se queda esperando la respuesta de la base de datos | El hilo **se devuelve al grupo** y atiende **otra petición** |
 | `async` hace el código más rápido | **No.** Esa consulta tarda lo mismo |
 | `async` sirve para hacer dos cosas a la vez | Sirve para **no bloquear** mientras se espera algo de afuera |
 
@@ -303,7 +303,7 @@ var producto = await _repositorio.ObtenerPorCodigoAsync(codigo);
 
 ---
 
-## 9 · Sin una sola transacción escrita en C#, ¿qué garantiza ya la base?
+## 9 · Sin una sola transacción escrita en C#, ¿qué garantiza ya la base de datos?
 
 **Casi todo, y es la respuesta que más sorprende.** En `api_facturas` no hay un
 `BeginTransaction()`. Y aun así:
@@ -317,7 +317,7 @@ var producto = await _repositorio.ObtenerPorCodigoAsync(codigo);
 | Una factura anulada dos veces | El **procedimiento**, que mira el estado |
 | Un renglón que sobreviva a su factura | `ON DELETE CASCADE` |
 
-> **Por qué está en la base y no en C#: porque la regla tiene que valer también
+> **Por qué está en la base de datos y no en C#: porque la regla tiene que valer también
 > para quien entre por SSMS.** Una validación que solo vive en la aplicación
 > protege a quien pasa por la aplicación — y en la vida real siempre hay alguien
 > que no pasa por ahí.

@@ -1,11 +1,11 @@
 # Modelo de datos — Versión 2: las seis tablas con clave foránea
 
-> **Las 12 tablas existen en la base desde la v1** (Artículo 5 de la
+> **Las 12 tablas existen en la base de datos desde la v1** (Artículo 5 de la
 > [constitución](../../1_constitution.md)). Lo que este documento describe es
 > **lo que el código de la v2 empieza a usar**, no lo que se crea: **la v2 no
 > crea ni modifica una sola tabla.**
 >
-> La base viene **dada** en `db/bdfacturas.sql`.
+> La base de datos viene **dada** en `db/bdfacturas.sql`.
 
 ---
 
@@ -62,7 +62,7 @@ derecha, lo que necesita que las otras existan.
 |---|---|
 | **1** | El cuerpo de crear una factura **no lleva** `total` ni `subtotal`: los pone el disparador |
 | **2** | Tampoco lleva el **precio**: lo toma del producto. Mandarlo permitiría vender a un precio inventado |
-| **3** | «Stock insuficiente» **no es un error de programación**: es una regla del negocio que vive en la base, y su mensaje viaja al cliente en el `detalle` |
+| **3** | «Stock insuficiente» **no es un error de programación**: es una regla del negocio que vive en la base de datos, y su mensaje viaja al cliente en el `detalle` |
 
 > **Por qué en un disparador y no en el servicio:** porque así la regla se
 > cumple **sin importar quién escriba** — la API, un script de carga, alguien
@@ -80,7 +80,7 @@ derecha, lo que necesita que las otras existan.
 | `sp_insertar_factura_y_productosporfactura` | La factura creada, **ya calculada** por el disparador. Recibe el detalle como **JSON** |
 | `sp_anular_factura` | El estado `'anulada'` y el stock devuelto. Ya anulada → `RAISE EXCEPTION … anulada` |
 
-**Los otros dos existen en la base y la v2 NO los expone:**
+**Los otros dos existen en la base de datos y la v2 NO los expone:**
 `sp_actualizar_factura_y_productosporfactura` y
 `sp_borrar_factura_y_productosporfactura`. Está en el
 [2_spec](2_spec.md) §2 con su razón: la operación del negocio es **anular**.
@@ -89,7 +89,7 @@ derecha, lo que necesita que las otras existan.
 
 | Procedimiento | |
 |---|---|
-| `listar_usuarios_con_roles` | Todos, con sus roles agrupados **por la base** |
+| `listar_usuarios_con_roles` | Todos, con sus roles agrupados **por la base de datos** |
 | `consultar_usuario_con_roles` | Uno. Inexistente → `RAISE EXCEPTION … no existe` |
 | `crear_usuario_con_roles` | El usuario **y** sus roles, en una transacción |
 | `actualizar_usuario_con_roles` | **Solo cambia la contraseña si llega con algo**, y **reemplaza** los roles |
@@ -128,7 +128,7 @@ el identificador en **0**, también en silencio. De ahí el
 
 `listar_rutarol`, `crear_rutarol` y `eliminar_rutarol`.
 
-> **Y uno más que la v2 NO usa:** `verificar_acceso_ruta`. Existe en la base,
+> **Y uno más que la v2 NO usa:** `verificar_acceso_ruta`. Existe en la base de datos,
 > cruza `usuario → rol_usuario → rutarol` y responde si alguien tiene un
 > permiso. **Es de la v3.** Que esté ahí no significa que el sistema controle
 > el acceso: no hay quien lo llame.
@@ -140,19 +140,19 @@ El script siembra las 12 tablas, y de ahí salen los valores concretos del
 productos con su stock, y las facturas de ejemplo con sus renglones.
 
 > **El stock sembrado importa para el criterio 6:** se anota antes, se emite
-> una factura, y se comprueba que bajó. Si la base se re-siembra
+> una factura, y se comprueba que bajó. Si la base de datos se re-siembra
 > (`docker compose down -v`), los números vuelven al inicio — y el criterio se
 > puede repetir.
 
 ## 6. Las restricciones, y cómo se ven desde la API
 
-| Lo que la base impide | Cómo llega al cliente |
+| Lo que la base de datos impide | Cómo llega al cliente |
 |---|---|
 | Insertar un cliente con una `persona` que no existe | **409** (`el error 547`) |
 | Repetir una pareja en una tabla puente | **409** (`los errores 2627 y 2601`) |
 | Borrar una `persona` que es cliente o vendedor | **409** — con el **nombre de la restricción** del motor en el `detalle` |
 | Vender más de lo que hay en stock | **500**, con el mensaje del **disparador** en el `detalle` |
 
-> **Las cuatro son de la base, no de la API**, y conviene verlas fallar a
+> **Las cuatro son de la base de datos, no de la API**, y conviene verlas fallar a
 > propósito: es la forma de comprobar que la integridad no depende de que el
 > programador se acuerde.

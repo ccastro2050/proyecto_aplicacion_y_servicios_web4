@@ -23,7 +23,7 @@ y trae consigo dos cosas que la v1 no tenía: **el 409** y **el desplegable**.
 
 > **Y hay una herencia de la v1 que ya conoce:** sus dos tablas tienen llave
 > **`IDENTITY`**, como las de Luis en la v1. La petición de crear **no lleva
-> `id`** — lo genera la base. Si el chat se lo pone, quítelo.
+> `id`** — lo genera la base de datos. Si el chat se lo pone, quítelo.
 
 ---
 
@@ -67,13 +67,13 @@ Un desplegable vacío en HTML **no manda `null`: manda `""`**. Y no son lo mismo
 Alguien manda `{"fkcodpersona": "P999"}`, y esa persona no existe.
 
 > **Responde 409, no 422.** El dato **no está mal**: `"P999"` es un texto de la
-> longitud permitida. Lo que se rompe es el **estado** de la base: esa fila no
-> está. Y saberlo **exige ir a la base**, así que ya no es un problema de forma.
+> longitud permitida. Lo que se rompe es el **estado** de la base de datos: esa fila no
+> está. Y saberlo **exige ir a la base de datos**, así que ya no es un problema de forma.
 
-| | Lo rechaza | Sin consultar la base |
+| | Lo rechaza | Sin consultar la base de datos |
 |---|---|---|
 | **422** | la petición, por las anotaciones | **sí** |
-| **409** | la base, y el controlador lo traduce | **no** |
+| **409** | la base de datos, y el controlador lo traduce | **no** |
 
 > **Es la pregunta de sustentación más probable de su parte**, y está razonada
 > en el [`4_research.md`](4_research.md) de esta versión — que lo escribió usted.
@@ -152,7 +152,7 @@ CINCO verbos, y su pantalla.
 
 TRES COSAS QUE NO SE CALCAN DEL MOLDE DE LA V1:
 
-  1. LA LLAVE ES IDENTITY: la genera la base. La petición de CREAR NO
+  1. LA LLAVE ES IDENTITY: la genera la base de datos. La petición de CREAR NO
      lleva `id`, y el modelo NO lo marca como `required`.
 
   2. LAS CLAVES FORÁNEAS. En cliente son DOS y NO son iguales:
@@ -161,9 +161,9 @@ TRES COSAS QUE NO SE CALCAN DEL MOLDE DE LA V1:
      caracteres. En vendedor hay una sola y es obligatoria.
 
   3. UN CÓDIGO HTTP NUEVO: el 409. Si la clave foránea apunta a una fila
-     que no existe, la base rechaza la operación y hay que traducir ese
+     que no existe, la base de datos rechaza la operación y hay que traducir ese
      error a 409 — NO a 422. Razón: el dato tiene la FORMA correcta, lo
-     que falla es el ESTADO de la base, y saberlo exige consultarla.
+     que falla es el ESTADO de la base de datos, y saberlo exige consultarla.
      La traducción va EN EL CONTROLADOR, no en el servicio: el servicio
      no puede nombrar nada de HTTP.
 
@@ -188,7 +188,7 @@ REGLAS QUE SIGUEN VIGENTES:
     IActionResult—; el repositorio no decide códigos de estado.
   · SIN ORM. SQL a mano con Dapper, siempre parametrizado.
   · TODO EN ESPAÑOL.
-  · El front NO habla con la base: solo con la API por HTTP.
+  · El front NO habla con la base de datos: solo con la API por HTTP.
   · NO toques la base de datos: las tablas ya existen. Nada de CREATE
     TABLE.
   · NO toques `factura` ni las tablas puente: son de mis compañeros.
@@ -262,7 +262,7 @@ Invoke-RestMethod http://localhost:8035/api/cliente -Method Post `
   -Body '{"fkcodpersona":"P001","fkcodempresa":"","credito":100}'
 #    espera: 422 — y por eso el front convierte "" a null
 
-# 4 · Crear SIN mandar id: la base lo genera.
+# 4 · Crear SIN mandar id: la base de datos lo genera.
 Invoke-RestMethod http://localhost:8035/api/vendedor -Method Post `
   -ContentType 'application/json' `
   -Body '{"carnet":999,"direccion":"Prueba Paco","fkcodpersona":"P001"}'

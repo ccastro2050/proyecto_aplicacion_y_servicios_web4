@@ -83,7 +83,7 @@ public class SesionController : ControllerBase
 ### El token dice QUIÉN es, no QUÉ puede
 
 > **En el token va el correo. Los permisos NO.** Se consultan en cada petición
-> contra la base — eso es de Paco, pero usted tiene que dejarle el correo
+> contra la base de datos — eso es de Paco, pero usted tiene que dejarle el correo
 > disponible para que él lo lea.
 >
 > **Si usted mete los roles en el token**, Paco va a construir sobre eso y el
@@ -149,7 +149,7 @@ DOS COSAS QUE SE HACEN MAL CASI SIEMPRE:
      en el método del POST. Cerrado por defecto, abierto por excepción.
 
   2. EN EL TOKEN VA EL CORREO, Y NADA MÁS. No metas los roles ni los
-     permisos. Se consultan en cada petición contra la base — si
+     permisos. Se consultan en cada petición contra la base de datos — si
      viajaran en el token, quitarle un permiso a alguien no surtiría
      efecto hasta que el token expire.
 

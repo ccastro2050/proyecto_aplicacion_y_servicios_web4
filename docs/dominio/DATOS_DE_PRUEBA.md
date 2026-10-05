@@ -1,6 +1,6 @@
 # Datos de prueba — `bdfacturas`
 
-> **Qué es este archivo.** Qué trae la base **recién sembrada**: cuántas filas,
+> **Qué es este archivo.** Qué trae la base de datos **recién sembrada**: cuántas filas,
 > cuáles, y **para qué sirve cada una**. Porque varias están puestas a propósito
 > para que algo se pueda probar.
 >
@@ -11,7 +11,7 @@
 > **Material académico simulado**: los nombres son inventados, las cifras son
 > verosímiles, y el sistema funciona con ellos.
 >
-> **Medido contra la base recién levantada**, no copiado del script.
+> **Medido contra la base de datos recién levantada**, no copiado del script.
 >
 > Versión 1.0 · 4 de octubre de 2026.
 
@@ -72,7 +72,7 @@
 | PR008 | Disco Duro Seagate 1TB | 32 |
 
 > **Estos son los stocks DESPUÉS de las seis facturas sembradas**, no los
-> iniciales: el disparador ya descontó lo vendido. Es decir, la base llega en un
+> iniciales: el disparador ya descontó lo vendido. Es decir, la base de datos llega en un
 > estado coherente, no con unos números sueltos.
 
 > **PR005 con 14 es el más cómodo para provocar el `THROW 50001`:** pida 50 y la
@@ -93,7 +93,7 @@
 | `carlos.castro@usbmed.edu.co` | — | los cinco |
 | `carloscastro5033@correo.itm.edu.co` | — | los cinco |
 
-> **Las contraseñas están en la base CIFRADAS.** Las tres de arriba se conocen
+> **Las contraseñas están en la base de datos CIFRADAS.** Las tres de arriba se conocen
 > porque el curso las publica para poder entrar; las demás se sembraron con un
 > hash y **nadie sabe su clave** — y eso también es correcto: así debe ser.
 
@@ -139,7 +139,7 @@ Las pruebas ensucian: una factura emitida se queda, y el stock baja.
 
 ```powershell
 docker compose down          # apaga y CONSERVA los datos
-docker compose down -v       # ⚠ borra el volumen: la base vuelve a sembrarse
+docker compose down -v       # ⚠ borra el volumen: la base de datos vuelve a sembrarse
 docker compose up -d
 ```
 

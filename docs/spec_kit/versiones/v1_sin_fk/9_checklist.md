@@ -113,7 +113,7 @@
 |---|---|
 | ☐ | **El `PUT` sin un campo da 422 y el MISMO body en `PATCH` da 200** — en al menos un recurso, y se entiende por qué |
 | ☐ | **El `PATCH` con body vacío da 400**, no 422: es regla de negocio, no de forma |
-| ☐ | **En `rol` y `ruta` el `POST` va SIN `id`** y la base lo asigna |
+| ☐ | **En `rol` y `ruta` el `POST` va SIN `id`** y la base de datos lo asigna |
 | ☐ | **Con la API apagada, la interfaz gráfica sigue en pie**, con su aviso y sin una sola fila |
 | ☐ | `docker compose up -d --build` desde cero levanta los **tres** servicios |
 

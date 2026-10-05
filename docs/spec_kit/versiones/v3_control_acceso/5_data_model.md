@@ -1,9 +1,9 @@
 # Modelo de datos — Versión 3: las tablas del acceso (ya existen)
 
 > **La v3 no crea ni modifica una sola tabla.** Las cinco tablas del control de
-> acceso están en la base desde la v1, y su CRUD se construyó en la v1 y la v2.
+> acceso están en la base de datos desde la v1, y su CRUD se construyó en la v1 y la v2.
 >
-> Lo único que cambia en la base es **la semilla de `usuario`**: sus
+> Lo único que cambia en la base de datos es **la semilla de `usuario`**: sus
 > contraseñas se vuelven a sembrar con hash.
 
 ---
@@ -31,7 +31,7 @@ personas sino **a los roles**, y las personas se ponen en roles.
 > quince interfaces hay **750** decisiones que mantener. Con roles hay quince,
 > y entra alguien nuevo asignándole uno.
 
-## 2. Lo que la v3 cambia en la base: la semilla
+## 2. Lo que la v3 cambia en la base de datos: la semilla
 
 **Dos problemas, y el segundo es el que impedía cerrar la versión:**
 

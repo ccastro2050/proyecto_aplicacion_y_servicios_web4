@@ -62,7 +62,7 @@ escrita. Una fase que no se puede comprobar no es una fase: es una esperanza.
 |---|---|
 | **Archivos** | `IRepositorioFactura.cs` · `RepositorioFacturaSqlServer.cs` |
 | **Lo que importa** | **Cuatro `CALL`, cero `SELECT` de tablas.** El `INOUT` leído con `ExecuteScalarAsync`, el `::json` del detalle, y los `P0001` traducidos por patrón |
-| **Verificación** | `grep -c "SELECT" RepositorioFacturaSqlServer.cs` → **0**. Si hay uno, la lógica se está saliendo de la base |
+| **Verificación** | `grep -c "SELECT" RepositorioFacturaSqlServer.cs` → **0**. Si hay uno, la lógica se está saliendo de la base de datos |
 
 ## Fase 6 — `factura`: servicio, controlador y ensamblador
 

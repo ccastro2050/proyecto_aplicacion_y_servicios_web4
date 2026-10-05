@@ -100,12 +100,12 @@ tablas, pasan por un procedimiento almacenado.**
 
 | | |
 |---|---|
-| **Qué va en la base** | El SQL: los `SELECT`, los `INSERT`, los `JOIN` de los listados |
+| **Qué va en la base de datos** | El SQL: los `SELECT`, los `INSERT`, los `JOIN` de los listados |
 | **Qué va en su repositorio** | La **llamada** al procedimiento, con sus parámetros |
 | **Qué NO va en su repositorio** | SQL escrito a mano, y mucho menos armado concatenando texto |
 
 > **Por qué.** El SQL queda en **un solo sitio**, con nombre, versionado en el
-> script de la base. Y los parámetros viajan como parámetros: una consulta
+> script de la base de datos. Y los parámetros viajan como parámetros: una consulta
 > armada pegando texto es por donde entra una inyección de SQL.
 
 ### Listar
@@ -243,12 +243,12 @@ Si la persona elige **Ana Torres Gómez**, lo que viaja es su clave:
 ```
 
 > **Eso es lo que hay que ver:** en la pantalla se lee «Ana Torres Gómez»; en
-> la petición viaja `1017245`. La persona reconoce nombres; la base necesita
+> la petición viaja `1017245`. La persona reconoce nombres; la base de datos necesita
 > claves.
 >
 > **Y si su borrado es lógico, el desplegable solo ofrece los ACTIVOS**, porque
 > el listado del que sale ya los filtra. Ofrecer un padre retirado es ofrecer
-> una opción que la base va a rechazar.
+> una opción que la base de datos va a rechazar.
 
 **Si la clave foránea es opcional**, el desplegable lleva una opción
 **«(ninguna)»** que manda `null` — que **no** es lo mismo que cadena vacía. Una
@@ -259,7 +259,7 @@ conversión en inglés, en vez de aceptar que no hay valor.
 
 ## 7. La integridad referencial: 409, nunca 500
 
-| Qué hace alguien | Qué responde la base | Qué tiene que responder su API |
+| Qué hace alguien | Qué responde la base de datos | Qué tiene que responder su API |
 |---|---|---|
 | Crear un hijo cuyo **padre no existe** | Rechaza por clave foránea | **409** con mensaje en castellano |
 | Repetir **la misma pareja** en una tabla puente | Rechaza por clave primaria duplicada | **409** |
@@ -270,7 +270,7 @@ conversión en inglés, en vez de aceptar que no hay valor.
 
 **Y una decisión que el equipo tiene que tomar y escribir:** si su borrado es
 **lógico**, ¿se puede **retirar** un maestro que todavía tiene detalle activo?
-La base no lo impide —es un `UPDATE`—, así que es una **regla de negocio**
+La base de datos no lo impide —es un `UPDATE`—, así que es una **regla de negocio**
 suya. Decídanla, pónganla en el servicio, y escríbanla en el `2_spec.md`.
 
 ---
@@ -288,7 +288,7 @@ suya. Decídanla, pónganla en el servicio, y escríbanla en el `2_spec.md`.
 | **7** | Crear un hijo con un padre inexistente responde **409** en castellano | Desde la colección de pruebas. **Un 500 es criterio fallado** |
 | **8** | Las tablas puente se asignan y se retiran **con sus dos claves**, y repetir la pareja da **409** | Se asigna, se repite y se retira |
 | **9** | El detalle se ve y se agrega **desde el maestro** | Se abre un maestro y ahí está su detalle |
-| **10** | Si el borrado es lógico, **los listados filtran** | Se retira un registro: desaparece de la lista, **sigue en la base** |
+| **10** | Si el borrado es lógico, **los listados filtran** | Se retira un registro: desaparece de la lista, **sigue en la base de datos** |
 | **11** | La interfaz **no habla en jerga** | No dice «PUT», «PATCH», «422» ni «FK» en ninguna pantalla |
 | **12** | **La regresión de la v1 pasa completa** | §9 |
 
@@ -322,8 +322,8 @@ se califica es que usted pueda decir **si es cierto**.
 | | Dicho sobre esta versión |
 |---|---|
 | **Qué hace** | Cuénteme este procedimiento almacenado sin leérmelo línea por línea |
-| **Por qué así** | ¿Por qué el total lo calcula un disparador en la base y no el servicio en C#? |
-| **Qué pasa si falla** | Si la base rechaza la clave foránea, ¿qué recibe quien llamó y qué ve la persona en la pantalla? |
+| **Por qué así** | ¿Por qué el total lo calcula un disparador en la base de datos y no el servicio en C#? |
+| **Qué pasa si falla** | Si la base de datos rechaza la clave foránea, ¿qué recibe quien llamó y qué ve la persona en la pantalla? |
 | **Qué cambiaría** | Si mañana hubiera que agregarle un campo al detalle, ¿dónde se toca? |
 
 > **Y no empieza en la v1 a propósito.** En la v1 se está aprendiendo a mover
@@ -366,7 +366,7 @@ seguir funcionando»: se corren.
 | | |
 |---|---|
 | **El spec kit de la v2** | `docs/spec_kit/versiones/v2_<nombre>/` con los mismos nueve documentos de la v1 **y la guía de IA**. Describe **solo el delta** |
-| **El script de la base** | Con **los procedimientos** y **el disparador**, versionados ahí |
+| **El script de la base de datos** | Con **los procedimientos** y **el disparador**, versionados ahí |
 | **El código** | Repositorios que **llaman** a los procedimientos |
 | **La interfaz gráfica** | Las pantallas de los recursos nuevos. **Una versión no está cerrada si la API responde y la interfaz no** |
 | **La colección de pruebas** | Con las peticiones nuevas, **incluidas las que tienen que fallar** |
@@ -407,7 +407,7 @@ seguir funcionando»: se corren.
 | **El disparador sordo al `UPDATE`** | Con borrado lógico, retirar es un `UPDATE`. Un disparador que solo oye `INSERT` y `DELETE` no se entera | El contador queda mal cuando alguien retira |
 | **El listado que no filtra** | Se olvidó el `WHERE activo` | Lo retirado sigue apareciendo |
 | **El desplegable con inactivos** | El listado que lo llena no filtra | Se puede elegir un padre retirado |
-| **El 500 que debía ser 409** | No se tradujo el error de la base | Criterio 7 |
+| **El 500 que debía ser 409** | No se tradujo el error de la base de datos | Criterio 7 |
 | **El sobre de la respuesta** | La API devuelve `{tabla, limite, total, datos}`, no una lista pelada. Leerlo mal deja la pantalla **vacía sin ningún error** | Una tabla sin filas y sin mensaje |
 | **La tabla puente con botón de editar** | Una pareja existe o no existe; no se edita | — |
 | **El procedimiento que no devuelve la fila** | La interfaz no puede mostrar lo que acaba de crear | — |

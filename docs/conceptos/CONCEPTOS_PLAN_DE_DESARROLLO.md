@@ -145,7 +145,7 @@ Ahí se ve lo que costó de verdad cada cosa frente a lo que se había previsto.
 ### Científicas actualizadas
 
 *(Las normas ya citadas abajo —ISO/IEC/IEEE 16326:2019 y 29148:2018— siguen
-siendo la base. Esto es lo que se ha publicado después.)*
+siendo la base de datos. Esto es lo que se ha publicado después.)*
 
 1. **IEEE Computer Society** (2024). ***SWEBOK Guide v4.0***, publicada el
    **15 de octubre de 2024**, área *Software Engineering Management*.

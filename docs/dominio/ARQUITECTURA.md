@@ -22,13 +22,13 @@
 | Proceso | Qué es | Puerto |
 |---|---|---|
 | **`front-blazor`** | Blazor Server. El único que le habla a la persona | 8099 |
-| **`api-facturas`** | ASP.NET Core. El único que habla con la base | 8035 |
+| **`api-facturas`** | ASP.NET Core. El único que habla con la base de datos | 8035 |
 | **`sqlserver`** | El motor, con **las reglas del negocio adentro** | 11466 |
 
 En la v5 se le suma **`postgres`** (15462), y el interruptor `MOTOR_BD` decide
 cuál de los dos atiende.
 
-> **La base NO es un tercero ajeno: es parte del sistema, y de las tres la que
+> **La base de datos NO es un tercero ajeno: es parte del sistema, y de las tres la que
 > más código propio tiene.** De las **849 líneas de código** de
 > `db/bdfacturas.sql` —sin contar comentarios—, **760 se escribieron en este
 > proyecto**: los 3 disparadores y los 16 procedimientos. Las 12 tablas que
@@ -45,10 +45,10 @@ cuál de los dos atiende.
 > [`FUENTES.md`](FUENTES.md) §0.
 
 > **La regla que no se negocia: en el front no puede haber un solo
-> `SqlConnection`.** Si el front puede llegar a la base, la separación es un
+> `SqlConnection`.** Si el front puede llegar a la base de datos, la separación es un
 > dibujo y no una arquitectura.
 >
-> **Y se comprueba, no se promete:** apague la API con la base encendida y abra
+> **Y se comprueba, no se promete:** apague la API con la base de datos encendida y abra
 > el front. Tiene que seguir en pie, con su menú y un aviso de que el servicio
 > no está disponible, **y sin una sola fila**. Si sigue mostrando datos, alguien
 > abrió una conexión que no debía.
@@ -176,9 +176,9 @@ Se puede contar:
 |---|---|---|
 | `Controllers/` | **15** | uno por recurso, más consultas, permisos y sesión |
 | `Servicios/` | **14** + sus 14 interfaces | |
-| `Repositorios/` | **29** implementaciones + 14 interfaces | **dos por recurso**: SqlServer y Postgres |
+| `Repositorios/` | **28** implementaciones + 14 interfaces | **dos por recurso**: SqlServer y Postgres |
 
-Esos 29 contra 14 son la arquitectura en un número: cada contrato tiene dos
+Esos 28 contra 14 son la arquitectura en un número: cada contrato tiene dos
 implementaciones, y arriba nadie sabe cuál está puesta.
 
 ---
@@ -220,8 +220,8 @@ sistema que decide CUÁL IMPLEMENTACIÓN DE REPOSITORIO se usa.**
 | El stock no queda negativo | **disparador** | Porque también vale para quien entre por SSMS |
 | El total es la suma de subtotales | **disparador** | Igual, y además así no puede desactualizarse |
 | Una factura tiene al menos un renglón | **procedimiento** | Va en la misma transacción que la inserta |
-| Una factura no se anula dos veces | **procedimiento** | Es una condición sobre el estado, y el estado está en la base |
-| El `{}` del PATCH no actualiza nada | **servicio** | Es una decisión de negocio, no de la base |
+| Una factura no se anula dos veces | **procedimiento** | Es una condición sobre el estado, y el estado está en la base de datos |
+| El `{}` del PATCH no actualiza nada | **servicio** | Es una decisión de negocio, no de la base de datos |
 | Falta el campo `nombre` | **la petición** (anotaciones) | Es forma, y la forma se rechaza antes de entrar |
 | ¿Tiene permiso? | **`[ExigePermiso]`**, antes del controlador | Para que ningún método pueda olvidarse de preguntarlo |
 
@@ -239,12 +239,12 @@ sistema que decide CUÁL IMPLEMENTACIÓN DE REPOSITORIO se usa.**
 | **Qué cuesta** | Si el circuito se corta —se recarga la página, se pierde la red— **la pantalla pierde su estado** |
 
 > **Eso último se nota al emitir una factura:** los renglones que se van
-> agregando viven **en el circuito**, no en la base. Oprimir F5 a mitad **los
+> agregando viven **en el circuito**, no en la base de datos. Oprimir F5 a mitad **los
 > pierde**.
 >
 > **No es un defecto: es la consecuencia de haber escogido Blazor Server.** Si
 > hiciera falta que el borrador sobreviviera, habría que guardarlo en otra parte
-> —la sesión, el navegador o la base—, y eso es trabajo que esta versión no
+> —la sesión, el navegador o la base de datos—, y eso es trabajo que esta versión no
 > hizo. Está declarado, sin construir, en
 > [`3_HISTORIAS_PROPUESTAS.md`](elicitacion/3_HISTORIAS_PROPUESTAS.md).
 
@@ -257,7 +257,7 @@ Decirlo evita que alguien lo busque:
 | No hay | Y en su lugar |
 |---|---|
 | Entity Framework ni ningún ORM | SQL escrito a mano y **Dapper** como micro-ejecutor |
-| Caché | Cada petición va a la base |
+| Caché | Cada petición va a la base de datos |
 | Colas, eventos, mensajería | Todo es síncrono dentro de la petición |
 | Microservicios | Tres procesos, y ya — ver §2 |
 | Repositorio genérico `Repositorio<T>` | Uno por recurso, a propósito — ver abajo |
@@ -273,7 +273,7 @@ Decirlo evita que alguien lo busque:
 
 | Qué se afirma | Cómo se comprueba |
 |---|---|
-| El front no toca la base | Apague `api-facturas` y abra el front: en pie y sin filas |
+| El front no toca la base de datos | Apague `api-facturas` y abra el front: en pie y sin filas |
 | Las capas no se saltan | En `Controllers/` no hay ni un `SqlConnection` —**0 archivos**—, y en `Repositorios/` no hay ni un `StatusCode` —**0**—. La palabra `Sql` sí aparece dos veces en los controladores, pero **en comentarios**, explicando que `SqlException` se traduce a 500 |
 | Cambiar de motor no toca arriba | `git diff --stat v4..v5 -- api_facturas/Controllers api_facturas/Servicios`: **vacío** |
 | Las reglas están abajo | Intente dejar el stock negativo con un `INSERT` directo en SSMS |

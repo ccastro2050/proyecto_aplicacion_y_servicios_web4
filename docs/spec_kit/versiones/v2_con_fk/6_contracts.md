@@ -21,7 +21,7 @@ repiten: el sobre en los listados, los errores como
 
 | | Por qué aparece ahora |
 |---|---|
-| **El 409 por clave foránea** | En la v1 ninguna tabla tenía FK, así que no había forma de violarla. Ahora sí: mandar un `fkcodpersona` que no existe es un **conflicto con el estado** de la base, no un error de forma |
+| **El 409 por clave foránea** | En la v1 ninguna tabla tenía FK, así que no había forma de violarla. Ahora sí: mandar un `fkcodpersona` que no existe es un **conflicto con el estado** de la base de datos, no un error de forma |
 | **Un recurso sin PUT ni PATCH ni DELETE** | `api/factura`. Una factura emitida no se corrige: **se anula** |
 | **Dos recursos con clave compuesta** | `api/rol-usuario` y `api/rutarol`. Su borrado lleva **dos** valores en la URL |
 | **Un recurso que no es una tabla** | `api/usuario-con-roles`. Opera `usuario` y `rol_usuario` juntas, en una transacción |
@@ -49,9 +49,9 @@ DELETE /api/cliente/{id}         → 200 · 404
 
 | | |
 |---|---|
-| **`id`** | Lo genera la base (`IDENTITY`). **No se envía al crear**, y mandarlo no lo cambia |
+| **`id`** | Lo genera la base de datos (`IDENTITY`). **No se envía al crear**, y mandarlo no lo cambia |
 | **`fkcodpersona`** | **Obligatoria.** Un cliente es una persona |
-| **`fkcodempresa`** | **Opcional y nullable.** Un cliente puede ser persona natural. Se manda `null`, **no cadena vacía**: `""` sería un código de empresa que no existe, y la base responde 409 |
+| **`fkcodempresa`** | **Opcional y nullable.** Un cliente puede ser persona natural. Se manda `null`, **no cadena vacía**: `""` sería un código de empresa que no existe, y la base de datos responde 409 |
 
 **La pareja didáctica, en cliente:** `{"credito":900000}` → **422** en PUT
 (falta `fkcodpersona`) y **200** en PATCH. El mismo cuerpo, dos respuestas.
@@ -78,7 +78,7 @@ DELETE /api/persona/P002          <- P002 es vendedor (FK desde vendedor.fkcodpe
        \"fk_vendedor_persona\"…"}
 ```
 
-La base **protege sus relaciones**, y el mensaje del motor viaja completo en
+La base de datos **protege sus relaciones**, y el mensaje del motor viaja completo en
 `detalle`. Esto en la v1 era imposible de provocar.
 
 ---
@@ -127,7 +127,7 @@ body { "fkidcliente": 1, "fkidvendedor": 1,
        "productos": [ {"codigo":"PR001","cantidad":2},
                       {"codigo":"PR003","cantidad":1} ] }
 
-→ 200 la factura COMPLETA, con fecha, subtotales y total calculados por la base
+→ 200 la factura COMPLETA, con fecha, subtotales y total calculados por la base de datos
 · 422 si falta un campo o si `productos` llega vacío (mínimo 1)
 · 409 si el cliente, el vendedor o un producto no existen
 · 500 si no hay stock suficiente — el mensaje del trigger viaja en `detalle`
@@ -139,11 +139,11 @@ body { "fkidcliente": 1, "fkidvendedor": 1,
 |---|---|
 | `total` | El **trigger** `trg_actualizar_totales_y_stock` |
 | `subtotal` de cada renglón | El mismo trigger |
-| `fecha` | La base, al insertar |
+| `fecha` | La base de datos, al insertar |
 
 > **Por qué importa:** si el cliente enviara el total habría **dos fuentes de
 > verdad**, y el día que no coincidan gana la que nadie revisó. El renglón que
-> viaja es `{codigo, cantidad}` y nada más — ni el precio, que lo toma la base
+> viaja es `{codigo, cantidad}` y nada más — ni el precio, que lo toma la base de datos
 > del producto.
 
 ### C4. `POST /api/factura/{numero}/anular` — el borrado lógico

@@ -45,7 +45,7 @@ todo lo que usted ya escribió.
 > eso es exactamente lo que la tabla existe para impedir. *«Marta es cajera»* no
 > puede ser verdad dos veces.
 >
-> Con la llave compuesta, la base **rechaza el duplicado sola**. Con un `id`,
+> Con la llave compuesta, la base de datos **rechaza el duplicado sola**. Con un `id`,
 > habría que programar la comprobación en algún lado, y alguien se olvidaría.
 
 ### Las cuatro consecuencias
@@ -171,7 +171,7 @@ LO MÁS IMPORTANTE, Y ES LO QUE NO SE CALCA DEL MOLDE:
       (GET /api/rol-usuario/usuario/{email}) y los usuarios de un rol
       (GET /api/rol-usuario/rol/{idrol}).
     · Y crear una pareja que YA EXISTE responde 409, no 422: el dato
-      tiene la forma correcta, lo que choca es el estado de la base.
+      tiene la forma correcta, lo que choca es el estado de la base de datos.
 
   NO HAY PUT NI PATCH, y la razón importa: en una tabla puente
   "actualizar" significa MOVER la fila, o sea borrar una pareja y crear
@@ -188,7 +188,7 @@ EL TERCER RECURSO, `usuario-con-roles`:
      eliminar_usuario_con_roles     actualizar_roles_usuario
 
   Su repositorio NO escribe SQL de tablas: llama procedimientos, igual
-  que el de factura que te adjunté. NO escribas CREATE PROCEDURE: la base
+  que el de factura que te adjunté. NO escribas CREATE PROCEDURE: la base de datos
   viene dada.
 
   Para qué existe: crear un usuario y asignarle tres roles son cuatro
@@ -207,8 +207,8 @@ REGLAS QUE SIGUEN VIGENTES:
     IActionResult—; el repositorio no decide códigos de estado.
   · SIN ORM. SQL a mano con Dapper, siempre parametrizado.
   · TODO EN ESPAÑOL.
-  · El front NO habla con la base: solo con la API por HTTP.
-  · NO toques la base: las tablas y los procedimientos ya existen.
+  · El front NO habla con la base de datos: solo con la API por HTTP.
+  · NO toques la base de datos: las tablas y los procedimientos ya existen.
   · NO toques `factura`, `cliente` ni `vendedor`: son de mis compañeros.
 
 LA INTERFAZ GRÁFICA: una pantalla para asignar roles a un usuario y otra
@@ -267,7 +267,7 @@ Invoke-RestMethod http://localhost:8035/api/rutarol -Method Post `
   -ContentType 'application/json' -Body '{"fkidruta":1,"fkidrol":2}'
 
 # 2 · LA PRUEBA DE LA LLAVE COMPUESTA: la misma pareja otra vez.
-#     Debe responder 409 — la base lo impide sola, sin que usted lo programe.
+#     Debe responder 409 — la base de datos lo impide sola, sin que usted lo programe.
 Invoke-RestMethod http://localhost:8035/api/rutarol -Method Post `
   -ContentType 'application/json' -Body '{"fkidruta":1,"fkidrol":2}'
 

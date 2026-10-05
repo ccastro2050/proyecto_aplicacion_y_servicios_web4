@@ -194,7 +194,7 @@ rutas existen.
 | **1** | **El front deserializa el sobre a `List<T>`** | La interfaz sale **vacía sin un solo error**. La API devuelve `{tabla, limite, total, datos[]}` — hay que entrar a `datos` |
 | **2** | **Dapper mapea por NOMBRE de columna** | Una propiedad que no se llama igual que su columna llega `null` **en silencio**, con HTTP 200 y la celda en blanco. Se arregla con un alias: `SELECT ruta AS RutaTexto` |
 | **3** | **El `JsonPropertyName` de los procedimientos** | Los procedimientos devuelven `nombre_cliente` y `idrol`; las propiedades son `NombreCliente` e `IdRol`. Sin el atributo, llegan `null` y **0** |
-| **4** | **La cadena vacía de un desplegable opcional** | `""` no es `null`. La anotación `[StringLength(10, MinimumLength = 1)]` lo atrapa **en la petición** y responde **422** — sin ella llegaría a la base y sería un **409** |
+| **4** | **La cadena vacía de un desplegable opcional** | `""` no es `null`. La anotación `[StringLength(10, MinimumLength = 1)]` lo atrapa **en la petición** y responde **422** — sin ella llegaría a la base de datos y sería un **409** |
 | **5** | **Los desplegables cargados EN FILA** | Con la API apagada, cada petición espera sus 10 segundos de *timeout*. `/facturas` pide **cinco** listas: en fila son **50 segundos** en blanco antes de mostrar el aviso. Con `Task.WhenAll` son 10 |
 
 > **Este quinto no se encuentra leyendo: se encuentra MIDIENDO.** Apareció

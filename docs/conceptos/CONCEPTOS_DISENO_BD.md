@@ -399,7 +399,7 @@ este proyecto, con lo que se decidió y lo que se descartó en cada una.
    normalización.
 3. **Härder, T.; Reuter, A.** (1983). «Principles of Transaction-Oriented
    Database Recovery». *ACM Computing Surveys* **15**(4), pp. 287-317.
-   DOI **`10.1145/289.291`** — donde se acuñó **ACID**. La **C** es «la base de
+   DOI **`10.1145/289.291`** — donde se acuñó **ACID**. La **C** es «la base de datos de
    datos no acepta quedar mal», y por eso §5 importa.
 
 ### Actualizadas (2025-2026) — el modelo de datos frente a los LLM

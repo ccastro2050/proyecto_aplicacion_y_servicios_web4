@@ -47,7 +47,7 @@
 
 | | Requisito | Cómo se comprueba | Dónde |
 |---|---|---|---|
-| **RNF-05** | El front **no toca la base de datos** | Apague `api-facturas` con la base encendida: el front sigue en pie, con su menú y **sin una sola fila**. Y `grep SqlConnection front_blazor` da **0** | Art. 3 |
+| **RNF-05** | El front **no toca la base de datos** | Apague `api-facturas` con la base de datos encendida: el front sigue en pie, con su menú y **sin una sola fila**. Y `grep SqlConnection front_blazor` da **0** | Art. 3 |
 | **RNF-06** | Cada capa depende de una **interfaz**, no de una clase | Los servicios reciben `IRepositorio*` por constructor | Art. 3 |
 | **RNF-07** | Cambiar de motor **no toca** controladores ni servicios | `git diff --stat v4..v5 -- api_facturas/Controllers api_facturas/Servicios`: **vacío** | Art. 3 |
 | **RNF-08** | El SQL está **a la vista**, sin ORM que lo genere | No hay Entity Framework en el `.csproj`; hay Dapper | Art. 2 |

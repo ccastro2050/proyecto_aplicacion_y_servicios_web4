@@ -12,11 +12,11 @@
 | Opción | Argumento |
 |---|---|
 | **422** | «El dato está mal, y el 422 es para datos malos» |
-| **409** ✅ | **El dato NO está mal: tiene la forma correcta.** `"NOEXISTE"` es un texto de la longitud permitida. Lo que se rompe es el **estado** de la base: esa fila no está |
+| **409** ✅ | **El dato NO está mal: tiene la forma correcta.** `"NOEXISTE"` es un texto de la longitud permitida. Lo que se rompe es el **estado** de la base de datos: esa fila no está |
 
 **Lo que decide:** el 422 se reserva para lo que la **petición** puede
 rechazar sin consultar nada —un campo que falta, un número negativo, un tipo
-equivocado—. Saber si `P001` existe **requiere ir a la base**, y eso ya es
+equivocado—. Saber si `P001` existe **requiere ir a la base de datos**, y eso ya es
 estado.
 
 > **Y es la razón por la que el 409 aparece en la v2 y no antes:** es la
@@ -43,7 +43,7 @@ produce un 409 que nadie entiende.
 | Opción | Argumento |
 |---|---|
 | **SQL en C#** | Más fácil de leer para quien no sabe plpgsql. Todo el código en un solo lenguaje |
-| **Procedimientos** ✅ | **La base ya los trae** —seis, escritos y probados— y la transacción es suya |
+| **Procedimientos** ✅ | **La base de datos ya los trae** —seis, escritos y probados— y la transacción es suya |
 
 **Lo que decide, y no es la pereza:** el detalle de una factura y su
 encabezado tienen que entrar **juntos o no entrar**. Con `INSERT` desde C#
@@ -70,14 +70,14 @@ catch (SqlException e) when (e.SqlState == "P0001"
 
 | Opción | Argumento |
 |---|---|
-| **Por patrón del mensaje** ✅ | Es lo que el motor da. Funciona hoy, sin tocar la base |
+| **Por patrón del mensaje** ✅ | Es lo que el motor da. Funciona hoy, sin tocar la base de datos |
 | **Un código propio en el JSON del procedimiento** | **Mejor**, y está descartado solo por alcance |
 
 > **Está escrito aquí a propósito, porque es frágil y se nota:** si alguien
 > traduce el mensaje del procedimiento al inglés, la API deja de responder 404
 > y responde 500 — **sin que nada falle al compilar**. La alternativa buena
 > —que cada procedimiento devuelva `{"error":"no_encontrado"}`— implica tocar
-> la base, y la base **se entrega dada**. Queda como deuda **conocida**, que es
+> la base de datos, y la base de datos **se entrega dada**. Queda como deuda **conocida**, que es
 > distinto de un descuido.
 
 ## D5 — Un recurso `usuario-con-roles` además de los otros dos
@@ -91,7 +91,7 @@ Ya existen `api/usuario` y `api/rol-usuario`. ¿Por qué un tercero?
 
 **Lo que decide:** con dos llamadas, un fallo en la segunda deja **un usuario
 sin ningún rol** — que no puede hacer nada, y que nadie sabe que está ahí
-hasta que alguien se queja. La base **ya trae** `crear_usuario_con_roles` para
+hasta que alguien se queja. La base de datos **ya trae** `crear_usuario_con_roles` para
 que sea una.
 
 > **Y los tres recursos se quedan**, que es la parte que suele incomodar:
@@ -106,8 +106,8 @@ que sea una.
 
 | Opción | Argumento |
 |---|---|
-| **El front lo manda** | Un cálculo menos en la base. Y el front ya lo tiene, porque lo está mostrando |
-| **Lo calcula la base** ✅ | **Una sola fuente de verdad** |
+| **El front lo manda** | Un cálculo menos en la base de datos. Y el front ya lo tiene, porque lo está mostrando |
+| **Lo calcula la base de datos** ✅ | **Una sola fuente de verdad** |
 
 **Lo que decide:** si los dos lo calculan, un día no van a coincidir —por un
 redondeo, por un precio que cambió entre que se cargó el desplegable y se
@@ -128,7 +128,7 @@ base, así que es el único que se guarda.
 | **Un solo POST al final** ✅ | La transacción del procedimiento **sirve para algo** |
 
 **Lo que decide:** con un POST por renglón, agregar tres y quitar uno deja
-**tres** en la base —el borrado del tercero habría que programarlo también— y
+**tres** en la base de datos —el borrado del tercero habría que programarlo también— y
 un fallo a mitad deja una factura incompleta que nadie pidió.
 
 > **Cómo se comprueba, y es el criterio 13:** agregue tres renglones, quite

@@ -17,8 +17,8 @@ docker compose up -d --build
 ```
 
 > **El `down -v` es necesario esta vez, y solo esta vez.** La v3 vuelve a
-> sembrar las contraseñas con hash, y el script de la base **solo se ejecuta
-> cuando el volumen nace**. Sin borrarlo, la base sigue con las contraseñas
+> sembrar las contraseñas con hash, y el script de la base de datos **solo se ejecuta
+> cuando el volumen nace**. Sin borrarlo, la base de datos sigue con las contraseñas
 > viejas y nada funciona.
 
 > **`curl.exe` con la extensión.** En PowerShell, `curl` pelado es un alias de
@@ -87,7 +87,7 @@ http://localhost:8035/swagger
 > controlador es `[AllowAnonymous]`. El candado dice «esta API usa token», no
 > «este endpoint lo exige».
 
-## 3. CRITERIO 1 — ninguna contraseña legible en la base
+## 3. CRITERIO 1 — ninguna contraseña legible en la base de datos
 
 ```powershell
 docker compose exec postgres sqlcmd -U postgres -d bdfacturas_sqlserver_local -c "SELECT email, contrasena FROM usuario;"
@@ -337,7 +337,7 @@ navegador: vive en el circuito, y el F5 lo tumba. Está en
 
 | Síntoma | Qué pasa |
 |---|---|
-| **Iniciar sesión responde 401 con las contraseñas de la tabla** | La base no se re-sembró. `docker compose down -v` y `up -d --build` |
+| **Iniciar sesión responde 401 con las contraseñas de la tabla** | La base de datos no se re-sembró. `docker compose down -v` y `up -d --build` |
 | **Todo responde 401, incluso con token** | Falta la palabra **`Bearer`** y el espacio antes del token |
 | **Todo responde 200, incluso sin token** | `app.UseAuthentication()` no está, o está **después** de `UseAuthorization()` |
 | **Un token vencido responde 200 durante cinco minutos** | Falta `ClockSkew = TimeSpan.Zero`. ASP.NET perdona 5 minutos de reloj por defecto |

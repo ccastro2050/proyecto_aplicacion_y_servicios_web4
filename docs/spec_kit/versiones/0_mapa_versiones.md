@@ -86,7 +86,7 @@ Las 12 tablas de `bdfacturas`, repartidas:
 > **`usuario_con_roles` no es una tabla**, y por eso aparece en la lista con una
 > advertencia: es un **recurso** —`api/usuario-con-roles`— que opera `usuario` y
 > `rol_usuario` **juntas**, a través de los cinco procedimientos almacenados que
-> la base ya trae. Está en el reparto porque tiene controlador, servicio,
+> la base de datos ya trae. Está en el reparto porque tiene controlador, servicio,
 > repositorio e interfaz gráfica propios, y lo que no se reparte no se audita.
 
 > **`sesion` y `permisos` tampoco son tablas.** Son los dos recursos que la v3
@@ -95,7 +95,7 @@ Las 12 tablas de `bdfacturas`, repartidas:
 > menú se arme. Este último **no decide nada**: la decisión la toma
 > `verificar_acceso_ruta` en cada operación.
 
-> **Ojo:** las 12 tablas **existen en la base desde la v1**. Lo que reparte esta
+> **Ojo:** las 12 tablas **existen en la base de datos desde la v1**. Lo que reparte esta
 > tabla es qué puede **nombrar el código** de cada versión, no qué existe en el
 > motor.
 >

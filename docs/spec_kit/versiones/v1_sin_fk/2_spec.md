@@ -104,7 +104,7 @@ versión que el contrato era incómodo de pintar.
 **No incluye (y es deliberado — ver [mapa de versiones](../0_mapa_versiones.md)):**
 - **Las SEIS tablas con clave foránea** —`cliente`, `vendedor`, `factura`,
   `productosporfactura`, `rol_usuario`, `rutarol`—: son la **v2**. Existen en
-  la base desde la v1 (Artículo 5), pero el código de esta versión **no las
+  la base de datos desde la v1 (Artículo 5), pero el código de esta versión **no las
   puede nombrar**.
 - **JWT, sesiones y control de acceso por rol**: es la **v3**. Ojo: el CRUD de
   `usuario` y `rol` **sí es de esta versión** —no tienen FK—; lo que llega en

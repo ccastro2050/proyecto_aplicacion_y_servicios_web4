@@ -11,7 +11,7 @@
 > |---|---|---|
 > | **1a** | **Desde cero**: el ingeniero redacta los once documentos | Se está aprendiendo el método. Es lento y es el único que enseña |
 > | **1b** | **Tomando un ejemplo y adecuándolo** | Ya hay un proyecto parecido hecho. Rápido, y el riesgo es arrastrar lo que no aplica |
-> | **2** | **Documentación de ingeniería + prompt**: se escribe la base y la IA redacta el kit | Hay tiempo para hacer la base de datos bien. Es el que escala |
+> | **2** | **Documentación de ingeniería + prompt**: se escribe la base de datos y la IA redacta el kit | Hay tiempo para hacer la base de datos bien. Es el que escala |
 >
 > **Qué es este archivo:** el del **camino 2**. Qué documentos lleva esa base,
 > **cuáles son oficiales y qué norma los respalda**, y qué hace falta tener
@@ -59,7 +59,7 @@ información** y los **mapea a cada proceso**.
 
 > **Esto NO es un molde para el spec kit.** El spec kit viene de otra parte
 > —GitHub, septiembre de 2025— y no cumple ni deriva de ninguna norma. La
-> 15289 sirve para lo otro: **justificar qué documentos lleva la base de
+> 15289 sirve para lo otro: **justificar qué documentos lleva la base de datos de
 > ingeniería**, que es de lo que trata este documento.
 >
 > Lo único que sí conviene tomar de ella, porque evita un error concreto: la
@@ -189,7 +189,7 @@ camino que exige releer lo heredado en vez de confiar en que aplica.**
 
 ### Camino 2 — documentación de ingeniería + prompt
 
-La IA redacta los **ocho** (`2_spec` a `9_checklist`) **a partir de la base**. La **constitución se le da como insumo, no se le pide**: si la IA reescribe la constitución en cada versión, deja de ser una política. Y aquí está la regla que decide
+La IA redacta los **ocho** (`2_spec` a `9_checklist`) **a partir de la base de datos**. La **constitución se le da como insumo, no se le pide**: si la IA reescribe la constitución en cada versión, deja de ser una política. Y aquí está la regla que decide
 si esto sirve o es un desastre:
 
 > **La IA solo puede redactar sobre lo que le dieron. Cada hueco en la
@@ -216,7 +216,7 @@ porque el modelo completó lo que faltaba con una suposición propia**. Y son
 
 Esto es lo que hace que el camino 2 sea gobernable en vez de un salto de fe.
 
-Cuando falta un documento de la base, la IA **va a rellenar** — eso está dado.
+Cuando falta un documento de la base de datos, la IA **va a rellenar** — eso está dado.
 La pregunta útil no es *«¿rellenará?»* sino ***¿qué exactamente va a tener que
 rellenar?***, y esa pregunta **se contesta antes de escribir el prompt**,
 porque la **plantilla del spec kit enumera todas las secciones** que hay que

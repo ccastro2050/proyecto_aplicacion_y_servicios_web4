@@ -175,7 +175,7 @@ El orden no es casual: cada paso deja algo **comprobable** antes de seguir.
 | Tropiezo | Cómo se vio | Dónde quedó la corrección |
 |---|---|---|
 | **El certificado autofirmado de SQL Server** | `self signed certificate in certificate chain` al conectar desde VS Code | `TUTORIAL_VSCODE_SQLTOOLS.md`, con **cuatro** salidas distintas |
-| **El contenedor no volvía tras reiniciar el equipo** | Las bases quedaban apagadas después de reiniciar | `restart: unless-stopped` **también** para las bases |
+| **El contenedor no volvía tras reiniciar el equipo** | Las bases de datos quedaban apagadas después de reiniciar | `restart: unless-stopped` **también** para las bases de datos |
 | **Contenedores huérfanos de otro proyecto** | Puertos ocupados por un repositorio clonado antes | Una advertencia en el README **antes** del `git clone` |
 | **Los puertos chocaban con los otros cursos** | Dos proyectos peleando por el 1433 | Puertos propios: API **8035**, SQL Server **11466**, y el registro en `PUERTOS.md` |
 

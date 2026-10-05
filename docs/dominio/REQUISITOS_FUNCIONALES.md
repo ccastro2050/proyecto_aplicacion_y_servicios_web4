@@ -111,7 +111,7 @@ agrega un endpoint y no actualiza esta tabla, la comprobación de §7 lo delata.
 > factura podría quedar con dos de tres. Ver
 > [`PRINCIPIOS_ACID.md`](../conceptos/PRINCIPIOS_ACID.md).
 
-> **Dos procedimientos existen en la base y la API NO los expone**:
+> **Dos procedimientos existen en la base de datos y la API NO los expone**:
 > `sp_actualizar_factura_y_productosporfactura` y `sp_borrar_…`. Está declarado
 > en el spec: la operación del negocio es **anular**, no corregir. Es el mismo
 > motivo por el que el `PUT` de factura está escrito y apagado (§6).
@@ -126,7 +126,7 @@ agrega un endpoint y no actualiza esta tabla, la comprobación de §7 lo delata.
 | **RF-v3-2** | Identificarse devuelve un **token** | `POST /api/sesion` |
 | **RF-v3-3** | Sin token no se entra: **401** | Cualquier endpoint sin cabecera |
 | **RF-v3-4** | Con token pero sin permiso: **403** | Entre como `cliente1@correo.com` y pida `/api/factura` |
-| **RF-v3-5** | El permiso **lo decide la base**, en cada petición | `verificar_acceso_ruta` |
+| **RF-v3-5** | El permiso **lo decide la base de datos**, en cada petición | `verificar_acceso_ruta` |
 | **RF-v3-6** | El menú muestra **solo** lo que ese rol puede abrir | Entre con los tres usuarios y compare |
 | **RF-v3-7** | El login responde **lo mismo** si el correo no existe y si la clave está mal | Dos peticiones, misma respuesta |
 | **RF-v3-8** | Repartir permisos desde la interfaz | Pantalla «Permisos» |

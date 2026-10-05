@@ -27,15 +27,15 @@
 
 Tres mecanismos, y conviene distinguirlos porque fallan distinto:
 
-- **La base** — una restricción (`PRIMARY KEY`, `FOREIGN KEY`, `UNIQUE`,
+- **La base de datos** — una restricción (`PRIMARY KEY`, `FOREIGN KEY`, `UNIQUE`,
   `NOT NULL`). No se puede evadir, ni siquiera desde SSMS.
 - **Un disparador o procedimiento** — código SQL que rechaza con `THROW`. Tampoco
   se evade, y además explica el motivo.
 - **El servicio** — código C#. Solo protege a quien pase por la API.
 
-> **El orden importa.** Una regla defendida por el servicio y no por la base se
+> **El orden importa.** Una regla defendida por el servicio y no por la base de datos se
 > rompe con una línea de SQL. Las reglas que de verdad no pueden fallar están
-> abajo del todo, en la base.
+> abajo del todo, en la base de datos.
 
 ---
 
@@ -45,14 +45,14 @@ Tres mecanismos, y conviene distinguirlos porque fallan distinto:
 |---|---|---|---|
 | **RN-01** | Toda factura tiene **un cliente y un vendedor**, y los dos existen | `fk_factura_cliente` y `fk_factura_vendedor` | 500 con el error del motor |
 | **RN-02** | Una factura tiene **al menos un renglón**. No existe una factura vacía | `sp_insertar_factura_y_productosporfactura`, con su mínimo y su `THROW` | 500 · *«La factura requiere minimo 1 producto(s).»* |
-| **RN-03** | El **número** de la factura lo pone la base y no se repite | `IDENTITY(1,1)` + `pk_factura` | — |
+| **RN-03** | El **número** de la factura lo pone la base de datos y no se repite | `IDENTITY(1,1)` + `pk_factura` | — |
 | **RN-04** | La **fecha** es la del momento en que se emitió, y no la manda el cliente | `DEFAULT GETDATE()` | lo que llegue se ignora |
 | **RN-05** | Una factura está **activa** o **anulada**. No hay un tercer estado | `DEFAULT N'activa'` y solo `sp_anular_factura` lo cambia | — |
 | **RN-06** | El mismo producto **no aparece dos veces** en una factura: se suma la cantidad | `pk_productosporfactura (fknumfactura, fkcodproducto)` | 500 por llave duplicada |
 
 > **RN-02 es la que más se olvida al construir el front**, y por eso la pantalla
 > de emitir muestra «Agregue al menos un renglón» en vez de dejar oprimir
-> «Emitir» con la lista vacía. La base la rechazaría igual — pero decirlo antes
+> «Emitir» con la lista vacía. La base de datos la rechazaría igual — pero decirlo antes
 > es más barato que un 500.
 
 ---
@@ -74,7 +74,7 @@ Tres mecanismos, y conviene distinguirlos porque fallan distinto:
 > **Y RN-08 explica por qué el front muestra un «total estimado».** Lo que se ve
 > antes de emitir es un cálculo para que la persona sepa cuánto va. El total que
 > queda guardado lo pone el disparador, y es el que manda. Dos fuentes de
-> verdad, y gana la de la base.
+> verdad, y gana la de la base de datos.
 
 ---
 
@@ -97,7 +97,7 @@ Tres mecanismos, y conviene distinguirlos porque fallan distinto:
 
 | | Regla | Quién la defiende | Si se viola |
 |---|---|---|---|
-| **RN-14** | Una factura anulada **se queda en la base**, con su número y su fecha | `sp_anular_factura` hace `UPDATE`, no `DELETE` | — |
+| **RN-14** | Una factura anulada **se queda en la base de datos**, con su número y su fecha | `sp_anular_factura` hace `UPDATE`, no `DELETE` | — |
 | **RN-15** | Una factura **no se anula dos veces** | `sp_anular_factura`, con `THROW 50010` | 409 · *«Factura 3 ya está anulada»* |
 | **RN-16** | Anular una factura que no existe no es un conflicto: es que no está | `sp_anular_factura`, con `THROW 50010` | 404 |
 

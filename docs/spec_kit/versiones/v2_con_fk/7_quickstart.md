@@ -58,7 +58,7 @@ sin clave foránea, con sus cinco verbos. **Tiene que pasar sin un solo cambio**
 # ============================================================
 curl.exe http://localhost:8035/api/cliente
 
-# crear: el `id` NO se envia, lo pone la base (SERIAL)
+# crear: el `id` NO se envia, lo pone la base de datos (SERIAL)
 curl.exe -X POST http://localhost:8035/api/cliente -H "Content-Type: application/json" -d "{\"credito\":500000,\"fkcodpersona\":\"P001\",\"fkcodempresa\":\"E001\"}"
 
 # la pareja didactica: el MISMO cuerpo, dos verbos, dos respuestas
@@ -82,7 +82,7 @@ curl.exe -X POST http://localhost:8035/api/cliente -H "Content-Type: application
 curl.exe http://localhost:8035/api/vendedor
 curl.exe -X POST http://localhost:8035/api/vendedor -H "Content-Type: application/json" -d "{\"carnet\":9001,\"direccion\":\"Calle 10 # 20-30\",\"fkcodpersona\":\"P003\"}"
 
-# borrar la PERSONA de un vendedor: la base lo impide y dice como se llama
+# borrar la PERSONA de un vendedor: la base de datos lo impide y dice como se llama
 # la restriccion. Esto en la v1 era imposible de provocar.
 curl.exe -i -X DELETE http://localhost:8035/api/persona/P003
 
@@ -117,7 +117,7 @@ curl.exe http://localhost:8035/api/producto/PR003
 # ============================================================
 # CRITERIO 7 — los errores del negocio
 # ============================================================
-# lista vacia: lo para la PETICION, ni llega a la base
+# lista vacia: lo para la PETICION, ni llega a la base de datos
 curl.exe -i -X POST http://localhost:8035/api/factura -H "Content-Type: application/json" -d "{\"fkidcliente\":1,\"fkidvendedor\":1,\"productos\":[]}"   # -> 422
 
 # mas cantidad que stock: lo para el DISPARADOR, y su mensaje viaja en `detalle`
@@ -195,9 +195,9 @@ navegador**, en `http://localhost:8099`.
 | | Qué hacer | Qué tiene que pasar |
 |---|---|---|
 | **11** | Abrir `/clientes` | El desplegable de **persona** está **lleno**, con nombres. Si está vacío, la interfaz no pidió el catálogo |
-| **12** | Crear un cliente y mirar lo que viaja | Se ve **«Ana Torres»** y en el JSON va **`P001`**. Nombre para la persona, código para la base |
+| **12** | Crear un cliente y mirar lo que viaja | Se ve **«Ana Torres»** y en el JSON va **`P001`**. Nombre para la persona, código para la base de datos |
 | **13** | En `/facturas`, en el formulario de arriba: agregar **tres** renglones, quitar **uno**, emitir | **Llegan DOS** |
-| **14** | Mirar el cuerpo de esa petición | **No lleva `total`** ni `subtotal`. Los puso la base |
+| **14** | Mirar el cuerpo de esa petición | **No lleva `total`** ni `subtotal`. Los puso la base de datos |
 | **15** | Buscar el botón de **eliminar** una factura | **No existe.** Hay **anular** — y después de anular, el stock del producto **subió** |
 | **16** | En `/usuario-con-roles`: marcar **dos** casillas y crear | **Un solo envío**, y la lista lo muestra con sus dos roles |
 | **17** | Editarlo dejando la contraseña **vacía** | Los roles cambian y la contraseña **sigue siendo la de antes** |
@@ -248,16 +248,16 @@ Recargue: las filas volvieron, sin reiniciar nada.
 | Síntoma | Qué pasa |
 |---|---|
 | `curl.exe` no conecta al **8035** | La primera compilación de `dotnet watch` no terminó. Espere ~1 min · `docker compose logs api-facturas` |
-| La API responde **500 en todo** | La base no se sembró, o la cadena no apunta a `postgres:5432`. Reset: `docker compose down -v` y `up -d` |
+| La API responde **500 en todo** | La base de datos no se sembró, o la cadena no apunta a `postgres:5432`. Reset: `docker compose down -v` y `up -d` |
 | **Una interfaz sale vacía sin ningún error** | El front deserializó el sobre a `List<T>`. La API devuelve `{tabla, limite, total, datos[]}`: hay que entrar a `datos` |
 | **Una columna sale en blanco, con HTTP 200** | Dapper mapea **por nombre**. Falta un alias: `SELECT ruta AS RutaTexto` |
 | **`nombre_cliente` llega `null`** | Falta el `[JsonPropertyName("nombre_cliente")]`. El procedimiento devuelve snake_case |
 | **Un desplegable opcional da 409** | Está mandando `""` en vez de `null`. La cadena vacía es un código que no existe |
-| **El `id` llega en 0 al crear** | Lo genera la base (`IDENTITY`): no se envía, y la respuesta trae el asignado |
+| **El `id` llega en 0 al crear** | Lo genera la base de datos (`IDENTITY`): no se envía, y la respuesta trae el asignado |
 | **404 en `api/rol_usuario`** | Es `api/rol-usuario`, **con guion**. Y `api/rutarol` **sin** guion. Se lee el `[Route]` |
 | Guardo un `.cs` y no pasa nada | Espere la recompilación; si no, `docker compose restart api-facturas` |
 | **Una interfaz tarda 30 o 50 segundos en mostrar el aviso** | Está cargando los desplegables **en fila**: cada uno espera sus 10 s de *timeout*. Van con `Task.WhenAll`, a la vez |
-| Reset total de la base | `docker compose down -v` y `docker compose up -d` — el script se vuelve a ejecutar |
+| Reset total de la base de datos | `docker compose down -v` y `docker compose up -d` — el script se vuelve a ejecutar |
 
 > **Los cuatro del medio fallan EN SILENCIO**, y es lo que los hace caros: no
 > hay excepción ni error en el log, hay un dato equivocado. Por eso el cierre

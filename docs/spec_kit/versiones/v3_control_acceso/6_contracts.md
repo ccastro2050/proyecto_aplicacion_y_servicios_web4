@@ -152,7 +152,7 @@ diez recursos.**
 | `/api/ruta` | **200** | **403** | **403** |
 | `/api/vendedor` | **200** | **403** | **403** |
 
-**Y calza exactamente con lo que la base dice:**
+**Y calza exactamente con lo que la base de datos dice:**
 
 ```
 Administrador  las 15 rutas

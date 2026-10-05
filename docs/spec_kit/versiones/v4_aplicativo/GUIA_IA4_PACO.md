@@ -117,7 +117,7 @@ líneas qué vas a construir y ESPERA MI CONFIRMACIÓN antes de escribir un
 solo archivo.
 
 PUEDES ESCRIBIR EN: api_facturas/ y front_blazor/
-NO TOQUES: docs/ (solo lectura) ni db/ (la base viene dada)
+NO TOQUES: docs/ (solo lectura) ni db/ (la base de datos viene dada)
 
 LAS TRES CONSULTAS QUE ME TOCAN:
 

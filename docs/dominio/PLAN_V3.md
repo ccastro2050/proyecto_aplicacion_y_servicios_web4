@@ -24,7 +24,7 @@
 | Identificarse devuelve un **token** | `POST /api/sesion` |
 | **Sin token, nada**: 401 en las 70 operaciones | `GET /api/producto` sin cabecera |
 | **Con token y sin permiso**: 403, que es otra cosa | Un rol sin `interfaz.usuarios` pidiendo `/api/usuario` |
-| El permiso lo resuelve **la base**, no C# | `verificar_acceso_ruta` |
+| El permiso lo resuelve **la base de datos**, no C# | `verificar_acceso_ruta` |
 | Quitarle un permiso a un rol **surte efecto ya** | Sin volver a identificarse |
 | El menú **cambia según el rol** | Entrar como `cliente1@correo.com` |
 | Escribir la dirección a mano **tampoco entra** | `/usuarios` en la barra, sin permiso |
@@ -66,7 +66,7 @@ Se decidió lo contrario: **el permiso se consulta en cada petición**.
 |---|---|---|
 | **Costo** | Cero consultas por operación | **Una** consulta por operación |
 | **Quitarle un permiso a un rol** | No surte efecto **hasta que el token venza** | Surte efecto **en la siguiente petición** |
-| **Quién manda** | Lo que se firmó hace una hora | Lo que dice la base **ahora** |
+| **Quién manda** | Lo que se firmó hace una hora | Lo que dice la base de datos **ahora** |
 
 > **Y de ahí sale el criterio 7 de la versión**, que está escrito justamente
 > para forzar esta decisión: *quitarle un permiso a un rol surte efecto sin
@@ -82,7 +82,7 @@ Lo que puede hacer esa persona se pregunta cada vez.
 
 ## 3. La segunda decisión: **el permiso lo resuelve la BASE DE DATOS**
 
-«La base», en este documento y en los demás, es **la base de datos** — el
+«La base de datos», en este documento y en los demás, es **la base de datos** — el
 motor, no una capa del código. Y la frase hay que tomarla literal: el permiso
 no es un `JOIN` escrito en C#. Es **`verificar_acceso_ruta`**, un
 **procedimiento almacenado** que ya estaba en el esquema desde el primer día.
@@ -212,7 +212,7 @@ método:
 
 > **El último merece el párrafo.** La pantalla se abre: eso está bien. El front
 > no es la autoridad y no tiene que fingir que lo es. Lo que no pasa es el
-> dato — y el aviso que la persona ve sale de un 403 que vino de la base.
+> dato — y el aviso que la persona ve sale de un 403 que vino de la base de datos.
 
 ---
 

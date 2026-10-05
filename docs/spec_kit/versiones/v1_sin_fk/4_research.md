@@ -131,6 +131,6 @@ estudiante).
 v1 — `docker compose up -d --build` deja todo funcionando.
 **Por qué:** el Artículo 4 de la constitución ("un solo comando") es
 permanente — y la constitución gana. El compose de v1 ya trae **sus tres
-servicios** —la base, la API y la interfaz gráfica— y **crece por versiones**: la
+servicios** —la base de datos, la API y la interfaz gráfica— y **crece por versiones**: la
 infraestructura también se construye por incrementos, pero ninguna versión
 nace sin su front.

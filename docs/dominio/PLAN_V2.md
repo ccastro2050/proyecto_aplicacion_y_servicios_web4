@@ -32,7 +32,7 @@
 ## 1. De dónde se partió
 
 De una v1 que funciona: seis recursos, tres capas, un comando. **Y de un
-esquema que ya tenía las doce tablas** — las seis de la v2 existían en la base
+esquema que ya tenía las doce tablas** — las seis de la v2 existían en la base de datos
 desde el primer día; lo que no existía era el código que las tocara.
 
 > **Eso cambia la naturaleza del trabajo.** La v2 no «crea» las tablas con clave
@@ -52,11 +52,11 @@ Alguien manda `{"fkcodpersona": "NOEXISTE"}`. ¿Qué responde la API?
 | Opción | El argumento |
 |---|---|
 | **422** | «El dato está mal, y el 422 es para datos malos» |
-| **409** ✅ | **El dato NO está mal: tiene la forma correcta.** `"NOEXISTE"` es un texto de la longitud permitida. Lo que se rompe es el **estado** de la base: esa fila no está |
+| **409** ✅ | **El dato NO está mal: tiene la forma correcta.** `"NOEXISTE"` es un texto de la longitud permitida. Lo que se rompe es el **estado** de la base de datos: esa fila no está |
 
 > **Lo que decide:** el 422 se reserva para lo que la **petición** puede rechazar
 > **sin consultar nada** — un campo que falta, un número negativo, un tipo
-> equivocado. Saber si `P001` existe **exige ir a la base**, y eso ya es estado.
+> equivocado. Saber si `P001` existe **exige ir a la base de datos**, y eso ya es estado.
 >
 > **Y de ahí sale por qué el 409 aparece en la v2 y no antes:** es la primera
 > versión en la que una fila **depende de otra**. En la v1 no había nada que
@@ -130,7 +130,7 @@ Tentador: el formulario ya tiene los renglones, ya sabe sumar.
 | **1** | **El front deserializa el sobre a `List<T>`** | La pantalla sale **vacía, sin un solo error**. La API devuelve `{tabla, limite, total, datos[]}`: hay que entrar a `datos` |
 | **2** | **Dapper mapea por NOMBRE de columna** | Una propiedad que no se llama igual que su columna llega `null` **en silencio**, con HTTP 200 y la celda en blanco. Se arregla con un alias: `SELECT ruta AS RutaTexto` |
 | **3** | **Los nombres que devuelven los procedimientos** | Vienen `nombre_cliente` e `idrol`; las propiedades son `NombreCliente` e `IdRol`. Sin `[JsonPropertyName]` llegan `null` y **0** |
-| **4** | **La cadena vacía de un desplegable opcional** | `""` **no es** `null`. Aquí lo atrapa la anotación y responde **422**; sin esa anotación llegaría a la base y sería un **409** |
+| **4** | **La cadena vacía de un desplegable opcional** | `""` **no es** `null`. Aquí lo atrapa la anotación y responde **422**; sin esa anotación llegaría a la base de datos y sería un **409** |
 | **5** | **Los desplegables cargados EN FILA** | Con la API apagada, cada petición espera sus 10 segundos de *timeout*. `/facturas` pide **cinco** listas: en fila son **50 segundos** en blanco antes del aviso. Con `Task.WhenAll`, **10** |
 
 > **Los cuatro primeros fallan EN SILENCIO, y eso es lo que los hace caros.** No
@@ -164,7 +164,7 @@ desplegable con una opción vacía. Y un desplegable vacío en HTML manda `""`.
 > **Y aquí hay una lección que solo aparece MIDIENDO.** El `3_plan.md` de esta
 > versión decía que la cadena vacía daría **409**, y la API devuelve **422**. Las
 > dos respuestas son defendibles, y la que da es la mejor: `[StringLength(10,
-> MinimumLength = 1)]` atrapa el `""` **en la petición**, antes de que la base se
+> MinimumLength = 1)]` atrapa el `""` **en la petición**, antes de que la base de datos se
 > entere.
 >
 > **O sea que el documento predijo un camino y el código tomó uno más corto.** Lo

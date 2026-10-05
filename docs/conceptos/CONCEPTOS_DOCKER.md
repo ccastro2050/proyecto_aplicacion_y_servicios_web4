@@ -354,7 +354,7 @@ esta secuencia**, en este orden:
 | 4 | **Crea la red** interna para que los contenedores se encuentren por su nombre | `docker network create red` |
 | 5 | **Crea los volúmenes** nombrados donde viven los datos | `docker volume create nombre` |
 | 6 | **Crea y enciende un contenedor por servicio**, con sus puertos, variables y volúmenes | `docker run -d --name … -p … -e … -v … imagen` por cada uno |
-| 7 | **Respeta el orden**: espera a que la base RESPONDA antes de encender la API | No tiene equivalente: habría que mirarlo a ojo |
+| 7 | **Respeta el orden**: espera a que la base de datos RESPONDA antes de encender la API | No tiene equivalente: habría que mirarlo a ojo |
 
 Y todo eso **es repetible**: quien lo corra mañana en otro computador obtiene
 exactamente lo mismo, porque la secuencia no está en la cabeza de nadie sino
@@ -497,7 +497,7 @@ proyecto**, la que tiene el `docker-compose.yml`.
 |---|---|---|
 | **Subir** | `docker compose up -d` | Crea la red, los volúmenes y los contenedores, y los deja corriendo |
 | **Bajar** | `docker compose down` | Apaga y **borra los contenedores y la red**. Los **datos se conservan** |
-| **Bajar y borrar los datos** | `docker compose down -v` | Lo anterior **y borra el volumen**: la base vuelve a cargarse desde cero |
+| **Bajar y borrar los datos** | `docker compose down -v` | Lo anterior **y borra el volumen**: la base de datos vuelve a cargarse desde cero |
 | **Pausar sin desarmar** | `docker compose stop` | Apaga los contenedores pero **la red sigue ocupada** |
 | **Ver qué hay de este proyecto** | `docker compose ps -a` | Los servicios de esta carpeta |
 | **Ver TODO lo encendido** | `docker ps` | De todos los proyectos del computador |
@@ -650,18 +650,18 @@ flowchart LR
 `localhost` y el **puerto publicado**. Los contenedores, en cambio, se hablan
 **por el nombre del servicio**, y ese nombre **solo existe dentro de su propia
 red**: no hay una sola línea entre las dos cajas azules, y no es un olvido del
-dibujo. Parado en `proyecto_php1`, el nombre `mariadb` es la base **de php1**;
+dibujo. Parado en `proyecto_php1`, el nombre `mariadb` es la base de datos **de php1**;
 la de php2 no tiene ahí ningún nombre que valga, aunque se llame igual y aunque
 esté en el mismo computador.
 
 > **Dos precisiones, porque la frase fácil se pasa de larga.**
 >
-> **Dentro de un mismo proyecto, el front SÍ alcanza la base.** Todos los
+> **Dentro de un mismo proyecto, el front SÍ alcanza la base de datos.** Todos los
 > contenedores del compose comparten la red, así que desde el front el nombre
 > `mariadb` resuelve y el puerto 3306 abre. Que el front no lo haga **no es
 > cosa de Docker**: Docker no lo impide. Lo impide la arquitectura por capas, y
 > se sostiene a pulso — y ayuda no darle al front ni las credenciales ni el
-> driver de la base, que es justo lo que hace el `docker-compose.yml` de este
+> driver de la base de datos, que es justo lo que hace el `docker-compose.yml` de este
 > repositorio.
 >
 > **Entre proyectos, lo que bloquea es el NOMBRE, no un muro.** El puerto
@@ -726,7 +726,7 @@ otro proyecto.
 Si quiere verlo en su máquina, con este proyecto levantado:
 
 ```bash
-# ¿«api-facturas» alcanza la base de SU propio proyecto? Le pregunta por el nombre
+# ¿«api-facturas» alcanza la base de datos de SU propio proyecto? Le pregunta por el nombre
 # al DNS interno de Docker. Si responde una IP, la red NO lo está impidiendo:
 # lo único que lo impide es la disciplina de no hacerlo.
 docker compose exec api-facturas getent hosts sqlserver
@@ -739,9 +739,9 @@ docker compose exec api-facturas curl -s -o /dev/null -w "%{http_code}\n" \
     http://host.docker.internal:PUERTO/
 ```
 
-> **La regla que no depende de Docker.** El front no entra a la base: ni a la
+> **La regla que no depende de Docker.** El front no entra a la base de datos: ni a la
 > del otro proyecto ni a la suya propia. Habla con los **controladores** de la
-> API, y ahí se acaba su mundo; quien entra a la base es la API. Acabamos de
+> API, y ahí se acaba su mundo; quien entra a la base de datos es la API. Acabamos de
 > ver que el camino está abierto y que Docker no lo cierra. No se toma igual, y
 > esa es toda la arquitectura por capas: una disciplina, no una reja.
 

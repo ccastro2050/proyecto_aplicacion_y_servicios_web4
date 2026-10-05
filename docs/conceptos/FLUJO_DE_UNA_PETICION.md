@@ -97,7 +97,7 @@ flowchart TD
     D --> E["5. el SERVICIO:<br/>reglas de negocio<br/>(no conoce HTTP)"]
     E -->|"regla rota:<br/>ArgumentException"| E400["400 con su sobre:<br/>estado, mensaje, detalle"]
     E -->|"pasa"| F["6. el REPOSITORIO:<br/>INSERT parametrizado<br/>con @codigo, @nombre, ..."]
-    F --> G{"7. ¿la base de<br/>datos aceptó?"}
+    F --> G{"7. ¿la base de datos de<br/>datos aceptó?"}
     G -->|"PK duplicada · NOT NULL<br/>· conexión caída"| E500["500 con el error del<br/>motor en el detalle"]
     G -->|"sí"| OK["8. la respuesta SUBE<br/>por las mismas capas:<br/>200 estado, mensaje"]
 ```

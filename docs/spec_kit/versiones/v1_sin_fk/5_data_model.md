@@ -65,7 +65,7 @@ public class Producto
 
 - El código de la v1 **solo puede nombrar las SEIS tablas sin clave
   foránea** —`producto`, `empresa`, `persona`, `rol`, `ruta`, `usuario`—. Las
-  otras seis existen en la base pero son territorio de la v2.
+  otras seis existen en la base de datos pero son territorio de la v2.
 - **`usuario` y `rol` SÍ son de esta versión**, aunque sean del control de
   acceso: el criterio es no tener clave foránea, y no la tienen. Lo que llega
   en la v3 **no es su CRUD** —ese es este— sino la sesión y el permiso.

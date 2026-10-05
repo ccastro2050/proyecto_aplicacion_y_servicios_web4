@@ -29,7 +29,7 @@ hacer cualquier cosa. **Eso es lo que la v3 arregla.**
 |---|---|---|
 | **1** | **La contraseña deja de viajar en claro**: se guarda con un hash y se verifica contra el hash | Sin esto, lo demás es decoración: da igual quién entre si la clave está a la vista |
 | **2** | **La sesión**: quien se identifica recibe un token (JWT) que acompaña cada petición | Es lo que permite que la segunda petición sepa quién hizo la primera |
-| **3** | **El permiso**: cada operación comprueba si el rol de ese usuario puede entrar a esa interfaz | Es `verificar_acceso_ruta`, y ya está en la base |
+| **3** | **El permiso**: cada operación comprueba si el rol de ese usuario puede entrar a esa interfaz | Es `verificar_acceso_ruta`, y ya está en la base de datos |
 
 ## 2. Alcance
 
@@ -70,7 +70,7 @@ hacer cualquier cosa. **Eso es lo que la v3 arregla.**
 | **Al editar** | Si el campo llega **vacío**, la contraseña **no se cambia**. Vacío significa «déjela como está», no «bórrela» |
 | **Qué nunca sale** | El hash tampoco se devuelve en el JSON. Un `GET /api/usuario` no trae la columna |
 
-> **La semilla de la base tiene contraseñas en claro.** Cerrar la v3 implica
+> **La semilla de la base de datos tiene contraseñas en claro.** Cerrar la v3 implica
 > volver a sembrarlas con hash — y eso se hace **en el script**, no a mano.
 
 ### RF2 — Identificarse devuelve un token
@@ -96,7 +96,7 @@ tiene.
 > **El 401 y el 403 no son lo mismo**, y confundirlos es el error clásico:
 > **401 es «no sé quién es usted»; 403 es «sé quién es, y no puede»**.
 
-### RF4 — El permiso lo decide la base
+### RF4 — El permiso lo decide la base de datos
 
 La comprobación usa **`verificar_acceso_ruta`**, que ya existe y cruza
 `usuario → rol_usuario → rutarol`.

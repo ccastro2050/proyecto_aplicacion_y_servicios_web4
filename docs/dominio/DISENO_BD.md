@@ -42,7 +42,7 @@ Doce tablas en cuatro grupos:
 
 > **La participación total es la que se olvida**, y es la que produce datos
 > huérfanos. «Todo renglón pertenece a una factura» no es cardinalidad: es que
-> `fknumfactura` es `NOT NULL`. Si fuera opcional, la base aceptaría renglones
+> `fknumfactura` es `NOT NULL`. Si fuera opcional, la base de datos aceptaría renglones
 > que no son de nadie, y nadie los vería nunca más.
 
 ### La decisión que define el modelo: `cliente` y `vendedor` aparte
@@ -102,7 +102,7 @@ media factura no existe. Ver [`PRINCIPIOS_ACID.md`](../conceptos/PRINCIPIOS_ACID
 |---|---|---|---|
 | `producto` · `empresa` · `persona` | `codigo` NVARCHAR(10) | **quien crea la fila** | Son códigos del negocio: `PR001`, `E001`. La gente los dice en voz alta |
 | `usuario` | `email` | quien crea la fila | El correo ya identifica a la persona; un `id` aparte sería un dato más que mantener |
-| `rol` · `ruta` · `cliente` · `vendedor` · `factura` | `id` / `numero` INT **IDENTITY** | **la base** | No hay un código natural. Inventarlo sería pedirle a alguien que lleve la cuenta |
+| `rol` · `ruta` · `cliente` · `vendedor` · `factura` | `id` / `numero` INT **IDENTITY** | **la base de datos** | No hay un código natural. Inventarlo sería pedirle a alguien que lleve la cuenta |
 | `productosporfactura` | `(fknumfactura, fkcodproducto)` | — | **Compuesta**: el renglón *es* esa pareja |
 | `rol_usuario` · `rutarol` | las dos columnas | — | Igual: una asignación existe o no existe |
 
@@ -115,7 +115,7 @@ media factura no existe. Ver [`PRINCIPIOS_ACID.md`](../conceptos/PRINCIPIOS_ACID
 | Columna | Tipo | Por qué ése |
 |---|---|---|
 | `valorunitario` · `subtotal` · `total` · `credito` | `DECIMAL(18,2)` | **Nunca `FLOAT` para dinero.** `0.1 + 0.2` en coma flotante no da `0.3`, y en una factura eso es un centavo que nadie encuentra |
-| `fecha` | `DATETIME2` con `DEFAULT GETDATE()` | La pone la base. Si la mandara el cliente, dependería del reloj de su máquina |
+| `fecha` | `DATETIME2` con `DEFAULT GETDATE()` | La pone la base de datos. Si la mandara el cliente, dependería del reloj de su máquina |
 | `estado` | `NVARCHAR(10)` con `DEFAULT N'activa'` | Dos valores: `activa` y `anulada` |
 | `contrasena` | `NVARCHAR(200)` | Guarda el **hash**, no la clave. 200 deja espacio para un algoritmo futuro más largo |
 
@@ -144,7 +144,7 @@ son el mismo caso:
 | `trg_prodfact_update` | al cambiar un renglón | Lo mismo, ajustando la diferencia |
 | `trg_prodfact_delete` | al quitar un renglón | **Devuelve** el stock · recalcula el `total` |
 
-> **Por qué en la base y no en C#.** Porque la regla tiene que valer también para
+> **Por qué en la base de datos y no en C#.** Porque la regla tiene que valer también para
 > quien entre por SSMS. Una validación que solo vive en la aplicación protege a
 > quien pasa por la aplicación.
 
@@ -154,7 +154,7 @@ son el mismo caso:
 |---|---|---|
 | `productosporfactura` → `factura` | **CASCADE** | Un renglón sin su factura no significa nada |
 | `rutarol` → `ruta` y → `rol` | **CASCADE** | Una asignación a un rol que ya no existe tampoco |
-| `factura` → `cliente` / `vendedor` | **sin cascada** | Borrar un cliente **no** puede llevarse sus facturas. La base lo impide, y está bien que lo impida |
+| `factura` → `cliente` / `vendedor` | **sin cascada** | Borrar un cliente **no** puede llevarse sus facturas. La base de datos lo impide, y está bien que lo impida |
 | `productosporfactura` → `producto` | **sin cascada** | Igual: un producto vendido no se puede borrar |
 
 > **Esos dos «sin cascada» son una decisión, no un olvido.** Significan que un

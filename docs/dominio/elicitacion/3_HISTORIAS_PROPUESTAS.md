@@ -101,7 +101,7 @@ mirarlo.
 > **Si esto bloqueara, habría inventario que no se puede vender** — que es
 > exactamente lo contrario de lo que don Hernán pidió.
 
-**Qué haría falta en la base:** una columna `stock_minimo` en `producto`. Es el
+**Qué haría falta en la base de datos:** una columna `stock_minimo` en `producto`. Es el
 cambio más pequeño de las cinco historias, y el que más resuelve del problema
 original.
 
@@ -187,7 +187,7 @@ documentada** del front. Es la historia más honesta de las cinco: nace de haber
 usado el sistema, no de haber imaginado un usuario.
 
 **Por qué pasa:** Blazor Server mantiene el estado de la pantalla en un
-**circuito** en el servidor. Los renglones viven ahí, no en la base. Si el
+**circuito** en el servidor. Los renglones viven ahí, no en la base de datos. Si el
 circuito se corta —un F5, una red que se cae—, **el borrador se pierde**.
 
 | Criterio de aceptación | |
@@ -205,7 +205,7 @@ circuito se corta —un F5, una red que se cae—, **el borrador se pierde**.
 > **Y lo que esta historia destapa es una consecuencia de la tecnología, no un
 > descuido.** Blazor Server guarda el estado de la pantalla en el **circuito**
 > del servidor; si el circuito se corta, se va. Para que el borrador sobreviviera
-> habría que guardarlo en otra parte —la sesión, el navegador o la base—, y eso
+> habría que guardarlo en otra parte —la sesión, el navegador o la base de datos—, y eso
 > es trabajo que nadie ha hecho. Ver [`ARQUITECTURA.md`](../ARQUITECTURA.md) §6.
 >
 > **Es la mejor lección disponible sobre «elegir una tecnología es elegir sus

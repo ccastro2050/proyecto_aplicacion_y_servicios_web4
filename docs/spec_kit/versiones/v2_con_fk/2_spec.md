@@ -34,7 +34,7 @@ claves foráneas no existen:
 | | Qué aparece | Por qué la v1 no lo tenía |
 |---|---|---|
 | **1** | **La dependencia entre filas.** Un cliente no existe sin su persona, y el motor lo hace cumplir | Ninguna de las seis tablas de la v1 tenía clave foránea: no había nada que violar |
-| **2** | **La lógica que vive en la base.** `factura` es maestro-detalle, y sus reglas pesadas —subtotales, total, stock— las hacen **procedimientos almacenados y un disparador**, no C# | La v1 era SQL plano: un `SELECT` por operación |
+| **2** | **La lógica que vive en la base de datos.** `factura` es maestro-detalle, y sus reglas pesadas —subtotales, total, stock— las hacen **procedimientos almacenados y un disparador**, no C# | La v1 era SQL plano: un `SELECT` por operación |
 | **3** | **El desplegable en vez del campo de texto.** La clave foránea se **elige** de una lista traída de la API | Sin claves foráneas no había nada que elegir |
 
 ```
@@ -73,7 +73,7 @@ claves foráneas no existen:
   puente necesita y nada más: listar por los dos lados, agregar una pareja y
   quitarla **con sus dos claves**.
 - **`api/usuario-con-roles`**: el usuario **y** sus roles como una sola
-  operación, con los cinco procedimientos que la base ya trae. No es una tabla
+  operación, con los cinco procedimientos que la base de datos ya trae. No es una tabla
   nueva — es otra forma de operar `usuario` y `rol_usuario`.
 - **Un código HTTP nuevo: el 409.** Clave foránea inexistente, pareja
   repetida, factura ya anulada.
@@ -86,7 +86,7 @@ claves foráneas no existen:
 | | Dónde está |
 |---|---|
 | **Token, sesión, 401 y 403** | La **v3**. Ojo con la confusión: el **CRUD** de `rol_usuario` y `rutarol` **sí es de esta versión** —tienen clave foránea—. Lo que llega en la v3 **no es su CRUD: es la puerta**. Administrar los permisos y *hacerlos valer* son dos cosas distintas |
-| **Editar o borrar físicamente una factura** | En ninguna. `sp_actualizar_factura_y_productosporfactura` y `sp_borrar_…` **existen en la base** y la API **no los expone**: la operación del negocio es **anular** |
+| **Editar o borrar físicamente una factura** | En ninguna. `sp_actualizar_factura_y_productosporfactura` y `sp_borrar_…` **existen en la base de datos** y la API **no los expone**: la operación del negocio es **anular** |
 | **Consultas multitabla, tablero, marca, publicación** | La **v4** |
 | **Otros motores y la fábrica** | La **v5**, después del curso |
 
@@ -95,11 +95,11 @@ claves foráneas no existen:
 ### RF1 — CRUD de `cliente`, con dos claves foráneas
 
 Los seis endpoints del molde sobre `/api/cliente`, con PK **entera generada
-por la base** (`IDENTITY`) y dos claves foráneas.
+por la base de datos** (`IDENTITY`) y dos claves foráneas.
 
 | Campo | Regla |
 |---|---|
-| `id` | **Lo genera la base.** No se envía al crear, y enviarlo no lo cambia |
+| `id` | **Lo genera la base de datos.** No se envía al crear, y enviarlo no lo cambia |
 | `credito` | Decimal, no negativo |
 | `fkcodpersona` | **Obligatoria** → `persona.codigo` |
 | `fkcodempresa` | **Opcional y nullable** → `empresa.codigo`. Un cliente puede ser persona natural |
@@ -115,7 +115,7 @@ obligatoria, porque un vendedor siempre es una persona—.
 
 **El requisito que sirve para ver la integridad referencial en acción:**
 borrar una `persona` que ya es vendedor tiene que **fallar**, con el nombre de
-la restricción del motor en el `detalle`. La base protege sus relaciones, y
+la restricción del motor en el `detalle`. La base de datos protege sus relaciones, y
 eso no se programa: ya está.
 
 ### RF3 — `factura`: cuatro operaciones, todas por procedimiento
@@ -138,7 +138,7 @@ eso no se programa: ya está.
 > **Por qué así, y no con tres `INSERT` desde C#:** porque entonces la
 > transacción la tendría que manejar la API, y el día que alguien cambie la
 > regla del total habría que cambiarla en dos sitios. Si un número sale mal, el
-> error se busca **en la base**, no en el servicio.
+> error se busca **en la base de datos**, no en el servicio.
 
 ### RF4 — Las dos tablas puente, con lo que una puente necesita
 
@@ -154,7 +154,7 @@ interfaz). Las dos tienen **clave primaria compuesta** y ningún campo propio.
 
 ### RF5 — `api/usuario-con-roles`: el usuario Y sus roles, en una operación
 
-Los cinco procedimientos que la base ya trae:
+Los cinco procedimientos que la base de datos ya trae:
 `listar_usuarios_con_roles`, `consultar_usuario_con_roles`,
 `crear_usuario_con_roles`, `actualizar_usuario_con_roles` y
 `eliminar_usuario_con_roles`.
@@ -234,8 +234,8 @@ varios—. Un solo envío.
 - **RNF1 — Los de la v1 siguen todos:** capas estrictas, sin ORM, SQL
   parametrizado, `async`, errores uniformes.
 - **RNF2 — La lógica de facturación NO se duplica en C#.** Ni subtotales, ni
-  total, ni stock. Si un número sale mal, el error está en la base.
-- **RNF3 — Los errores de la base también son contrato.** El repositorio
+  total, ni stock. Si un número sale mal, el error está en la base de datos.
+- **RNF3 — Los errores de la base de datos también son contrato.** El repositorio
   traduce los `RAISE EXCEPTION` de los procedimientos —todos llegan con
   `el número de error P0001`, sin número— **por patrón del mensaje**: «no existe» → 404,
   «anulada» → 409. Las señales de error del motor son parte de la interfaz.
@@ -248,7 +248,7 @@ varios—. Un solo envío.
 | | |
 |---|---|
 | **1** | **Regresión:** `docker compose up -d --build` —un comando— y la prueba de humo **de la v1** pasa completa, con lo único cambiado siendo `"version":"v2"` |
-| **2** | **`cliente`, los cinco verbos** con su `id` generado por la base, y la pareja didáctica: el **mismo** cuerpo da **422** en PUT y **200** en PATCH |
+| **2** | **`cliente`, los cinco verbos** con su `id` generado por la base de datos, y la pareja didáctica: el **mismo** cuerpo da **422** en PUT y **200** en PATCH |
 | **3** | **El 409 de la clave foránea:** crear un cliente con un `fkcodpersona` inexistente responde **409** — y un cliente **sin** empresa se crea con `fkcodempresa: null` |
 | **4** | **`vendedor`, los cinco verbos**, y **borrar la persona de un vendedor falla** con el nombre de la restricción del motor en el `detalle` |
 | **5** | **Lectura maestro-detalle:** `GET /api/factura` trae las facturas sembradas con los **nombres** de cliente y vendedor y sus renglones **anidados**; una inexistente → **404** |
@@ -290,11 +290,11 @@ varios—. Un solo envío.
 
 | # | La pregunta | La respuesta, con su razón | Dónde quedó |
 |---|---|---|---|
-| C1 | La clave foránea inexistente, ¿422 o 409? | **409.** El dato tiene la forma correcta —es un texto válido— y lo que se rompe es el **estado** de la base. El 422 se reserva para el cuerpo mal formado | RF1 · contrato de `cliente` |
+| C1 | La clave foránea inexistente, ¿422 o 409? | **409.** El dato tiene la forma correcta —es un texto válido— y lo que se rompe es el **estado** de la base de datos. El 422 se reserva para el cuerpo mal formado | RF1 · contrato de `cliente` |
 | C2 | `fkcodempresa` sin empresa, ¿cadena vacía o `null`? | **`null`.** La columna es nullable; `""` sería un código de empresa que no existe, y daría 409 | RF1 · RF7 |
 | C3 | Una factura equivocada, ¿se borra o se anula? | Se **anula**: borrado lógico que devuelve el stock. Es un hecho contable; borrarla perdería la trazabilidad | RF3 · contrato de anular |
 | C4 | Anular dos veces la misma factura, ¿qué responde? | **409.** La factura existe (no es 404) y el cuerpo está bien (no es 422): el conflicto es de **estado** | RF3 |
-| C5 | El total de la factura, ¿lo manda el front o lo calcula la base? | **La base**, con su disparador. Dos fuentes de verdad para un número es garantía de que un día no coincidan | RF3 · RF8 |
+| C5 | El total de la factura, ¿lo manda el front o lo calcula la base de datos? | **La base de datos**, con su disparador. Dos fuentes de verdad para un número es garantía de que un día no coincidan | RF3 · RF8 |
 | C6 | El detalle de la factura, ¿se envía renglón por renglón o junto? | **Junto, en un solo envío.** Renglón por renglón, un fallo a mitad deja una factura incompleta — y la transacción del procedimiento no sirve de nada | RF8 · criterio 13 |
 | C7 | ¿Por qué un recurso `usuario-con-roles` si ya hay `usuario` y `rol-usuario`? | Porque crear el usuario y asignarle los roles son **dos** operaciones, y si falla la segunda queda un usuario sin rol. Los tres recursos se quedan: administran cosas distintas | RF5 |
 | C8 | La contraseña vacía al editar, ¿la borra o la deja? | **La deja.** Vacío significa «no la cambie». Lo contrario haría que cambiar un rol borrara la clave | RF5 · RF9 |

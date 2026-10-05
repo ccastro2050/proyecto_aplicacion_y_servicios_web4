@@ -1,7 +1,7 @@
 # Glosario — Facturación (`bdfacturas`)
 
 > **Qué es este archivo.** El vocabulario del dominio: cada término con **una
-> sola** definición, y el nombre exacto que lleva en la base, en la API y en la
+> sola** definición, y el nombre exacto que lleva en la base de datos, en la API y en la
 > interfaz. Cuando los tres no coinciden, aquí se dice cuál manda.
 >
 > **Qué es un glosario y por qué no es una lista de palabras bonitas:**
@@ -24,7 +24,7 @@ Cada término trae cuatro cosas, y las cuatro hacen falta:
 |---|---|
 | **Término** | La palabra en castellano, como la dice el negocio |
 | **Definición** | Qué es, sin usar la propia palabra y sin decir cómo se implementa |
-| **En la base** | El nombre exacto de la tabla o la columna |
+| **En la base de datos** | El nombre exacto de la tabla o la columna |
 | **En la API** | La ruta o el campo JSON |
 
 > **La cuarta columna es la que evita el 404.** La tabla se llama `rol_usuario`
@@ -35,7 +35,7 @@ Cada término trae cuatro cosas, y las cuatro hacen falta:
 
 ## 2. Las personas y las empresas
 
-| Término | Definición | En la base | En la API |
+| Término | Definición | En la base de datos | En la API |
 |---|---|---|---|
 | **Persona** | Ser humano identificado por un código, con nombre, correo y teléfono. **No** es todavía ni cliente ni vendedor: es el dato de la persona | `persona` | `/api/persona` |
 | **Empresa** | Compañía a la que puede pertenecer un cliente. Solo tiene código y nombre | `empresa` | `/api/empresa` |
@@ -57,19 +57,19 @@ Cada término trae cuatro cosas, y las cuatro hacen falta:
 
 ## 3. La factura y su detalle
 
-| Término | Definición | En la base | En la API |
+| Término | Definición | En la base de datos | En la API |
 |---|---|---|---|
 | **Factura** | Documento que registra una venta: a quién, quién vendió, cuándo y por cuánto. Es el **maestro** | `factura` | `/api/factura` |
 | **Renglón** | Una línea de la factura: qué producto y cuántas unidades. Es el **detalle** | `productosporfactura` | el arreglo `productos` |
 | **Producto** | Artículo que se vende, con su precio y sus unidades disponibles | `producto` | `/api/producto` |
-| **Stock** | Unidades disponibles de un producto. **Lo mueve la base, no la API** | `producto.stock` | `stock` |
+| **Stock** | Unidades disponibles de un producto. **Lo mueve la base de datos, no la API** | `producto.stock` | `stock` |
 | **Valor unitario** | Precio de UNA unidad del producto **hoy** | `producto.valorunitario` | `valorunitario` |
 | **Subtotal** | `cantidad × valor unitario` **en el momento en que se emitió la factura**. Se guarda, no se recalcula | `productosporfactura.subtotal` | `subtotal` |
 | **Total** | Suma de los subtotales de la factura. Lo calcula un disparador | `factura.total` | `total` |
 | **Estado** | `activa` o `anulada`. No hay otros | `factura.estado` | `estado` |
 | **Anular** | Dejar la factura sin efecto **conservando la fila**, con su número y su fecha, y devolviendo el stock a los productos | — | `POST /api/factura/{n}/anular` |
 
-> **«Renglón» no existe como palabra en la base, y es deliberado.** La tabla se
+> **«Renglón» no existe como palabra en la base de datos, y es deliberado.** La tabla se
 > llama `productosporfactura` porque así llegó el esquema. En la conversación,
 > en la interfaz y en este glosario se dice **renglón**, que es como lo llama
 > quien factura. El glosario existe justamente para que esa diferencia esté
@@ -84,10 +84,10 @@ Cada término trae cuatro cosas, y las cuatro hacen falta:
 
 ## 4. El control de acceso
 
-| Término | Definición | En la base | En la API |
+| Término | Definición | En la base de datos | En la API |
 |---|---|---|---|
 | **Usuario** | Quien puede entrar al sistema, identificado por su correo | `usuario` | `/api/usuario` |
-| **Contraseña** | La clave de un usuario. **En la base vive cifrada**, nunca en claro, y no sale en ninguna respuesta | `usuario.contrasena` | solo de entrada |
+| **Contraseña** | La clave de un usuario. **En la base de datos vive cifrada**, nunca en claro, y no sale en ninguna respuesta | `usuario.contrasena` | solo de entrada |
 | **Rol** | Papel que agrupa permisos: `Administrador`, `Vendedor`, `Cajero`, `Contador`, `Cliente` | `rol` | `/api/rol` |
 | **Ruta** | Una interfaz o acción que se puede proteger. Es un dato, no una dirección de la API | `ruta` | `/api/ruta` |
 | **Permiso** | Que un rol tenga concedida una ruta | `rutarol` | `/api/rutarol` |

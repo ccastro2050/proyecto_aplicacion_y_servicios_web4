@@ -65,11 +65,11 @@ Alguien manda `{"fkcodpersona": "NOEXISTE"}`. ¿Qué responde la API?
 | | El argumento |
 |---|---|
 | **422** | «El dato está mal, y el 422 es para datos malos» |
-| **409** ✅ | **El dato NO está mal: tiene la forma correcta.** Lo que se rompe es el **estado** de la base: esa fila no está |
+| **409** ✅ | **El dato NO está mal: tiene la forma correcta.** Lo que se rompe es el **estado** de la base de datos: esa fila no está |
 
 > **Lo que decide:** el 422 se reserva para lo que la petición puede rechazar
 > **sin consultar nada** — un campo que falta, un número negativo, un tipo
-> equivocado. Saber si `P001` existe **exige ir a la base**, y eso ya es estado.
+> equivocado. Saber si `P001` existe **exige ir a la base de datos**, y eso ya es estado.
 >
 > **Y de ahí sale por qué el 409 aparece en la v2 y no antes:** es la primera
 > versión en la que una fila **depende de otra**. En la v1 no había nada que
@@ -156,7 +156,7 @@ entra por **Pull Request**. Solo Carlos fusiona.
 | `db/bdfacturas.sql` | **Viene dado.** Las tablas y los procedimientos **ya existen** |
 
 > **Esto último es nuevo y conviene subrayarlo:** los seis procedimientos de
-> `factura` **ya están en la base** desde la v1. La IA **no los escribe**: los
+> `factura` **ya están en la base de datos** desde la v1. La IA **no los escribe**: los
 > llama. Si propone crear un `CREATE PROCEDURE`, está contradiciendo el Artículo 5.
 
 ---

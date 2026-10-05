@@ -139,7 +139,7 @@ entonces usted ya sabrá qué es lo que hace, porque lo escribió.
 | Tipo | Qué prueba | Necesita | Velocidad |
 |---|---|---|---|
 | **Unitaria** | Una pieza sola: un método, una regla | Nada más | Milisegundos |
-| **De integración** | Dos o más piezas juntas: el servicio **con** la base | La base corriendo | Segundos |
+| **De integración** | Dos o más piezas juntas: el servicio **con** la base de datos | La base de datos corriendo | Segundos |
 | **De extremo a extremo** | El sistema completo, como lo usa una persona | Todo levantado | Minutos |
 
 La **pirámide de pruebas** —la idea la popularizó Mike Cohn— dice que
@@ -152,13 +152,13 @@ de extremo a extremo, sabe que *algo* de veinte piezas está mal.
 
 > **En este proyecto:** la prueba de capas es **unitaria** (el servicio con un
 > repositorio falso), y el *smoke test* del `7_quickstart.md` es de **extremo
-> a extremo** (la API de verdad, contra la base de verdad).
+> a extremo** (la API de verdad, contra la base de datos de verdad).
 
 ---
 
 ## 4. El doble de prueba: por qué existe el repositorio falso
 
-Para probar el **servicio** —donde viven las reglas— no hace falta la base de
+Para probar el **servicio** —donde viven las reglas— no hace falta la base de datos de
 datos. Se le pasa en su lugar una pieza falsa que cumple la misma interfaz:
 
 ```csharp
@@ -171,13 +171,13 @@ polimorfismo haciendo su trabajo.
 
 **Qué se gana:**
 
-| | Con la base | Con el doble |
+| | Con la base de datos | Con el doble |
 |---|---|---|
 | Tiempo | Segundos | Milisegundos |
 | ¿Hay que levantar algo? | Sí | No |
-| Si falla, ¿de quién es la culpa? | Puede ser de la base, de la red o del código | **Del código** |
+| Si falla, ¿de quién es la culpa? | Puede ser de la base de datos, de la red o del código | **Del código** |
 
-Y hay algo más importante: **si su servicio NO se puede probar sin la base,
+Y hay algo más importante: **si su servicio NO se puede probar sin la base de datos,
 las capas están mal cortadas.** La prueba de capas no solo verifica reglas —
 verifica la arquitectura. Por eso es el criterio 6 de la v1.
 

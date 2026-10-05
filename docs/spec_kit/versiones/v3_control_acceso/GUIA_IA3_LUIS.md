@@ -20,7 +20,7 @@ muestra bien** — y, peor, la van a sufrir si la muestra mal.
 |---|---|
 | **Entrar** | Pide correo y contraseña, guarda el token |
 | **El menú** | Muestra **solo** lo que ese rol puede abrir |
-| **Permisos** | Reparte rutas a roles, sin tocar la base a mano |
+| **Permisos** | Reparte rutas a roles, sin tocar la base de datos a mano |
 
 ---
 
@@ -84,12 +84,12 @@ permiso.eliminar     ruta.crear           ruta.eliminar
 | Prohibido | Por qué |
 |---|---|
 | Hablar con la base de datos | Artículo 3. Solo HTTP contra la API |
-| **Decidir** si alguien tiene permiso | Eso lo decide la base. El front **pregunta y obedece** |
+| **Decidir** si alguien tiene permiso | Eso lo decide la base de datos. El front **pregunta y obedece** |
 | Guardar la contraseña | Guarda **el token**, y nada más |
 
 > **El front nunca calcula un permiso.** Le pregunta a la API qué puede abrir
 > este usuario, y pinta eso. Si usted arma la lógica de roles en C# del lado del
-> front, cuando alguien cambie un permiso en la base el menú va a mentir.
+> front, cuando alguien cambie un permiso en la base de datos el menú va a mentir.
 
 ---
 
@@ -158,7 +158,7 @@ TRES COSAS QUE NO SE NEGOCIAN:
 
   1. EL FRONT NO DECIDE PERMISOS. Pregunta y obedece. Si armas la lógica
      de roles en C# del lado del front, el día que alguien cambie un
-     permiso en la base el menú va a mentir.
+     permiso en la base de datos el menú va a mentir.
 
   2. ESCONDER NO ES PROTEGER. El menú oculta lo que no se puede abrir
      para que la interfaz sea cómoda; quien de verdad rechaza es la API
@@ -251,7 +251,7 @@ Start-Process http://localhost:8099/
 > castellano.
 
 ```powershell
-# 7 · Y que el front no toque la base. Tiene que dar 0.
+# 7 · Y que el front no toque la base de datos. Tiene que dar 0.
 Select-String -Path front_blazor\**\*.cs,front_blazor\**\*.razor `
   -Pattern 'SqlConnection|Npgsql' | Measure-Object | Select-Object Count
 ```

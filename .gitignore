@@ -8,3 +8,6 @@ obj/
 # Archivos de usuario de IDEs
 *.user
 .vs/
+
+# Los documentos del aula viven en .md: el .docx se desfasaba y nadie avisaba
+*.docx

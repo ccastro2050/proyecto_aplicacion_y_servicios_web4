@@ -255,7 +255,7 @@ Los que ya trabajan en este código:
 |---|---|---|
 | **Repositorio** (Repository) | arquitectónico (PoEAA) | `Repositorios/`: todo el acceso a datos detrás de una interfaz |
 | **Inyección de dependencias** | creacional (IoC) | los constructores + el ensamblador de `Program.cs` |
-| **Fábrica abstracta** (Abstract Factory) | creacional (GoF) | `Fabricas/` (v4): la familia completa de repositorios por motor |
+| **Fábrica abstracta** (Abstract Factory) | creacional (GoF) | `Fabricas/` (**v5**): la familia completa de repositorios por motor |
 | **DTO** — objeto de petición | arquitectónico (PoEAA) | `Peticiones/`: un objeto por verbo que valida la forma del body |
 | **Estrategia** (Strategy) | comportamiento (GoF) | implícito: implementaciones intercambiables tras cada interfaz |
 
@@ -266,7 +266,7 @@ Los que ya trabajan en este código:
 Task<Producto?> ObtenerPorCodigoAsync(string codigo);
 
 // ServicioProducto lo usa SIN saber si detrás hay SQL Server, PostgreSQL
-// o un diccionario en memoria (las pruebas). Por eso la v4 pudo cambiar
+// o un diccionario en memoria (las pruebas). Por eso la v5 pudo cambiar
 // de motor sin tocarlo.
 ```
 
@@ -280,7 +280,7 @@ public ServicioProducto(IRepositorioProducto repositorio) { … }
 builder.Services.AddScoped<IServicioProducto, ServicioProducto>();
 ```
 
-### Fábrica abstracta — UNA decisión, la familia completa (v4)
+### Fábrica abstracta — UNA decisión, la familia completa (v5)
 
 ```csharp
 // Un punto del código decide el motor…
@@ -290,10 +290,27 @@ IFabricaRepositorios fabrica = motor switch
     "postgres"  => new FabricaPostgres(cadenaPostgres),
     _ => throw new InvalidOperationException($"Motor desconocido: '{motor}'."),
 };
-// …y la fábrica entrega los 11 repositorios COHERENTES entre sí:
+// …y la fábrica entrega los 14 repositorios COHERENTES entre sí:
 builder.Services.AddScoped<IRepositorioProducto>(_ => fabrica.CrearRepositorioProducto());
-// Agregar MariaDB (v5) costará UNA clase y UN case — eso compra el patrón.
+// Agregar un TERCER motor costaria UNA clase mas y UN case — eso compra el patron.
 ```
+
+> **¿Y por qué hace falta una fábrica, si ya hay inyección de dependencias?**
+> Porque son dos cosas distintas y resuelven problemas distintos:
+>
+> | | Qué resuelve |
+> |---|---|
+> | **Inyección de dependencias** | que una clase **no se fabrique sola** lo que necesita: lo recibe por constructor |
+> | **Fábrica abstracta** | que la decisión de **cuál** implementación se entrega se tome **en un solo sitio, en tiempo de ejecución, y de forma COHERENTE** |
+>
+> **La palabra que la define es «familia».** Sin fábrica, `Program.cs` tendría
+> catorce líneas eligiendo motor, y nada impediría que la catorceava se quedara
+> en SQL Server mientras las otras trece pasaron a PostgreSQL — **un sistema
+> mitad en un motor y mitad en otro**, que compila y arranca.
+>
+> **La fábrica lo hace imposible:** se escoge **una vez**, y de ahí salen los
+> catorce **del mismo motor**. Eso es lo que significa que entregue una
+> «familia» y no objetos sueltos.
 
 ### DTO por verbo — el body aterriza en un objeto que solo valida forma
 
@@ -321,10 +338,10 @@ mismo: quien usa la interfaz jamás pregunta cuál implementación le tocó.
 | Principio | Se ve desde | Se termina de demostrar en |
 |---|---|---|
 | S | v1 (una clase por responsabilidad) | v2 (más entidades, mismas responsabilidades) |
-| O | v1 (la interfaz existe) | **v4** (segundo motor sin tocar lo construido — cumplido) |
-| L | v1 (el repositorio falso de las pruebas) | **v4** (motores intercambiables de verdad — cumplido) |
-| I | v1 (interfaces mínimas) | v3 (los puentes: contratos sin verbos que no aplican) |
-| D | v1 (constructores reciben interfaces) | **v4** (la fábrica reemplazó al ensamblador simple — cumplido) |
+| O | v1 (la interfaz existe) | **v5** (segundo motor sin tocar lo construido — cumplido) |
+| L | v1 (el repositorio falso de las pruebas) | **v5** (motores intercambiables de verdad — cumplido) |
+| I | v1 (interfaces mínimas) | **v2** (los puentes: contratos sin verbos que no aplican) |
+| D | v1 (constructores reciben interfaces) | **v5** (la fábrica reemplazó al ensamblador simple — cumplido) |
 
 ## 5. Referencias
 

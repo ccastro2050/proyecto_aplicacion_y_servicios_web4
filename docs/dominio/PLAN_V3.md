@@ -80,17 +80,58 @@ Lo que puede hacer esa persona se pregunta cada vez.
 
 ---
 
-## 3. La segunda decisión: **el permiso lo resuelve la base**
+## 3. La segunda decisión: **el permiso lo resuelve la BASE DE DATOS**
 
-El permiso no es un `JOIN` escrito en C#. Es
-**`verificar_acceso_ruta`**, un procedimiento que ya estaba en el esquema
-desde el primer día.
+«La base», en este documento y en los demás, es **la base de datos** — el
+motor, no una capa del código. Y la frase hay que tomarla literal: el permiso
+no es un `JOIN` escrito en C#. Es **`verificar_acceso_ruta`**, un
+**procedimiento almacenado** que ya estaba en el esquema desde el primer día.
+
+**La cadena completa, archivo por archivo:**
+
+| # | Quién | Qué hace |
+|---|---|---|
+| 1 | [`ExigePermisoAttribute.cs`](../../api_facturas/Autorizacion/ExigePermisoAttribute.cs) | Saca el correo del token y **pregunta** |
+| 2 | [`IRepositorioAcceso`](../../api_facturas/Repositorios/IRepositorioAcceso.cs) | `Task<bool> TieneAccesoAsync(email, ruta)` — una interfaz, sin SQL |
+| 3 | `RepositorioAccesoSqlServer` / `…Postgres` | Traduce el nombre de la ruta a su `id` y **ejecuta el procedimiento** |
+| 4 | **`verificar_acceso_ruta`**, en el motor | **Aquí está el `JOIN`** de tres tablas, y aquí se decide |
+
+**El `JOIN` que decide, tal como está en el motor:**
+
+```sql
+IF EXISTS (
+    SELECT 1
+    FROM usuario u
+    INNER JOIN rol_usuario ur ON u.email = ur.fkemail
+    INNER JOIN rutarol rr    ON ur.fkidrol = rr.fkidrol
+    WHERE u.email = @p_email AND rr.fkidruta = @p_fkidruta
+)
+    SET @v_tiene_acceso = 1;
+```
+
+> **Y se puede comprobar sin la API encendida**, que es la prueba de que la
+> regla no vive en C#. Contra el motor, directo:
+>
+> ```sql
+> CALL verificar_acceso_ruta('admin@correo.com',    2, NULL);
+> -- {"tiene_acceso" : true,  "email" : "admin@correo.com",    "fkidruta" : 2}
+> CALL verificar_acceso_ruta('cliente1@correo.com', 2, NULL);
+> -- {"tiene_acceso" : false, "email" : "cliente1@correo.com", "fkidruta" : 2}
+> ```
+>
+> La ruta 2 es `interfaz.usuarios`. **Nadie levantó la API para obtener esas
+> dos respuestas.**
 
 | | |
 |---|---|
-| **Dónde está la regla** | En la base: `usuario → rol_usuario → rol → rutarol → ruta` |
-| **Qué hace la API** | Pregunta. No reconstruye el cruce |
-| **Por qué ahí** | La regla vale **también** para quien entre por SSMS o por otro cliente, no solo para quien pase por la API |
+| **Dónde está la regla** | En la base de datos: `usuario → rol_usuario → rutarol` |
+| **Qué hace la API** | Pregunta y **obedece**. No reconstruye el cruce |
+| **Por qué ahí** | La regla vale **también** para quien entre por SSMS, por `psql` o por otro cliente — no solo para quien pase por la API |
+
+> **Una cosa que el repositorio sí decide, y conviene verla:** si el nombre de
+> la ruta **no está declarado** en la tabla `ruta`, responde `false` sin
+> preguntarle a nadie. **Falla cerrado, no abierto** — una ruta que nadie
+> declaró no es una ruta que todos pueden usar.
 
 > **Es el mismo argumento de la v2 con el stock**, y conviene que se repita:
 > una regla que solo existe en C# protege **una** puerta. La que está en la

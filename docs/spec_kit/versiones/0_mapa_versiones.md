@@ -65,7 +65,8 @@ v5**, y está aquí porque ya estaba construido.
 | | |
 |---|---|
 | **Qué demuestra** | Que la interfaz del repositorio servía: se agregó un segundo motor **sin tocar el servicio ni el controlador** |
-| **Qué falta para cerrar la v5** | El tercer motor (MariaDB). Con dos motores se puede resolver con un `if`; con tres, el `if` ya no se sostiene — y ahí nace la fábrica de verdad |
+| **Qué YA está construido** | Los repositorios de **los dos motores**, la **fábrica** (`Fabricas/IFabricaRepositorios.cs` y sus dos implementaciones) y el interruptor `MOTOR_BD`, que elige cuál atiende **sin recompilar** |
+| **Qué falta para cerrar la v5** | El **tercer motor (MariaDB)**. Con dos, la fábrica ya evita el `if` repartido por el código; con tres se ve por qué hacía falta |
 
 > **Se conservó a propósito.** Era código que funcionaba y que enseña algo
 > real; tirarlo por un cambio de mapa habría sido peor que reubicarlo.

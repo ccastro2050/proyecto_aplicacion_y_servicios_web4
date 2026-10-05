@@ -209,7 +209,7 @@ es **reconstruirla usted mismo, en una carpeta propia (fuera del clon)**,
 siguiendo las especificaciones — con o sin ayuda de IA:
 
 > 🤖 ¿Va a trabajar con IA? Siga la **[Guía para construir la versión con
-> IA](docs/spec_kit/versiones/v5_otros_motores/GUIA_IA5.md)** — cubre los dos caminos con su prompt exacto listo
+> IA](docs/spec_kit/versiones/v4_aplicativo/GUIA_IA4.md)** — cubre los dos caminos con su prompt exacto listo
 > para copiar: **chat web** (Gemini, DeepSeek, ChatGPT: qué archivos
 > subirle) e **IDE agéntico** (Antigravity, Cursor, Claude Code: cómo
 > supervisar al agente).
@@ -296,15 +296,27 @@ más carpetas de componentes (y el compose crecerá con ellas).
 ## 3. La ruta de versiones
 
 ```
-v1  api_facturas (C#/ASP.NET Core): CRUD de producto, solo SQL Server   (cerrada: tag v1)
-v2  persona (el molde replicado) + factura maestro-detalle con SPs   (cerrada: tag v2)
-v3  el RESTO de las entidades: toda la bdfacturas cubierta con
-    UN motor (usuario con BCrypt, tablas puente)   (cerrada: tag v3)
-v4  segundo motor (PostgreSQL) — nace la fábrica de
-    repositorios y el interruptor MOTOR_BD   ← USTED ESTÁ AQUÍ
-v5  tercer motor (MariaDB) + compose completo
-v6  frontend BLAZOR: CRUD de las 12 entidades + login + facturación
+v1  CRUD de las SEIS tablas sin clave foránea — API E INTERFAZ GRÁFICA
+                                                      (cerrada: tag v1)
+v2  las DOCE tablas: las FK como listas desplegables, las puente y la
+    factura maestro-detalle por procedimientos — API E INTERFAZ GRÁFICA
+                                                      (cerrada: tag v2)
+v3  el control de acceso: la contraseña con hash, la sesión con token
+    y el permiso resuelto por ruta. NO agrega tablas   (cerrada: tag v3)
+v4  el aplicativo: 10 consultas multitabla, tablero con gráficos,
+    manual de marca, responsive/PWA y publicación   ← USTED ESTÁ AQUÍ
+v5  otros motores de base de datos y la fábrica que elige
+    cuál usar                      (SE PROYECTA — fuera de las cuatro)
 ```
+
+> **Son CUATRO versiones, y la v5 se proyecta.** Las cuatro del curso son
+> v1–v4; la v5 —otros motores— está **después** y es de otra naturaleza: no
+> agrega funcionalidad, **demuestra** que la interfaz del repositorio servía.
+> El detalle está en [el mapa](docs/spec_kit/versiones/0_mapa_versiones.md).
+>
+> **Y cada versión entrega su API y su interfaz gráfica.** Media versión no es
+> una versión: lo que antes se pensaba como «una versión por motor» y «el front
+> al final» cambió de lugar, y el mapa cuenta por qué.
 
 La regla del juego: la **constitución** es permanente, cada versión tiene
 su propia spec, y una versión está TERMINADA solo cuando pasa sus criterios
@@ -315,14 +327,28 @@ de aceptación (commit + tag). Mapa completo:
 
 | Documento | Contenido |
 |---|---|
-| [1_constitution.md](docs/spec_kit/1_constitution.md) | Las reglas permanentes del proyecto |
-| [2_spec.md](docs/spec_kit/versiones/v5_otros_motores/2_spec.md) | QUÉ construir y los criterios de aceptación |
-| [3_plan.md](docs/spec_kit/versiones/v5_otros_motores/3_plan.md) | CÓMO: stack, estructura y diseño de las capas |
-| [4_research.md](docs/spec_kit/versiones/v5_otros_motores/4_research.md) | Decisiones y alternativas (el porqué) |
-| [5_data_model.md](docs/spec_kit/versiones/v5_otros_motores/5_data_model.md) | La MISMA bdfacturas en dialecto PostgreSQL (equivalencias y semillas) |
-| [6_contracts.md](docs/spec_kit/versiones/v5_otros_motores/6_contracts.md) | CERO endpoints nuevos: el mismo contrato con ambos motores | |
-| [7_quickstart.md](docs/spec_kit/versiones/v5_otros_motores/7_quickstart.md) | Arranque y la regresión DOBLE (ambos motores) |
-| [8_tasks.md](docs/spec_kit/versiones/v5_otros_motores/8_tasks.md) | Orden de construcción por fases verificables |
+| [1_constitution.md](docs/spec_kit/1_constitution.md) | Las reglas permanentes del proyecto — **valen para las cuatro versiones** |
+| [2_spec.md](docs/spec_kit/versiones/v4_aplicativo/2_spec.md) | QUÉ construir y los criterios de aceptación de la v4 |
+| [3_plan.md](docs/spec_kit/versiones/v4_aplicativo/3_plan.md) | CÓMO: stack, estructura y diseño de las capas |
+| [4_research.md](docs/spec_kit/versiones/v4_aplicativo/4_research.md) | Decisiones y alternativas (el porqué) |
+| [5_data_model.md](docs/spec_kit/versiones/v4_aplicativo/5_data_model.md) | El modelo de datos. **La v4 no agrega tablas**: consulta las doce |
+| [6_contracts.md](docs/spec_kit/versiones/v4_aplicativo/6_contracts.md) | Los contratos. Lo de v1–v3 **no se toca**; la v4 **suma** las consultas |
+| [7_quickstart.md](docs/spec_kit/versiones/v4_aplicativo/7_quickstart.md) | Arranque y verificación |
+| [8_tasks.md](docs/spec_kit/versiones/v4_aplicativo/8_tasks.md) | Orden de construcción por fases verificables |
+| [9_checklist.md](docs/spec_kit/versiones/v4_aplicativo/9_checklist.md) | La lista que **se marca a mano** antes de poner el tag |
+| [GUIA_IA4.md](docs/spec_kit/versiones/v4_aplicativo/GUIA_IA4.md) | Los dos caminos —chat web e IDE agéntico— con su prompt exacto |
+
+> **Y las cuatro versiones del curso tienen su spec kit completo**, cada una en
+> su carpeta: [`v1_sin_fk/`](docs/spec_kit/versiones/v1_sin_fk/),
+> [`v2_con_fk/`](docs/spec_kit/versiones/v2_con_fk/),
+> [`v3_control_acceso/`](docs/spec_kit/versiones/v3_control_acceso/) y
+> [`v4_aplicativo/`](docs/spec_kit/versiones/v4_aplicativo/). Cada versión es
+> **acumulativa** —contiene las anteriores—, y por eso la regresión es
+> obligatoria.
+>
+> **La v5 se proyecta y no tiene spec kit publicado aquí:** está descrita en
+> [el mapa](docs/spec_kit/versiones/0_mapa_versiones.md), y su adelanto es
+> **código**, no documentos — el segundo motor y la fábrica, que ya están.
 
 ## 5. Material conceptual del curso
 

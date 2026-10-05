@@ -11,3 +11,8 @@ obj/
 
 # Los documentos del aula viven en .md: el .docx se desfasaba y nadie avisaba
 *.docx
+
+# La spec de la v5 (otros motores) NO se publica: el curso son cuatro
+# versiones y al estudiante se le proyecta la v5, no se le muestra. La
+# carpeta se queda en el disco —trabajo en curso—, pero fuera de GitHub.
+docs/spec_kit/versiones/v5_otros_motores/

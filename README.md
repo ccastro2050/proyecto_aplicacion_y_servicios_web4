@@ -276,7 +276,7 @@ proyecto_aplicacion_y_servicios_web4/
 │   │                            #   una carpeta por versión con sus 9 .md
 │   │                            #   + la GUIA_IA de ESA versión (GUIA_IA1, GUIA_IA2…) (cómo
 │   │                            #   construirla con ayuda de una IA)
-│   ├── conceptos/               # QUÉ HAY QUE SABER: 22 .md con sus ilustraciones
+│   ├── conceptos/               # QUÉ HAY QUE SABER: 23 .md con sus ilustraciones
 │   │                            #   propias — POO, SOLID y patrones, ACID, Docker,
 │   │                            #   asincronía, pruebas, SDD, los dos tutoriales de BD
 │   └── dominio/                 # QUÉ ES ESTE SISTEMA: 18 .md — el plan del equipo,
@@ -326,11 +326,12 @@ de aceptación (commit + tag). Mapa completo:
 
 ## 5. Material conceptual del curso
 
-**Son 22 documentos en [`docs/conceptos/`](docs/conceptos/), cada uno con sus
+**Son 23 documentos en [`docs/conceptos/`](docs/conceptos/), cada uno con sus
 ilustraciones propias.** Los que conviene leer primero:
 
 | Documento | Qué cubre |
 |---|---|
+| [**La arquitectura del software**](docs/conceptos/ARQUITECTURA_DEL_SOFTWARE.md) | **Empiece por aquí:** qué es este sistema —tres niveles, dos unidades desplegables—, si es o no un monolito, el backend, el frontend y Docker, en una sola vista |
 | [El flujo de una petición](docs/conceptos/FLUJO_DE_UNA_PETICION.md) | **Léalo primero:** dónde está el GET, dónde se captura el POST, y el viaje completo por las capas |
 | [Colección de Postman](postman/README.md) | Las 25 peticiones de v1 + v2 listas para importar y probar con clics — la pareja PUT/PATCH, el error de FK, el trigger calculando y el 409 del doble anular |
 | [Ramas y colaboración en Git](docs/conceptos/CONCEPTOS_RAMAS_Y_COLABORACION.md) | **Para el proyecto de aula:** qué es una rama de verdad, por qué ocurre un conflicto, la identidad que decide si su trabajo se le acredita, y la receta paso a paso para un equipo de 3 |
@@ -344,7 +345,7 @@ ilustraciones propias.** Los que conviene leer primero:
 
 ## 6. El dominio: qué ES este sistema
 
-Los 22 de arriba explican **los conceptos**. Estos 18, en
+Los 23 de arriba explican **los conceptos**. Estos 18, en
 [`docs/dominio/`](docs/dominio/), describen **este sistema concreto** — y están
 escritos desde el código, el esquema y la API corriendo, no de memoria.
 

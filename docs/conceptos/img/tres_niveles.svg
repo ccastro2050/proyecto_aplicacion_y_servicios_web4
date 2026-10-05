@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 674" width="980" height="674" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Los tres niveles del sistema</title>
+  <desc>Arquitectura de tres niveles: presentacion, aplicacion y datos. El front no toca la base; se hablan solo por HTTP. Y el nivel de datos no guarda y ya: defiende las reglas.</desc>
+  <defs>
+    <marker id="fl3" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#17495B"/>
+    </marker>
+    <marker id="no3" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#B4402F"/>
+    </marker>
+  </defs>
+  <rect width="980" height="674" fill="#F4F2EC"/>
+
+  <text x="36" y="42" font-size="21" font-weight="600" fill="#17495B">Arquitectura de TRES NIVELES (three-tier)</text>
+  <text x="36" y="66" font-size="14" fill="#4A4A4A">Tres procesos, dos unidades desplegables propias, y un solo camino entre ellas: HTTP.</text>
+
+  <!-- ===== NIVEL 1 · PRESENTACION ===== -->
+  <rect x="36" y="92" width="828" height="150" rx="10" fill="#fff" stroke="#17495B" stroke-width="2.5"/>
+  <text x="56" y="118" font-size="14" font-weight="600" fill="#17495B">1 · PRESENTACION</text>
+  <text x="56" y="138" font-size="12" fill="#4A4A4A">front-blazor  ·  puerto 8099  ·  Blazor Server</text>
+
+  <rect x="56" y="150" width="240" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="176" y="166" font-size="11.5" text-anchor="middle" fill="#4A4A4A">15 pantallas</text>
+  <text x="176" y="182" font-size="10.5" text-anchor="middle" fill="#4A4A4A">Components/Pages</text>
+
+  <rect x="310" y="150" width="240" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="430" y="166" font-size="11.5" text-anchor="middle" fill="#4A4A4A">16 servicios del front</text>
+  <text x="430" y="182" font-size="10.5" text-anchor="middle" fill="#4A4A4A">uno por recurso</text>
+
+  <rect x="564" y="150" width="280" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="704" y="166" font-size="11.5" text-anchor="middle" fill="#4A4A4A">el circuito</text>
+  <text x="704" y="182" font-size="10.5" text-anchor="middle" fill="#4A4A4A">el estado de la pantalla vive aqui</text>
+
+  <text x="56" y="214" font-size="12" font-weight="600" fill="#2F7D5C">QUE DECIDE: nada. Pregunta y obedece.</text>
+  <text x="56" y="232" font-size="11.5" fill="#4A4A4A">Si esconde un boton es comodidad, no proteccion. Quien rechaza es la API.</text>
+
+  <!-- flecha HTTP -->
+  <line x1="450" y1="242" x2="450" y2="286" stroke="#17495B" stroke-width="3" marker-end="url(#fl3)"/>
+  <rect x="362" y="250" width="176" height="26" rx="5" fill="#E39B2D"/>
+  <text x="450" y="268" font-size="12" font-weight="600" text-anchor="middle" fill="#4A4A4A">HTTP — y solo HTTP</text>
+
+  <!-- ===== NIVEL 2 · APLICACION ===== -->
+  <rect x="36" y="290" width="828" height="168" rx="10" fill="#fff" stroke="#17495B" stroke-width="2.5"/>
+  <text x="56" y="316" font-size="14" font-weight="600" fill="#17495B">2 · APLICACION</text>
+  <text x="56" y="336" font-size="12" fill="#4A4A4A">api-facturas  ·  puerto 8035  ·  ASP.NET Core  ·  80 operaciones</text>
+
+  <rect x="56" y="348" width="240" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="176" y="364" font-size="11.5" text-anchor="middle" fill="#4A4A4A">15 controladores</text>
+  <text x="176" y="380" font-size="10.5" text-anchor="middle" fill="#4A4A4A">traduce HTTP y negocio</text>
+
+  <rect x="310" y="348" width="240" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="430" y="364" font-size="11.5" text-anchor="middle" fill="#4A4A4A">14 servicios + 14 interfaces</text>
+  <text x="430" y="380" font-size="10.5" text-anchor="middle" fill="#4A4A4A">las reglas de flujo</text>
+
+  <rect x="564" y="348" width="280" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="704" y="364" font-size="11.5" text-anchor="middle" fill="#4A4A4A">29 repositorios · 14 interfaces</text>
+  <text x="704" y="380" font-size="10.5" text-anchor="middle" fill="#4A4A4A">DOS por recurso: un motor cada uno</text>
+
+  <text x="56" y="412" font-size="12" font-weight="600" fill="#2F7D5C">QUE DECIDE: la forma de la peticion (el 422) y el flujo.</text>
+  <text x="56" y="430" font-size="11.5" fill="#4A4A4A">El servicio NO sabe que es un 404 ni que motor hay debajo — por eso se puede probar sin levantar una base.</text>
+  <text x="56" y="448" font-size="11.5" fill="#4A4A4A">La FABRICA es la unica que conoce la implementacion concreta.</text>
+
+  <!-- flecha a datos -->
+  <line x1="450" y1="458" x2="450" y2="500" stroke="#17495B" stroke-width="3" marker-end="url(#fl3)"/>
+  <rect x="378" y="466" width="144" height="24" rx="5" fill="#F4F2EC" stroke="#17495B"/>
+  <text x="450" y="483" font-size="11" text-anchor="middle" fill="#17495B">Dapper · SQL a mano</text>
+
+  <!-- ===== NIVEL 3 · DATOS ===== -->
+  <rect x="36" y="504" width="828" height="150" rx="10" fill="#fff" stroke="#2F7D5C" stroke-width="3"/>
+  <text x="56" y="530" font-size="14" font-weight="600" fill="#2F7D5C">3 · DATOS — y aqui no se guarda y ya</text>
+  <text x="56" y="550" font-size="12" fill="#4A4A4A">sqlserver (11466)  ·  postgres (15462)  ·  el interruptor MOTOR_BD elige cual atiende</text>
+
+  <rect x="56" y="562" width="240" height="40" rx="6" fill="#F4F2EC" stroke="#b9c6cc"/>
+  <text x="176" y="578" font-size="11.5" text-anchor="middle" fill="#4A4A4A">12 tablas</text>
+  <text x="176" y="594" font-size="10.5" text-anchor="middle" fill="#4A4A4A">del curso de Bases de Datos</text>
+
+  <rect x="310" y="562" width="534" height="40" rx="6" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
+  <text x="577" y="578" font-size="11.5" font-weight="600" text-anchor="middle" fill="#2F7D5C">3 disparadores  ·  16 procedimientos</text>
+  <text x="577" y="594" font-size="10.5" text-anchor="middle" fill="#4A4A4A">1371 de las 1540 lineas del script: escritas en ESTE proyecto</text>
+
+  <text x="56" y="626" font-size="12" font-weight="600" fill="#2F7D5C">QUE DECIDE: el stock, el total y la anulacion.</text>
+  <text x="56" y="644" font-size="11.5" fill="#4A4A4A">Esta abajo para que la regla valga TAMBIEN para quien entre por SSMS, no solo para quien pasa por la API.</text>
+
+  <!-- ===== LA LINEA PROHIBIDA ===== -->
+  <path d="M 864 170 Q 940 170 940 582 Q 940 582 876 582" fill="none" stroke="#B4402F" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#no3)"/>
+  <rect x="872" y="326" width="100" height="100" rx="6" fill="#B4402F"/>
+  <text x="922" y="350" font-size="10.5" font-weight="600" text-anchor="middle" fill="#fff">PROHIBIDO</text>
+  <text x="922" y="372" font-size="9.5" text-anchor="middle" fill="#fff">el front NO</text>
+  <text x="922" y="386" font-size="9.5" text-anchor="middle" fill="#fff">toca la base</text>
+  <text x="922" y="406" font-size="9.5" font-weight="600" text-anchor="middle" fill="#E39B2D">cero</text>
+  <text x="922" y="418" font-size="9.5" font-weight="600" text-anchor="middle" fill="#E39B2D">SqlConnection</text>
+
+  <!-- ===== CIERRE ===== -->
+</svg>

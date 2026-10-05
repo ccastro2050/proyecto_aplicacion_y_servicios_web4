@@ -573,9 +573,18 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- DEVOLVER EL STOCK. Esto es lo que hace que anular una factura reponga
-    -- la mercancia sin que nadie escriba codigo para reponerla: el
-    -- procedimiento de anular borra los renglones, y el stock vuelve solo.
+    -- DEVOLVER EL STOCK. Lo que se quito de la factura vuelve a la bodega.
+    --
+    -- OJO CON QUIEN DISPARA ESTO, PORQUE NO ES ANULAR UNA FACTURA:
+    -- `sp_anular_factura` NO borra renglones —los conserva para poder
+    -- auditarlos— y devuelve el stock con un UPDATE propio. Este disparador
+    -- no interviene ahi.
+    --
+    -- QUIEN LO DISPARA DE VERDAD:
+    --   · borrar un renglon suelto
+    --   · borrar la factura entera (la cascada se lleva los renglones)
+    --   · y sobre todo `sp_actualizar_factura_y_productosporfactura`, que
+    --     borra TODOS los renglones y los vuelve a insertar
     UPDATE p
     SET p.stock = p.stock + d.cantidad
     FROM producto p
@@ -1138,6 +1147,35 @@ BEGIN
         BEGIN TRANSACTION;
 
         -- Eliminar detalle anterior (el trigger restaura stock y recalcula total)
+        -- ============================================================
+        -- LA DECISION DE ESTE PROCEDIMIENTO: BORRAR TODO EL DETALLE Y
+        -- VOLVERLO A INSERTAR. No se comparan renglon por renglon para ver
+        -- cual cambio.
+        --
+        -- POR QUE, Y QUE CUESTA:
+        --
+        --   · comparar exigiria averiguar que renglon se agrego, cual se
+        --     quito y cual cambio de cantidad — tres caminos distintos y
+        --     tres formas de equivocarse
+        --   · borrar y reinsertar es UN camino, y el estado final es
+        --     exactamente el que mando quien llamo
+        --
+        -- Y LO QUE PASA POR DEBAJO, QUE ES LO BONITO DE VERLO:
+        --
+        --   1. este DELETE dispara `trg_prodfact_delete` una vez, que
+        --      DEVUELVE a la bodega el stock de todos los renglones
+        --   2. cada INSERT de abajo dispara `trg_prodfact_insert`, que
+        --      vuelve a validar el stock y a descontarlo
+        --
+        -- O sea que la validacion de «no se vende lo que no hay» se aplica
+        -- otra vez, con el stock ya devuelto. Nadie escribio codigo para eso:
+        -- sale gratis de haber puesto la regla en los disparadores.
+        --
+        -- EL EFECTO SECUNDARIO QUE HAY QUE CONOCER: `trg_prodfact_update`
+        -- casi nunca se dispara desde la API, porque la API no actualiza
+        -- renglones — los borra y los vuelve a crear. Ese disparador esta
+        -- ahi para quien entre por SSMS y haga un UPDATE a mano.
+        -- ============================================================
         DELETE FROM productosporfactura WHERE fknumfactura = @p_numero;
 
         -- Insertar nuevos productos (el trigger calcula subtotal, descuenta stock, actualiza total)
@@ -1288,7 +1326,25 @@ BEGIN
     DECLARE @v_estado NVARCHAR(10);
     DECLARE @v_msg NVARCHAR(500);
 
-    -- Validar que la factura existe
+    -- ============================================================
+    -- ANULAR NO ES BORRAR, Y ESA ES TODA LA IDEA DE ESTE PROCEDIMIENTO.
+    --
+    -- La factura se queda donde esta, con sus renglones intactos, y solo
+    -- cambia de `estado` a 'anulada'. Es el borrado logico:
+    --
+    --   · se puede auditar que se anulo, cuanto valia y que llevaba
+    --   · la consulta «anulaciones por cliente» de la v4 tiene algo que
+    --     contar — sobre filas borradas no se cuenta nada
+    --   · y el numero de factura no se reutiliza
+    -- ============================================================
+
+    -- GUARDIA 1 — ¿existe la factura? Si no, no hay nada que anular.
+    --
+    -- `IF NOT EXISTS (SELECT 1 ...)` es el modismo de «¿hay alguna fila que
+    -- cumpla esto?». El `SELECT 1` no trae datos: trae un uno cualquiera, y
+    -- al motor le basta encontrar la primera coincidencia para contestar.
+    -- Por eso no se escribe `SELECT COUNT(*)`, que recorreria todo para
+    -- responder algo que se sabe con la primera fila.
     IF NOT EXISTS (SELECT 1 FROM factura WHERE numero = @p_numero)
     BEGIN
         SET @v_msg = CONCAT(N'Factura ', @p_numero, N' no existe');
@@ -1296,6 +1352,16 @@ BEGIN
     END
 
     -- Validar que no esté ya anulada
+    -- GUARDIA 2 — ¿YA ESTABA ANULADA? Y esta guardia no es cortesia: es lo
+    -- unico que protege el inventario.
+    --
+    -- Sin ella, anular dos veces la misma factura devolveria el stock DOS
+    -- veces, y la bodega quedaria con mercancia que no existe. El sistema
+    -- seguiria funcionando y las cifras serian mentira.
+    --
+    -- Es la diferencia entre una operacion idempotente y una que no lo es:
+    -- cambiar el estado a 'anulada' dos veces da lo mismo, pero SUMAR stock
+    -- dos veces no. Por eso se verifica antes de sumar.
     SELECT @v_estado = estado FROM factura WHERE numero = @p_numero;
     IF @v_estado = N'anulada'
     BEGIN
@@ -1306,7 +1372,21 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        -- Restaurar stock de todos los productos de la factura
+        -- DEVOLVER EL STOCK, A MANO Y EN UNA SOLA SENTENCIA.
+        --
+        -- ¿Por que a mano, si hay disparadores que ya saben hacerlo? Porque
+        -- los disparadores viven en `productosporfactura`, y aqui NO se toca
+        -- esa tabla: los renglones se conservan. Nadie los borra, asi que
+        -- nada se dispara, y el stock hay que devolverlo explicitamente.
+        --
+        -- ES LA EXCEPCION A LA REGLA «EL STOCK LO MUEVEN LOS DISPARADORES»,
+        -- y conviene saberla porque es la pregunta natural de la
+        -- sustentacion: aqui lo mueve el procedimiento, y es correcto
+        -- justamente porque la alternativa —borrar los renglones para que el
+        -- disparador actue— destruiria la informacion que se quiere auditar.
+        --
+        -- El JOIN recorre todos los renglones de esa factura y le suma a cada
+        -- producto su cantidad. Una sentencia, todos los productos.
         UPDATE p
         SET p.stock = p.stock + pf.cantidad
         FROM producto p

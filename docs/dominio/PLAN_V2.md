@@ -206,3 +206,5 @@ permisos.
 > **Administrar permisos y hacerlos valer son dos cosas distintas**, y la v2
 > hace la primera. La segunda es la v3: el token, el 401, el 403 y un menú que
 > solo muestra lo que ese rol puede abrir.
+
+Sigue en [`PLAN_V3.md`](PLAN_V3.md).

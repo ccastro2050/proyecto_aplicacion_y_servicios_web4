@@ -102,7 +102,7 @@ documento no las describe como si lo estuvieran:
 
 | | Estado |
 |---|---|
-| **Imagen corporativa con su manual de marca** | Pendiente |
+| **Imagen corporativa con su manual de marca** | **Hecha** — `marca.css` enchufada en `App.razor`, con los cinco colores del manual |
 | **Páginas corporativas** (inicio, servicios, soporte, contacto) | Pendiente |
 | **Responsive / PWA** | Pendiente — la interfaz **sí** es responsive por Bootstrap, pero no hay manifiesto ni *service worker* |
 | **Publicación en un servidor** | Pendiente |

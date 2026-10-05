@@ -126,8 +126,10 @@ segundo corrige al primero:
 
 | Plan | Qué versión | Lo que vale la pena mirar |
 |---|---|---|
-| [`PLAN_V1.md`](../spec_kit/versiones/v1_sin_fk/3_plan.md) | Versión 1 — una tabla, `sede` | §2 «El primer hallazgo, y el que cambió el plan», y §4, el plan en 10 pasos |
-| [`PLAN_V2.md`](../spec_kit/versiones/v2_con_fk/3_plan.md) | Versión 2 — diez recursos sin clave foránea | §2 «Lo primero que hubo que contar bien» y §4, la decisión que define la versión |
+| [`PLAN_V1.md`](../dominio/PLAN_V1.md) | Versión 1 — la v1 **no es «una tabla»**: son las seis sin clave foránea |
+| [`PLAN_V2.md`](../dominio/PLAN_V2.md) | Versión 2 — ¿422 o 409?, y la factura que **no escribe SQL de tablas** |
+| [`PLAN_V3.md`](../dominio/PLAN_V3.md) | Versión 3 — el permiso **no va en el token**, y por eso se consulta cada vez |
+| [`PLAN_V4.md`](../dominio/PLAN_V4.md) | Versión 4 — el cruce se hace **donde están los datos**, y qué falta todavía |
 
 Léalos como lo que son: **planes que se escribieron antes y se corrigieron
 después**, no informes escritos al final para justificar lo hecho. Por eso

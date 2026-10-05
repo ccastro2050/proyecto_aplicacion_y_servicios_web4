@@ -278,7 +278,7 @@ git status
 #     Hay que borrar las tres líneas de marcas: <<<<<<<, ======= y >>>>>>>.
 
 # 3 · Decirle a Git que ese archivo ya está resuelto.
-git add docs/spec_kit/versiones/v1/2_spec.md
+git add docs/spec_kit/versiones/v1_sin_fk/2_spec.md
 
 # 4 · Cerrar la fusión. Git propone un mensaje; se deja.
 git commit
@@ -863,7 +863,7 @@ git pull origin main
 git switch -c rama-paco-v1
 
 # 3 · Trabajar SOLO en su archivo (§7). Commits pequeños y frecuentes:
-git add docs/spec_kit/versiones/v1/5_data_model.md
+git add docs/spec_kit/versiones/v1_sin_fk/5_data_model.md
 git commit -m "docs: el modelo de datos de la v1"
 #    ... y otro, y otro. No uno solo al final.
 

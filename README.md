@@ -226,7 +226,7 @@ siguiendo las especificaciones — con o sin ayuda de IA:
 | **Spec kit** | Los documentos que dicen QUÉ/CÓMO/EN QUÉ ORDEN — la fuente de verdad |
 | **Versión / tag** | Un incremento cerrado y verificado (`v1`, `v2`, …): se avanza solo en verde |
 
-> Detalle de los conceptos Docker: [docs/CONCEPTOS_DOCKER.md](docs/conceptos/CONCEPTOS_DOCKER.md).
+> Detalle de los conceptos Docker: [docs/conceptos/CONCEPTOS_DOCKER.md](docs/conceptos/CONCEPTOS_DOCKER.md).
 
 ---
 

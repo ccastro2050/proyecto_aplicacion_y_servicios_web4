@@ -6,7 +6,7 @@
 // una petición no valida (422), y se encienden las rutas.
 //
 // El recorrido completo de una petición está explicado en
-// docs/FLUJO_DE_UNA_PETICION.md.
+// docs/conceptos/FLUJO_DE_UNA_PETICION.md.
 // ============================================================
 
 // "using" trae tipos de otros espacios de nombres para poder usarlos:
@@ -295,7 +295,7 @@ app.MapGet("/", () => Results.Json(new
     mensaje = "API Facturas funcionando",
     version = "v4",
     motor,      // v4: a cuál motor le está hablando la API (el interruptor)
-    contratos = "docs/spec_kit/versiones/v4_postgresql/6_contracts.md"
+    contratos = "docs/spec_kit/versiones/v4_aplicativo/6_contracts.md"
 }));
 
 // MapControllers enciende las rutas declaradas con atributos en los

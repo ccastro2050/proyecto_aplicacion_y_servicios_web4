@@ -1,10 +1,50 @@
 ﻿-- ============================================================
--- bdfacturas_postgres_local — la MISMA bdfacturas, en PostgreSQL (v4)
+-- bdfacturas_postgres_local — la MISMA bdfacturas, en PostgreSQL.
 --
--- Es el espejo de db/bdfacturas.sql (SQL Server): 12 tablas, el
--- trigger de totales/stock, los SPs de factura y las MISMAS
--- semillas con los MISMOS ids (setval alinea las secuencias).
--- Equivalencias de dialecto: docs/spec_kit/versiones/v4_postgresql/5_data_model.md
+-- QUE ES ESTE ARCHIVO: el espejo de db/bdfacturas.sql (SQL Server). Las
+-- mismas 12 tablas, el mismo disparador de totales y stock, los mismos 16
+-- procedimientos y las MISMAS semillas con los MISMOS ids (setval alinea las
+-- secuencias). Dos motores, un solo comportamiento.
+--
+-- PARA QUE SIRVE QUE EXISTA: es la prueba de que la interfaz del repositorio
+-- servia. Se agrego un segundo motor sin tocar el servicio ni el controlador,
+-- y el interruptor MOTOR_BD elige cual atiende sin recompilar. Eso es el
+-- adelanto de la v5 (ver docs/spec_kit/versiones/0_mapa_versiones.md), que
+-- esta FUERA de las cuatro versiones del curso.
+--
+-- ============================================================
+-- EQUIVALENCIAS DE DIALECTO — lo mismo, dicho en los dos idiomas.
+-- Medido comparando los dos archivos de esta carpeta, no de memoria:
+--
+--   SQL SERVER                        POSTGRESQL
+--   ---------------------------------  --------------------------------------
+--   NVARCHAR(n)                        VARCHAR(n)
+--   DECIMAL(18,2)                      NUMERIC        (ojo: sin precision,
+--                                                      no redondea a 2)
+--   INT IDENTITY(1,1)                  SERIAL
+--   DATETIME2 / GETDATE()              TIMESTAMP / CURRENT_TIMESTAMP
+--   SET IDENTITY_INSERT ON/OFF         setval() despues de sembrar
+--
+--   SCOPE_IDENTITY()                   RETURNING numero INTO v_numero
+--   CURSOR + FETCH + @@FETCH_STATUS    FOR v IN SELECT ... LOOP
+--   OPENJSON() + JSON_VALUE(x,'$.c')   json_array_elements() + x->>'c'
+--   CAST(... AS INT)                   (...)::INTEGER
+--   FOR JSON PATH                      json_agg(row_to_json(...))
+--   ... WITHOUT_ARRAY_WRAPPER          row_to_json(...)  a secas
+--   THROW 50001, @msg, 1               RAISE EXCEPTION '...'
+--   @p_resultado NVARCHAR(MAX) OUTPUT  INOUT p_resultado JSON
+--
+--   3 disparadores AFTER separados,    1 funcion BEFORE que pregunta TG_OP,
+--   con INSERTED y DELETED             con NEW y OLD
+--
+-- LA ULTIMA FILA ES LA QUE MAS CAMBIA EL CODIGO, y la unica diferencia
+-- conceptual de verdad: las demas son la misma idea con otras palabras.
+-- ============================================================
+--
+-- COMO SE CARGA: a diferencia de SQL Server, PostgreSQL SI ejecuta este
+-- script automaticamente. El compose lo monta en
+-- /docker-entrypoint-initdb.d/ y el contenedor lo corre la PRIMERA vez
+-- (volumen vacio) — por eso aqui no hay contenedor inicializador.
 --
 -- A diferencia de SQL Server, PostgreSQL SÍ ejecuta este script
 -- automáticamente: el compose lo monta en /docker-entrypoint-initdb.d/

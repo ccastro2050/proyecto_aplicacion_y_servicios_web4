@@ -83,7 +83,12 @@ Program.cs  →  IFabricaRepositorios  →  FabricaSqlServer
 ```
 
 Un interruptor —la variable `MOTOR_BD`— elige cuál. **Y es el único sitio del
-sistema que conoce clases concretas.**
+sistema que decide CUÁL IMPLEMENTACIÓN DE REPOSITORIO se usa.**
+
+> **No confundirlo con «no se nombran clases concretas».** `ProductoController` y
+> `ServicioProducto` lo son, y se nombran sin problema: de cada uno hay **uno
+> solo**. La regla aplica donde hay **dos alternativas** — los repositorios — y
+> por eso son los únicos que pasan por la fábrica.
 
 > **Ésa es la prueba del principio abierto/cerrado, y está MEDIDA con un
 > `diff`:** agregar PostgreSQL fue **18 archivos y 1 373 líneas**, de los cuales

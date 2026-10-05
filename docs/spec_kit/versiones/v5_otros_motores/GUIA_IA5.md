@@ -59,7 +59,7 @@ git diff --stat v4..v5 -- api_facturas/Controllers api_facturas/Servicios
 
 ---
 
-## 5. La fábrica, que es el único sitio que conoce clases concretas
+## 5. La fábrica: el único sitio que decide CUÁL repositorio se usa
 
 ```
 Program.cs  →  IFabricaRepositorios  →  FabricaSqlServer
@@ -81,6 +81,28 @@ docker compose up -d api-facturas
 > **Si alguien hiciera `new RepositorioProductoSqlServer()` dentro de un
 > servicio, todo esto se cae** — y el compilador no diría nada, porque compilar
 > es lo único que ese código haría bien.
+
+> **Ojo con cómo se lee esa frase, porque es más estrecha de lo que parece.**
+> `ProductoController` y `ServicioProducto` **también son clases concretas**, y se
+> nombran sin problema — de hecho `Program.cs` escribe
+> `AddScoped<IServicioProducto, ServicioProducto>()`.
+>
+> **La regla no es «nunca nombre una clase concreta». Es:**
+>
+> | | Qué se hace |
+> |---|---|
+> | Hay **UNA** implementación | **nómbrela.** `ServicioProducto`, `ProductoController` |
+> | Hay **VARIAS** y hay que poder cambiar | use la **interfaz**, y que **un solo sitio** decida cuál |
+>
+> Y se ve en dos líneas seguidas de `Program.cs`:
+>
+> ```csharp
+> AddScoped<IRepositorioProducto>(_ => fabrica.CrearRepositorioProducto());  // 2 implementaciones → la fábrica decide
+> AddScoped<IServicioProducto, ServicioProducto>();                          // 1 implementación  → se nombra y ya
+> ```
+>
+> **El repositorio es el único punto del sistema donde hay dos alternativas**, y
+> por eso es el único que necesita una fábrica.
 
 ---
 

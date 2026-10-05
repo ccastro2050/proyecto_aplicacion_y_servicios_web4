@@ -30,8 +30,30 @@ Program.cs  →  IFabricaRepositorios  →  FabricaSqlServer
 ```
 
 > **Y la regla que hace que todo esto valga la pena: la fábrica es el ÚNICO
-> sitio del sistema que conoce clases concretas.** Arriba se usa siempre la
-> interfaz.
+> sitio que decide CUÁL IMPLEMENTACIÓN DE REPOSITORIO se usa.** Arriba se recibe
+> siempre la interfaz `IRepositorioX`, nunca `RepositorioXSqlServer`.
+
+> **Ojo con cómo se lee esa frase, porque es más estrecha de lo que parece.**
+> `ProductoController` y `ServicioProducto` **también son clases concretas**, y se
+> nombran sin problema — de hecho `Program.cs` escribe
+> `AddScoped<IServicioProducto, ServicioProducto>()`.
+>
+> **La regla no es «nunca nombre una clase concreta». Es:**
+>
+> | | Qué se hace |
+> |---|---|
+> | Hay **UNA** implementación | **nómbrela.** `ServicioProducto`, `ProductoController` |
+> | Hay **VARIAS** y hay que poder cambiar | use la **interfaz**, y que **un solo sitio** decida cuál |
+>
+> Y se ve en dos líneas seguidas de `Program.cs`:
+>
+> ```csharp
+> AddScoped<IRepositorioProducto>(_ => fabrica.CrearRepositorioProducto());  // 2 implementaciones → la fábrica decide
+> AddScoped<IServicioProducto, ServicioProducto>();                          // 1 implementación  → se nombra y ya
+> ```
+>
+> **El repositorio es el único punto del sistema donde hay dos alternativas**, y
+> por eso es el único que necesita una fábrica.
 >
 > Si alguien escribiera `new RepositorioProductoSqlServer()` dentro de un
 > servicio, se cae toda la versión — y **el compilador no diría nada**, porque
@@ -125,8 +147,14 @@ LO QUE CONSTRUYO YO:
      repositorio que exista.
 
   2. Dos implementaciones: FabricaSqlServer y FabricaPostgres. LA FÁBRICA
-     ES EL ÚNICO SITIO DEL SISTEMA QUE PUEDE NOMBRAR CLASES CONCRETAS.
-     En ningún otro lado puede aparecer un `new RepositorioXSqlServer()`.
+     ES EL ÚNICO SITIO QUE PUEDE NOMBRAR UNA IMPLEMENTACIÓN DE REPOSITORIO.
+     En ningún otro lado puede aparecer un `new RepositorioXSqlServer()`
+     ni un `new RepositorioXPostgres()`.
+     OJO: esto NO quiere decir que esté prohibido nombrar clases concretas
+     en general. Program.cs registra servicios por su nombre
+     —AddScoped<IServicioProducto, ServicioProducto>()— y está bien,
+     porque de ésos hay UNO SOLO. La regla aplica donde hay DOS
+     alternativas y hay que poder cambiar entre ellas: los repositorios.
 
   3. El interruptor en Program.cs: lee la variable de entorno MOTOR_BD
      ("sqlserver" por defecto) y registra la fábrica que corresponda. Y
@@ -217,7 +245,7 @@ errores** y **qué repositorio es el molde**.
 
 ```powershell
 git status ; git add api_facturas/
-git commit -m "feat: la fabrica de repositorios, el unico sitio que conoce clases concretas"
+git commit -m "feat: la fabrica, unica que decide cual implementacion de repositorio se usa"
 git push -u origin rama-carlos-v5
 ```
 

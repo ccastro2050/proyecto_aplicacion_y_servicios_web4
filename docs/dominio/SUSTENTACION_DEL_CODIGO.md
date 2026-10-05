@@ -184,7 +184,10 @@ git diff --stat v4..v5 -- api_facturas/
 > porque arriba se usa siempre la interfaz.
 
 > **Y la respuesta de sustentación completa agrega la fábrica.** La fábrica es
-> **el único sitio del sistema que conoce clases concretas**. Si alguien hiciera
+> **el único sitio que decide cuál implementación de repositorio se usa** — no
+> «el único que nombra clases concretas», que sería falso: `ServicioProducto` y
+> `ProductoController` lo son y se nombran sin problema, porque de cada uno hay
+> **uno solo**. Si alguien hiciera
 > `new RepositorioProductoSqlServer()` dentro de un servicio, todo lo anterior se
 > caería — y el compilador no diría nada, porque compilar es lo único que ese
 > código haría bien.

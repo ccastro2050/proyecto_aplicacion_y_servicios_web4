@@ -46,8 +46,15 @@ HTTP → Controller (valida el body contra la PETICIÓN del verbo → 422)
 - El controlador no toca SQL; el servicio no conoce HTTP ni el motor; el
   repositorio no conoce HTTP. Los contratos son `interface` de C#.
 - **Solo el ensamblador** (la sección de registro de dependencias en
-  `Program.cs`) conoce clases concretas. Todo lo demás recibe interfaces
-  por constructor.
+  `Program.cs`) decide **qué implementación** se usa. Todo lo demás
+  **recibe interfaces por constructor**, nunca instancia lo que necesita.
+
+  > **Cuidado con leer esto como «está prohibido nombrar clases
+  > concretas»: no lo es.** `ProductoController` y `ServicioProducto` son
+  > clases concretas y se nombran sin problema — de cada una hay **una
+  > sola**. Lo que la regla prohíbe es que una clase **se fabrique sola**
+  > lo que necesita: ningún servicio escribe `new RepositorioX…()`, porque
+  > ahí sí hay **dos alternativas** y elegir una lo casaría con un motor.
 - El negocio comunica problemas con excepciones
   (`ArgumentException` → 400 · `NoEncontradoExcepcion` → 404) y el
   controlador las traduce a HTTP.

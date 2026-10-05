@@ -10,12 +10,7 @@
 <h1>Productos</h1>
 
 @* --- El aviso de error: SIEMPRE visible, nunca en la consola ------------- *@
-@if (aviso is not null)
-{
-    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
-        @aviso
-    </div>
-}
+<Aviso Texto="@aviso" EsError="@avisoEsError" />
 
 @* --- El formulario ------------------------------------------------------- *@
 <section class="tarjeta">

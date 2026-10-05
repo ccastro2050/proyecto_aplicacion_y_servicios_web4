@@ -42,10 +42,7 @@
     </button>
 </div>
 
-@if (aviso is not null)
-{
-    <div class="alert alert-danger" role="alert">@aviso</div>
-}
+<Aviso Texto="@aviso" EsError="true" />
 
 @if (cargando)
 {

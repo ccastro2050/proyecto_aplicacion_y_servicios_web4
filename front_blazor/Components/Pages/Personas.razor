@@ -9,12 +9,7 @@
 
 <h1>Personas</h1>
 
-@if (aviso is not null)
-{
-    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
-        @aviso
-    </div>
-}
+<Aviso Texto="@aviso" EsError="@avisoEsError" />
 
 <section class="tarjeta">
     <h2>@(editando ? "Editar" : "Agregar persona")</h2>

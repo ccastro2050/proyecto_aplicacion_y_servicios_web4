@@ -40,12 +40,7 @@
     <a href="usuario-con-roles">Usuarios y roles</a>.
 </p>
 
-@if (aviso is not null)
-{
-    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
-        @aviso
-    </div>
-}
+<Aviso Texto="@aviso" EsError="@avisoEsError" />
 
 <section class="tarjeta">
     <h2>Asignar un rol a un usuario</h2>

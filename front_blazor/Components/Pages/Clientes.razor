@@ -29,12 +29,7 @@
 
 <h1>Clientes</h1>
 
-@if (aviso is not null)
-{
-    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
-        @aviso
-    </div>
-}
+<Aviso Texto="@aviso" EsError="@avisoEsError" />
 
 <section class="tarjeta">
     <h2>@(editando ? $"Editar el cliente {enEdicion.Id}" : "Agregar cliente")</h2>

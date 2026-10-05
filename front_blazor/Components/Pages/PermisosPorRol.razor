@@ -38,12 +38,7 @@
     entra a todo aunque esta tabla diga otra cosa.
 </p>
 
-@if (aviso is not null)
-{
-    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
-        @aviso
-    </div>
-}
+<Aviso Texto="@aviso" EsError="@avisoEsError" />
 
 <section class="tarjeta">
     <h2>Dar acceso a un rol</h2>

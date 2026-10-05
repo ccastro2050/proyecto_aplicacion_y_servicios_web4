@@ -11,12 +11,7 @@
 
 @* El `id` lo genera la base (SERIAL): al crear no se pide, y al editar se
    muestra pero no se puede cambiar. *@
-@if (aviso is not null)
-{
-    <div class="aviso @(avisoEsError ? "aviso-error" : "aviso-bien")" role="alert">
-        @aviso
-    </div>
-}
+<Aviso Texto="@aviso" EsError="@avisoEsError" />
 
 <section class="tarjeta">
     <h2>@(editando ? "Editar" : "Agregar rol")</h2>

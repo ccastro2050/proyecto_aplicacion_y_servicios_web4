@@ -1,0 +1,36 @@
+@* ============================================================
+   Aviso — el mensaje que la pantalla le da a la persona.
+
+   QUE ES: el unico sitio del front donde se decide como se ve un
+   aviso. Antes este bloque estaba copiado en 16 de las 17
+   pantallas, y no todas igual: once usaban las clases propias
+   del proyecto (.aviso) y cinco las de Bootstrap (.alert). Dos
+   aspectos distintos para exactamente lo mismo.
+
+   POR QUE IMPORTA Y NO ES SOLO ORDEN: el dia que haya que cambiar
+   como se ve un error —un color, un icono, que desaparezca solo
+   a los cinco segundos— se cambia AQUI. Con el bloque repetido,
+   habia que acordarse de 16 archivos, y el que se olvidara
+   quedaba distinto sin que nadie lo notara.
+
+   COMO SE USA:
+       <Aviso Texto="@aviso" EsError="@avisoEsError" />
+
+   Si Texto es null no pinta nada, igual que hacia el @if que
+   reemplaza.
+   ============================================================ *@
+
+@if (Texto is not null)
+{
+    <div class="aviso @(EsError ? "aviso-error" : "aviso-bien")" role="alert">
+        @Texto
+    </div>
+}
+
+@code {
+    /// <summary>El mensaje. Si es null, el componente no pinta nada.</summary>
+    [Parameter] public string? Texto { get; set; }
+
+    /// <summary>true pinta el aviso en rojo; false, en verde.</summary>
+    [Parameter] public bool EsError { get; set; }
+}

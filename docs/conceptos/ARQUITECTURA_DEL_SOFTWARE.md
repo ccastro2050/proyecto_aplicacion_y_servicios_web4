@@ -46,7 +46,7 @@ que hay que saber decir.
 > **Pero con una diferencia respecto al three-tier de manual, y es la que define
 > a este sistema:** en el libro, el nivel de datos **guarda y ya**. Aquí
 > **defiende las reglas** — tiene 3 disparadores y 16 procedimientos, y de las
-> 1 540 líneas del script **1 371 se escribieron en este proyecto**.
+> **849 líneas de código** del script **760 se escribieron en este proyecto**.
 >
 > Por eso la pregunta *«¿dónde va esta validación?»* tiene **tres** respuestas
 > posibles y no dos. Ver §6.

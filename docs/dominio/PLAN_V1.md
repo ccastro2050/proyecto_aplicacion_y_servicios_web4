@@ -38,7 +38,7 @@
 | Insumo | Qué aportó |
 |---|---|
 | **La constitución** | El stack, las capas, el idioma, el «un solo comando» |
-| **El esquema `bdfacturas.sql`** | Las doce tablas **ya hechas**: 1 540 líneas con disparadores y procedimientos |
+| **El esquema `bdfacturas.sql`** | Las doce tablas **ya hechas** —89 líneas de código— y, con ellas, **760 líneas** de disparadores y procedimientos |
 | **El mapa de versiones** | Qué va en la v1 y qué no |
 
 > **Y aquí está la particularidad del proyecto, que conviene tener presente desde

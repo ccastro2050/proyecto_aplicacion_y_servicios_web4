@@ -70,10 +70,11 @@ corre con `dotnet watch`: guardar un `.cs` recompila y reinicia solo.
 La BD `bdfacturas` tiene **dos orígenes**, y conviene no confundirlos:
 
 - **Las 12 tablas vienen del curso de Bases de Datos** — el modelo ya estaba
-  hecho y se reusa tal cual. Son **169 líneas** del script.
+  hecho y se reusa tal cual. Son **89 líneas de código** del script.
 - **Los 3 disparadores y los 16 procedimientos se escriben en ESTE proyecto**,
   en la fase 0, antes de la v1: son **las reglas del negocio**, y salen de la
-  elicitación. Son **1 371 líneas** — el 89 % del script.
+  elicitación. Son **760 líneas de código** — el **89 %** del script. (El
+  conteo excluye comentarios: así no cambia cuando se comenta mejor.)
 
 Ese trabajo está en
 [`docs/dominio/elicitacion/`](../dominio/elicitacion/1_PREGUNTAS.md),

@@ -177,8 +177,8 @@ reglas, y de las reglas los disparadores y los procedimientos.
 
 > **Y hay una distinción que este proyecto hace y conviene copiar:** las **12
 > tablas** vienen del curso de Bases de Datos —el modelo ya estaba—, pero **los 3
-> disparadores y los 16 procedimientos se escribieron aquí**. Son 1 371 de las
-> 1 540 líneas del script.
+> disparadores y los 16 procedimientos se escribieron aquí**. Son **760 de las
+> 849 líneas de código** del script — el 89 %.
 >
 > **Las tablas no deciden nada.** Todas las reglas del negocio viven en lo que se
 > escribió en este proyecto — y todas salen de la elicitación.

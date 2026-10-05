@@ -76,7 +76,7 @@
 
   <rect x="310" y="562" width="534" height="40" rx="6" fill="#fff" stroke="#2F7D5C" stroke-width="2"/>
   <text x="577" y="578" font-size="11.5" font-weight="600" text-anchor="middle" fill="#2F7D5C">3 disparadores  ·  16 procedimientos</text>
-  <text x="577" y="594" font-size="10.5" text-anchor="middle" fill="#4A4A4A">1371 de las 1540 lineas del script: escritas en ESTE proyecto</text>
+  <text x="577" y="594" font-size="10.5" text-anchor="middle" fill="#4A4A4A">760 de las 849 lineas de CODIGO: escritas en ESTE proyecto</text>
 
   <text x="56" y="626" font-size="12" font-weight="600" fill="#2F7D5C">QUE DECIDE: el stock, el total y la anulacion.</text>
   <text x="56" y="644" font-size="11.5" fill="#4A4A4A">Esta abajo para que la regla valga TAMBIEN para quien entre por SSMS, no solo para quien pasa por la API.</text>

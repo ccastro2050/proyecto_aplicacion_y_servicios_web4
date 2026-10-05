@@ -30,11 +30,11 @@ Select-String -Path dbdfacturas.sql -Pattern 'CREATE (TABLE|TRIGGER|PROCEDURE)'
   Group-Object { $_.Matches[0].Groups[2].Value } | Select-Object Count, Name
 ```
 
-| | | Líneas | De dónde viene |
+| | | Líneas de **código** | De dónde viene |
 |---|---|---|---|
-| **12 tablas** con sus restricciones | | **169** | **del curso de Bases de Datos** |
+| **12 tablas** con sus restricciones | | **89** | **del curso de Bases de Datos** |
 | **3 disparadores** | `trg_prodfact_insert` · `_update` · `_delete` | | |
-| **16 procedimientos** | los 6 de `factura`, los de usuario y roles, `verificar_acceso_ruta` | **1 371** | **de este proyecto** |
+| **16 procedimientos** | los 6 de `factura`, los de usuario y roles, `verificar_acceso_ruta` | **760** | **de este proyecto** |
 | Los datos de ejemplo | | | |
 
 > **El 11 % del script llegó hecho. El 89 % se escribió aquí.** Y no es un

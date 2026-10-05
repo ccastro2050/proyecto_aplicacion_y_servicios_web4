@@ -29,9 +29,15 @@ En la v5 se le suma **`postgres`** (15462), y el interruptor `MOTOR_BD` decide
 cuál de los dos atiende.
 
 > **La base NO es un tercero ajeno: es parte del sistema, y de las tres la que
-> más código propio tiene.** De las 1 540 líneas de `db/bdfacturas.sql`, **1 371
-> se escribieron en este proyecto** — los 3 disparadores y los 16
-> procedimientos. Solo las 12 tablas vinieron del curso de Bases de Datos.
+> más código propio tiene.** De las **849 líneas de código** de
+> `db/bdfacturas.sql` —sin contar comentarios—, **760 se escribieron en este
+> proyecto**: los 3 disparadores y los 16 procedimientos. Las 12 tablas que
+> vinieron del curso de Bases de Datos son **89**.
+>
+> **El conteo es de código a propósito.** El archivo entero tiene más de dos
+> mil líneas porque está comentado; contar comentarios haría que la cifra
+> cambiara cada vez que alguien explica mejor algo, y entonces no mediría
+> nada.
 >
 > Y no es un dato de contabilidad: **las tablas no deciden nada.** Que el stock
 > no quede negativo, que el total cuadre con sus renglones y que una factura no

@@ -120,7 +120,7 @@ recurso, y no una.
 |---|---|
 | Porque **cada verbo exige cosas distintas** | En `POST` el nombre es obligatorio; en `PATCH` no, porque lo que no se manda no se toca |
 | Porque ASP.NET valida **antes** del controlador | Las anotaciones producen un **422 con la lista de errores** sin que el controlador se entere |
-| Porque la entidad no es un formulario | `Producto` es lo que viaja; `ProductoCrear` es lo que se acepta |
+| Porque la entidad no es un formulario | de `Producto` se arman los objetos que **viajan**; `ProductoCrear` es lo que **se acepta** |
 
 > **Y de aquí sale una pregunta de sustentación que casi nadie responde bien:**
 > con el **mismo cuerpo**, el `PUT` da 422 y el `PATCH` da 200. No es un error:

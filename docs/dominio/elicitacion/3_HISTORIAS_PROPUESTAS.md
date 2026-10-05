@@ -202,11 +202,11 @@ circuito se corta —un F5, una red que se cae—, **el borrador se pierde**.
 > productos reservados sin que nadie lo sepa. **El stock se mueve cuando la
 > venta existe, no cuando alguien la está pensando.**
 
-> **Y esto es exactamente lo que el curso compara entre los tres fronts.** En el
-> front de **Flask** del curso de Diseño el borrador vive en la **sesión** y
-> **sobrevive al F5**; en Blazor vive en el circuito y no. Es la única diferencia
-> funcional real entre los dos, y está en
-> [`ARQUITECTURA.md`](../ARQUITECTURA.md) §5.
+> **Y lo que esta historia destapa es una consecuencia de la tecnología, no un
+> descuido.** Blazor Server guarda el estado de la pantalla en el **circuito**
+> del servidor; si el circuito se corta, se va. Para que el borrador sobreviviera
+> habría que guardarlo en otra parte —la sesión, el navegador o la base—, y eso
+> es trabajo que nadie ha hecho. Ver [`ARQUITECTURA.md`](../ARQUITECTURA.md) §6.
 >
 > **Es la mejor lección disponible sobre «elegir una tecnología es elegir sus
 > consecuencias»**: nadie escogió Blazor *para* perder el borrador. Vino en el

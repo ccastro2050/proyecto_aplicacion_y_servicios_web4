@@ -233,10 +233,14 @@ sistema que decide CUÁL IMPLEMENTACIÓN DE REPOSITORIO se usa.**
 | **Qué cuesta** | Si el circuito se corta —se recarga la página, se pierde la red— **la pantalla pierde su estado** |
 
 > **Eso último se nota al emitir una factura:** los renglones que se van
-> agregando viven en el circuito, no en la base. Oprimir F5 a mitad los pierde.
-> En el front de Flask del curso de Diseño el borrador vive en la sesión y
-> sobrevive al F5 — **ésa es la única diferencia real entre los dos fronts**, y
-> es lo que el curso compara.
+> agregando viven **en el circuito**, no en la base. Oprimir F5 a mitad **los
+> pierde**.
+>
+> **No es un defecto: es la consecuencia de haber escogido Blazor Server.** Si
+> hiciera falta que el borrador sobreviviera, habría que guardarlo en otra parte
+> —la sesión, el navegador o la base—, y eso es trabajo que esta versión no
+> hizo. Está declarado, sin construir, en
+> [`3_HISTORIAS_PROPUESTAS.md`](elicitacion/3_HISTORIAS_PROPUESTAS.md).
 
 ---
 

@@ -47,7 +47,7 @@ public class Usuario
 
 > **No tiene la contraseña. Ni cifrada.** Y por eso **ninguna respuesta de la API
 > puede devolverla jamás** — no porque alguien se acuerde de quitarla en cada
-> endpoint, sino **porque la clase que viaja no la tiene**.
+> endpoint, sino **porque el objeto que viaja no la tiene: su clase no la declara**.
 >
 > **Ésa es la diferencia entre una regla y un diseño.** Una regla hay que
 > recordarla en veinte sitios; un diseño la hace imposible de romper. Si usted

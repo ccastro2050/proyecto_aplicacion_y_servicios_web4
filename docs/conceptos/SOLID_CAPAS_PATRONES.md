@@ -100,9 +100,11 @@ modelo NO es una capa, y la diferencia ES la lección:**
 - Las **capas son las ESTACIONES del viaje**: cada una le HACE algo a la
   petición (el controller traduce HTTP, el servicio decide, el
   repositorio consulta).
-- El **modelo es LO QUE VIAJA entre estaciones**: el repositorio arma un
-  `Producto` desde la fila, el servicio lo razona, el controller lo
-  vuelve JSON. No procesa nada: ES el paquete. Por eso el diagrama de
+- El **modelo es la FORMA de lo que viaja entre estaciones** — y lo que
+  viaja de verdad es un **objeto**, no la clase. La clase `Producto` es
+  el molde; el repositorio **arma un objeto** con los datos de la fila,
+  el servicio lo razona, y el controller lo vuelve JSON. El objeto no
+  procesa nada: ES el paquete. Por eso el diagrama de
   palitos no lo pinta como caja — el modelo va implícito en las flechas.
 
 ```mermaid

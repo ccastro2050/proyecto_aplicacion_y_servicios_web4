@@ -127,12 +127,17 @@ HTML y mantiene un **circuito** abierto.
 | `Components/Compartidos/` | **1** | lo que se repetía en todas: el `Aviso` |
 | `Components/Layout/` | **3** | el marco y el menú |
 | `Servicios/` | **16** | **uno por recurso**, más `EstadoSesion` y `MenuApp` |
-| `Modelos/` | **13** | las clases que viajan |
+| `Modelos/` | **13** | la forma de los datos que viajan |
 
 ### La regla que no se negocia
 
 > **En el front no puede haber un solo `SqlConnection`.** Si el front puede
-> llegar a la base, la separación es un dibujo y no una arquitectura.
+> llegar a la base, **la separación existe en el diagrama y no en el sistema**:
+> queda como una intención de quien lo dibujó, no como algo que el código
+> obligue a respetar.
+>
+> Y el día que alguien tenga afán, va a hacer la consulta directa «solo esta
+> vez» — porque **nada se lo impide**.
 >
 > **Y se comprueba:** apague la API con la base encendida. El front tiene que
 > seguir en pie, con su menú y **sin una sola fila**.
@@ -144,10 +149,17 @@ HTML y mantiene un **circuito** abierto.
 | No hay que escribir JavaScript; el estado de la pantalla vive en C# | Si el circuito se corta —un F5, la red— **la pantalla pierde su estado** |
 
 > **Eso se nota al emitir una factura:** los renglones que se van agregando viven
-> en el circuito, no en la base. Oprimir F5 a mitad los pierde. En el front de
-> **Flask** del curso de Diseño el borrador vive en la sesión y sobrevive —
-> **ésa es la única diferencia real entre los dos fronts**, y es lo que el curso
-> compara.
+> **en el circuito**, no en la base. Oprimir F5 a mitad **los pierde**.
+>
+> **No es un defecto del código: es lo que se escogió al escoger Blazor Server.**
+> Si hiciera falta que el borrador sobreviviera, habría que guardarlo en otra
+> parte —la sesión, el navegador o la base— y eso es trabajo aparte. Está
+> declarado como historia propuesta, sin construir, en
+> [`3_HISTORIAS_PROPUESTAS.md`](../dominio/elicitacion/3_HISTORIAS_PROPUESTAS.md).
+
+> **Y de ahí sale la lección general: elegir una tecnología es elegir sus
+> consecuencias.** Nadie escogió Blazor *para* perder el borrador — vino en el
+> paquete, y hay que saberlo antes de escoger, no después.
 
 ---
 

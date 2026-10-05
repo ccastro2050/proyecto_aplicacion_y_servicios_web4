@@ -197,7 +197,7 @@ git diff --stat v4..v5 -- api_facturas/
 ## 6 · `Producto` y `ProductoCrear` son clases distintas. ¿Qué tiene una que la otra no?
 
 ```csharp
-// Modelos/Producto.cs — la ENTIDAD: lo que viaja entre capas
+// Modelos/Producto.cs — la ENTIDAD: el molde de los objetos que viajan
 public class Producto {
     public required string Codigo { get; set; }
     public required string Nombre { get; set; }

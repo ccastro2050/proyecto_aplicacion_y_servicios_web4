@@ -17,15 +17,26 @@
 
 ---
 
-## 1. Dos procesos, no uno
+## 1. Tres procesos
 
 | Proceso | Qué es | Puerto |
 |---|---|---|
-| **`api-facturas`** | ASP.NET Core. La única que habla con la base | 8035 |
-| **`front-blazor`** | Blazor Server. La única que le habla a la persona | 8099 |
+| **`front-blazor`** | Blazor Server. El único que le habla a la persona | 8099 |
+| **`api-facturas`** | ASP.NET Core. El único que habla con la base | 8035 |
+| **`sqlserver`** | El motor, con **las reglas del negocio adentro** | 11466 |
 
-Y un tercero que no es nuestro: **`sqlserver`**, la base. En la v5 se le suma
-**`postgres`**.
+En la v5 se le suma **`postgres`** (15462), y el interruptor `MOTOR_BD` decide
+cuál de los dos atiende.
+
+> **La base NO es un tercero ajeno: es parte del sistema, y de las tres la que
+> más código propio tiene.** De las 1 540 líneas de `db/bdfacturas.sql`, **1 371
+> se escribieron en este proyecto** — los 3 disparadores y los 16
+> procedimientos. Solo las 12 tablas vinieron del curso de Bases de Datos.
+>
+> Y no es un dato de contabilidad: **las tablas no deciden nada.** Que el stock
+> no quede negativo, que el total cuadre con sus renglones y que una factura no
+> se anule dos veces vive **ahí**, no en C#. Ver
+> [`FUENTES.md`](FUENTES.md) §0.
 
 > **La regla que no se negocia: en el front no puede haber un solo
 > `SqlConnection`.** Si el front puede llegar a la base, la separación es un

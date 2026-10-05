@@ -2,6 +2,7 @@
 @inject ServicioSesion Servicio
 @inject EstadoSesion Estado
 @inject NavigationManager Navegador
+@inject IJSRuntime JS
 
 @*
    ============================================================
@@ -66,7 +67,7 @@
                         <label class="form-label" for="correo">Correo</label>
                         <input id="correo" type="email" class="form-control"
                                @bind="email" @bind:event="oninput"
-                               placeholder="admin@@correo.com" />
+                               placeholder="Digite el correo" />
                     </div>
 
                     <div class="mb-4">
@@ -74,6 +75,7 @@
                         @* type="password": no se muestra en pantalla *@
                         <input id="clave" type="password" class="form-control"
                                @bind="contrasena" @bind:event="oninput"
+                               placeholder="Digite la contraseña"
                                @onkeyup="PorSiLeDioEnter" />
                     </div>
 
@@ -154,9 +156,20 @@
 
     private async Task Entrar()
     {
+        // EL AUTOCOMPLETADO DEL NAVEGADOR NO DISPARA `oninput`.
+        //
+        // Cuando Edge o Chrome rellenan el formulario, escriben en la pantalla
+        // SIN avisarle a Blazor: el campo se ve lleno y estas dos variables
+        // siguen vacias. Antes de validar, se leen del DOM tal como estan.
+        //
+        // Si el usuario escribio a mano, esto devuelve lo mismo que ya tenemos
+        // y no cambia nada. Si lo relleno el navegador, lo rescata.
+        email = await JS.InvokeAsync<string>("leerCampo", "correo");
+        contrasena = await JS.InvokeAsync<string>("leerCampo", "clave");
+
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(contrasena))
         {
-            aviso = "Escriba el correo y la contrasena.";
+            aviso = "Escriba el correo y la contraseña.";
             return;
         }
 

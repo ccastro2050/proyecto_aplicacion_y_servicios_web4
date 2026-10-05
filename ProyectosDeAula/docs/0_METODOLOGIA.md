@@ -67,10 +67,10 @@ grupo la fija el profesor en clase (anótela en el espacio en blanco).
 | Momento | Fecha general | Fecha exacta (su grupo) | Evaluación |
 |---|---|---|---|
 | **Evaluación individual teórico-práctica** | Segunda semana de **septiembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** individual |
-| **Entrega versión 1** | Última semana de **septiembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% sustentación individual (incluidos los commits) + 10% entrega en equipo |
-| **Entrega versión 2** | Última semana de **octubre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% sustentación individual (incluidos los commits) + 10% entrega en equipo |
-| **Entrega versión 3** | Segunda semana de **noviembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% sustentación individual (incluidos los commits) + 10% entrega en equipo |
-| **Entrega versión 4** | Última semana de **noviembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% sustentación individual (incluidos los commits) + 10% entrega en equipo |
+| **Entrega versión 1** | Última semana de **septiembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% sustentación individual (incluidos los commits) + 10% entrega en equipo. *Sin interpretabilidad: empieza en la v2* |
+| **Entrega versión 2** | Última semana de **octubre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% individual (**4 de interpretabilidad** + commits y sustentación) + 10% entrega en equipo |
+| **Entrega versión 3** | Segunda semana de **noviembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% individual (**4 de interpretabilidad** + commits y sustentación) + 10% entrega en equipo |
+| **Entrega versión 4** | Última semana de **noviembre** | \_\_\_\_/\_\_\_\_/\_\_\_\_\_\_\_\_ | **20%** — 10% individual (**4 de interpretabilidad** + commits y sustentación) + 10% entrega en equipo |
 
 > **"Incluidos los commits"** significa que en la sustentación individual
 > cada estudiante responde por SU rama: qué hizo, por qué, y sus commits
@@ -359,9 +359,39 @@ restricción, y no una preferencia de quien programa.
 
 ## 7. Rúbrica de evaluación
 
-Aplica en cada versión; el profesor asigna el peso por criterio. Cada
-criterio se califica en una de dos franjas: **Cumple (de 3.0 a 5.0**,
-según la calidad de lo entregado**)** o **No cumple (de 0 a 2.9)**.
+Aplica en cada versión. Cada criterio se califica en una de dos franjas:
+**Cumple (de 3.0 a 5.0**, según la calidad de lo entregado**)** o **No cumple
+(de 0 a 2.9)**.
+
+> ### El peso que SÍ está fijado: la interpretabilidad vale el 20 %
+>
+> **Desde la versión 2, el 20 % de la nota de cada versión es
+> interpretabilidad.** El profesor reparte el 80 % restante entre los demás
+> criterios según lo que esa versión exija.
+>
+> **Y en puntos, para que no haya dudas:**
+>
+> | | |
+> |---|---|
+> | Cada versión vale **20 %** del semestre | 10 % individual + 10 % en equipo |
+> | La interpretabilidad es **20 % de esa versión** | **4 de los 20 puntos** |
+> | Y es **individual**, no de equipo | esos 4 puntos salen de **sus 10 puntos individuales** |
+> | Son **tres versiones** con interpretabilidad (v2, v3 y v4) | **12 % de la nota final del semestre** |
+>
+> **En la versión 1 ese 20 % no se evalúa** —se está aprendiendo a mover las
+> piezas— y se reparte entre los demás criterios.
+>
+> **Por qué pesa tanto, dicho sin rodeos:** es el único criterio que **no se
+> puede delegar**. La API puede funcionar porque una IA la escribió bien; el
+> front puede verse bien por lo mismo. **Explicar por qué está así solo lo puede
+> hacer quien entendió.** Un equipo puede entregar un sistema perfecto y sacar
+> 2.9 en este criterio — y es correcto que así sea.
+>
+> **Ojo con confundir comentar y entender.** Los comentarios **facilitan** la
+> interpretabilidad: por eso se exigen, y por eso la IA tiene que escribirlos. Pero
+> **el comentario no es la nota**: un comentario se puede recitar sin entenderlo, y
+> además **puede estar equivocado** —la IA comenta lo que *cree* que hizo—. Lo que
+> se califica es que usted pueda decir **si es cierto**.
 
 | Criterio | Cumple (3.0 – 5.0) | No cumple (0 – 2.9) |
 |---|---|---|
@@ -375,7 +405,7 @@ según la calidad de lo entregado**)** o **No cumple (de 0 a 2.9)**.
 | **Dashboard y consultas (v4)** | 10 consultas de 4+ tablas con gráficos claros | Menos de 10 consultas, consultas de menos de 4 tablas, o sin dashboard |
 | **Imagen corporativa y responsive (v4)** | **Existe un manual de marca** —propio o el del ejemplo— y la interfaz gráfica lo cumple: los colores y las tipografías salen de él, no de un gusto; todo responsive | No hay manual, o lo hay y la interfaz gráfica no lo respeta, o no es responsive |
 | **Publicación (v4)** | Publicado, funcional, con secretos en variables de entorno del servidor | No publicado o con secretos expuestos |
-| **Interpretabilidad (desde la v2)** | Cada integrante **explica en voz alta** el código que entregó: qué hace, por qué está escrito así, qué pasa si falla y qué haría distinto. El código está comentado y los comentarios dicen el **porqué** | No puede explicar lo que entregó; lo lee en voz alta sin poder decir por qué; o atribuye a la IA decisiones que nadie revisó |
+| **Interpretabilidad (desde la v2) — 20 %** | Cada integrante **explica en voz alta** el código que entregó: qué hace, por qué está escrito así, qué pasa si falla y qué haría distinto. El código está comentado y los comentarios dicen el **porqué** | No puede explicar lo que entregó; lo lee en voz alta sin poder decir por qué; o atribuye a la IA decisiones que nadie revisó |
 
 Dentro de la franja "Cumple", la nota (3.0 a 5.0) refleja la calidad:
 completitud, solidez ante errores, claridad del código y de la spec, y la

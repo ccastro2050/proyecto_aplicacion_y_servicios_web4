@@ -87,35 +87,39 @@ donde `L` se obtiene linealizando cada canal y pesándolos
 y no una opinión.
 
 > **Haga la cuenta con los colores de este proyecto y verá que incomoda.** El
-> manual de la Universidad de San Buenaventura fija dos colores
-> institucionales, y esto es lo que dan:
+> manual de **Comercial Los Andes S.A.** —la empresa de este proyecto— fija
+> cinco colores, y esto es lo que dan sobre el fondo:
 >
-> | Color | Hex | Sobre blanco | Sobre el negro institucional |
+> | Color | Hex | Sobre el fondo | Con blanco encima |
 > |---|---|---|---|
-> | Naranja institucional | `#EF7D00` | **2,76:1** | 7,60:1 |
-> | Negro institucional | `#1D1D1B` | 16,88:1 | — |
+> | azul cordillera | `#17495B` | **8,76** ✅ | 9,81 ✅ |
+> | verde páramo | `#2F7D5C` | **4,46** ⚠ | 4,99 ✅ |
+> | rojo anulada | `#B4402F` | **5,05** ✅ | 5,65 ✅ |
+> | piedra | `#4A4A4A` | **7,92** ✅ | 8,86 ✅ |
+> | **ámbar cosecha** | `#E39B2D` | **2,09** ❌ | 2,34 ❌ |
 >
-> **El naranja institucional no sirve para texto sobre blanco.** Ni para texto
-> normal (pide 4,5:1), ni para texto grande, ni siquiera para un borde o un
-> icono (piden 3:1): 2,76 no llega a ninguno de los tres umbrales.
+> **El ámbar no sirve para texto, ni para llevar texto encima.** Ni para texto
+> normal (pide 4,5), ni para texto grande, **ni siquiera para un borde o un
+> icono** (piden 3): 2,09 no llega a ninguno de los tres umbrales.
 >
-> Eso **no** es un defecto del manual. Un manual de identidad se hace pensando
-> en papel, vallas y pendones, donde el naranja sobre blanco se ve
-> perfectamente. La pantalla es otro medio, con otra norma, y el manual no
-> tiene por qué haberla previsto.
+> Eso **no** es un defecto de la paleta. Un ámbar cálido es perfecto como
+> **acento** —el triángulo del isotipo, un realce—, que es para lo que se
+> escogió. La pantalla solo le exige un número cuando se le pone texto encima o
+> se usa para **informar algo**.
 >
-> Lo que sí es responsabilidad de quien programa es **no llevarse el color al
-> texto sin hacer la cuenta**. Hay dos salidas legítimas, y este proyecto usa
-> la primera:
+> **Y en este proyecto eso se incumplió, de verdad.** El borde del campo
+> enfocado —que es un **indicador de interfaz** y pide 3— estaba en ámbar:
+> **2,09**. Alguien que distinga mal los colores no veía en qué campo estaba
+> escribiendo. Hay dos salidas legítimas:
 >
-> 1. **Ponerlo sobre el negro institucional**, donde da 7,60:1 y sobra. Es lo
->    que hace la barra superior de este front: fondo `--usb-negro`, y el
->    nombre de la dependencia en `--usb-naranja`.
-> 2. **Definir una variante oscura solo para texto**, del mismo matiz y la
->    misma saturación, bajando la luminosidad hasta pasar el umbral:
->    `#B45E00` da **4,62:1** sobre blanco. No reemplaza al institucional —el
->    manual prohíbe cambiarlo—: **convive** con él, igual que el manual ya
->    prevé una escala de grises para cuando no hay color.
+> 1. **Llevarlo a un color que sí cumpla.** Es lo que se hizo: el foco pasó a
+>    `azul cordillera`, que da **8,76**.
+> 2. **Definir una variante oscura del mismo matiz**, bajando la luminosidad
+>    hasta pasar el umbral. No reemplaza al color de marca: **convive** con él.
+>
+> **Y el verde da 4,46, que se queda a cuatro centésimas del 4,5 — y eso no se
+> redondea hacia arriba.** Para texto va en negrita o en tamaño grande; para un
+> botón, con blanco encima, donde sí llega a 4,99.
 >
 > Un manual que dice «nuestros colores son accesibles» sin el número no dice
 > nada. Y una aplicación que usa el color institucional para texto sin
@@ -131,8 +135,16 @@ color no se entera.
 ## 5. Cuando **no hay** manual — que es el caso normal
 
 Hasta aquí, este documento ha supuesto que existe un manual. **En este proyecto
-existe** —la Resolución de Rectoría General n.º 404— y eso es suerte, no lo
-corriente.
+NO existe**, y por eso §5 no es teoría: es lo que de verdad se hizo.
+
+> **«Comercial Los Andes S.A.» es una empresa ficticia**, así que no hay
+> departamento de comunicaciones al que pedirle el PDF ni resolución que citar.
+> El manual de [`MANUAL_DE_MARCA.md`](../dominio/MANUAL_DE_MARCA.md) es
+> **derivado**: se construyó siguiendo los cinco pasos de abajo, y lo dice en su
+> primera línea.
+>
+> **Y eso es lo normal, no la excepción.** Al equipo le va a pasar lo mismo en su
+> proyecto de aula.
 
 > **Lo habitual es que la organización tenga una identidad visual y ningún
 > documento que la describa.** Hay un logo en el sitio web, unos colores que
@@ -200,7 +212,7 @@ El documento empieza así, y no en letra pequeña:
 
 #### 5 · Someterlo a aprobación — y **si nadie aprueba, decirlo**
 
-Se le pasa a quien pueda validarlo: comunicaciones, mercadeo, rectoría, el
+Se le pasa a quien pueda validarlo: comunicaciones, mercadeo, la gerencia, el
 cliente. Y entonces pasa una de dos:
 
 - **Lo aprueban** → deja de ser derivado y pasa a ser el manual.
@@ -241,76 +253,113 @@ al medirlo resulta que una combinación institucional no llega al 4,5:1, eso
 **La regla es una sola: los valores del manual van en un archivo aparte.**
 
 En este proyecto ese archivo es
-[`front_flask/static/marca.css`](../../front_blazor/wwwroot/marca.css), y está
-separado de `estilos.css` a propósito: **aquí van los valores que el manual
-fija y que nadie puede cambiar; allá va cómo se usan**.
+[`front_blazor/wwwroot/marca.css`](../../front_blazor/wwwroot/marca.css), y está
+separado de `app.css` a propósito: **aquí van los valores que el manual fija;
+allá va cómo se usan**.
 
 ```css
 :root {
-  --usb-naranja:  #EF7D00;   /* C:0 M:60 Y:100 K:0 · R:239 G:125 B:0 */
-  --usb-negro:    #1D1D1B;   /* C:0 M:0  Y:0   K:100 · R:29 G:29 B:27 */
+  --azul-cordillera: #17495B;   /* el principal: barra, títulos, botón primario */
+  --verde-paramo:    #2F7D5C;   /* lo que salió bien */
+  --rojo-anulada:    #B4402F;   /* lo que falló o se anuló */
+  --piedra:          #4A4A4A;   /* texto corriente */
+  --ambar-cosecha:   #E39B2D;   /* SOLO acento: nunca lleva texto */
+  --niebla:          #F4F2EC;   /* el fondo */
 }
 ```
 
-Esos dos valores no son una preferencia de diseño. El manual lo dice con
-todas las letras: *«Por ningún motivo se deben cambiar los colores
-corporativos.»* Quien los cambie está fuera de norma, y no es una norma del
-curso: es una **Resolución de Rectoría**.
-
-Y los estilos de la aplicación **usan la variable, nunca el valor**:
+Y las pantallas **usan la variable, nunca el valor**:
 
 ```css
 /* bien */
-.barra { background: var(--usb-negro); }
+.barra { background: var(--azul-cordillera); }
 
 /* mal */
-.barra { background: #1D1D1B; }
+.barra { background: #17495B; }
 ```
-
-Compruébelo: `estilos.css` usa `var(--…)` treinta y cinco veces y **no repite
-ni una vez** un color institucional escrito a mano.
 
 Por qué importa:
 
-| | Con el valor regado por todo el CSS | Con `marca.css` |
+| | Con el valor regado por el CSS | Con `marca.css` |
 |---|---|---|
-| La universidad cambia su verde | Buscar y reemplazar, y rezar | Se cambia una línea |
-| ¿De dónde salió este color? | Nadie sabe | Del manual, punto 2 |
-| ¿Está permitido usar este otro? | Se discute | Si no está en `marca.css`, no |
+| La empresa cambia su azul | Buscar y reemplazar, y rezar | Se cambia **una línea** |
+| ¿De dónde salió este color? | Nadie sabe | Del manual |
+| ¿Está permitido usar este otro? | Se discute | **Si no está en `marca.css`, no** |
+
+> **Y esto no es teoría: aquí se rompió.** Cuando se escribió el manual, `app.css`
+> traía **cuatro colores de Bootstrap escritos a mano** —`#86b7fe` en el foco,
+> `#0b5ed7` y `#0a58ca` en el botón primario, y `#6f42c1` en una barra del
+> tablero—. Ninguno era de esta marca: eran los valores por defecto de Bootstrap,
+> de cuando se copió el estilo.
+>
+> **Peor aún: había DOS estilos de foco distintos** —uno en `marca.css` y otro en
+> `app.css`—, así que según el campo en que uno se parara veía uno u otro.
+> **Tener dos es tener ninguno.**
 
 Es la misma idea que sostiene el resto del curso: **separar lo que es una
-restricción de lo que es una decisión**. El manual manda; el CSS de la
-aplicación obedece.
+restricción de lo que es una decisión**. El manual manda; el CSS obedece.
 
 ---
 
 ## 7. Cómo se comprueba en este proyecto
 
-Aquí la marca **no es un ejercicio**: es la de la Universidad de San
-Buenaventura, y el documento que la fija está en el repositorio —
-un PDF oficial y su transcripción a markdown para poder citarla y buscarla.
+> **Aquí el manual no es un PDF aparte: son dos documentos que se leen juntos.**
+> [`MANUAL_DE_MARCA.md`](../dominio/MANUAL_DE_MARCA.md) explica **qué** y **por
+> qué**; [`marca.css`](../../front_blazor/wwwroot/marca.css) lo hace **exigible**,
+> porque un color que no esté ahí **sencillamente no existe** para las pantallas.
 
-> **En este repositorio el manual no es un documento aparte: es
-> [`marca.css`](../../front_blazor/wwwroot/marca.css).** Los colores y las
-> tipografías viven ahí como variables, y las pantallas usan la variable, nunca
-> el valor. Es la misma idea —el manual manda sobre el gusto de quien
-> programa— con una ventaja: si una pantalla se sale del manual, no hay que
-> revisarla a ojo contra un PDF; el color simplemente no existe.
+**Y la ventaja de tenerlo en CSS en vez de en un PDF es que se puede CONTAR.**
+«La interfaz se ve bien» no se califica; **«hay cero colores fuera de la paleta»
+sí**:
 
-Seis comprobaciones, todas verificables mirando archivos:
+```powershell
+# 1 · NINGÚN color de marca escrito a mano fuera de marca.css.
+#     OJO: hay DOS formas de escribir un color, y la segunda es la que se
+#     escapa. Las sombras en rgba(0,0,0,…) NO cuentan: el negro de una sombra
+#     no es un color de marca.
+Select-String -Path front_blazor\wwwroot\app.css `
+  -Pattern '#[0-9a-fA-F]{6}|rgba?\([0-9]' |
+  Where-Object { $_.Line -notmatch 'rgba\(0, ?0, ?0|rgba\(255|/\*|^\s*\*' }
 
-| Qué se comprueba | Dónde se mira |
+# 2 · TODOS los focos del mismo color: compare el valor de cada uno.
+Select-String -Path front_blazor\wwwroot\*.css -Pattern ':focus' -Context 0,3
+
+# 3 · El ámbar NO lleva texto encima. Revise a ojo dónde se usa:
+Select-String -Path front_blazor\wwwroot\*.css `
+  -Pattern 'ambar-cosecha|227, ?155, ?45'
+```
+
+> **El `rgba?` del comando 1 no es un adorno, y este proyecto lo aprendió a
+> golpes.** Buscando solo `#rrggbb` el repositorio daba **cero colores a mano**
+> — y tenía dos, escritos en el otro formato:
+>
+> | Dónde | Qué era |
+> |---|---|
+> | `app.css`, el foco del botón | `rgba(13, 110, 253, .25)` — **el azul de Bootstrap**, `#0d6efd` |
+> | `marca.css`, el foco del campo | el borde en azul y **la sombra todavía en ámbar** |
+>
+> El segundo es el peor: una corrección anterior cambió el borde y **se olvidó
+> de la sombra**, así que el foco quedó medio azul y medio ámbar. **Nadie lo
+> notó, porque la comprobación no lo buscaba.**
+>
+> **Una comprobación que no puede fallar no está comprobando nada.**
+
+| Qué se comprueba | Cómo |
 |---|---|
-| Los colores institucionales están **solo** en `marca.css` | `grep -c "#EF7D00" front_flask/static/estilos.css` debe dar **0** |
-| La aplicación usa variables, no valores | `estilos.css` usa `var(--…)`, nunca el hex |
-| Ningún color institucional aparece **modificado** | Ningún `#EF7D00` alterado ni `opacity` sobre el logo |
-| El logosímbolo respeta **tamaño mínimo** y **área de reserva** | El manual, punto 4; el margen está declarado en `marca.css` |
-| El naranja no lleva texto sobre fondo claro | La barra lo usa sobre `--usb-negro`: 7,60:1 |
-| Los estados —correcto, error— no usan los colores institucionales | Los tonos de aviso de `estilos.css` son propios, no de la marca |
+| Los colores viven **solo** en `marca.css` | el comando 1 da **0** |
+| Las pantallas usan variables, no valores | `app.css` usa `var(--…)`, nunca el hex |
+| **Un solo** estilo de foco | el comando 2 lo encuentra una vez |
+| El ámbar nunca lleva texto | 2,09 no alcanza ningún umbral — §4 |
+| El verde no se usa para texto pequeño sobre el fondo | 4,46 se queda a cuatro centésimas |
+| El rojo significa **una** cosa: algo falló o se deshizo | No se usa para «destacar» un dato importante |
+
+> **La última fila es la que más se rompe.** Usar el rojo para resaltar un dato
+> que no es un error le quita el significado — y el día que haya un error de
+> verdad, nadie lo va a distinguir.
 
 Lo que **no** se comprueba es el gusto. No se trata de que la pantalla sea
-bonita: se trata de que **cumpla un documento que alguien firmó**, y de que
-cualquiera pueda verificar que lo cumple sin discutir de estética.
+bonita: se trata de que **cumpla un documento**, y de que cualquiera pueda
+verificar que lo cumple **sin discutir de estética**.
 
 ---
 

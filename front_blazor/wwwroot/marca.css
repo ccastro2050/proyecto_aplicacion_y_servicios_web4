@@ -2,6 +2,11 @@
    Nada de layout ni responsive aquí: eso es 100% Bootstrap. */
 :root {
     --azul-cordillera: #17495B;
+    /* LOS COMPONENTES DEL MISMO AZUL, por separado.
+       rgba() NO acepta var(--azul-cordillera): necesita los numeros sueltos.
+       Sin esto, cada sombra translucida obliga a escribir 23, 73, 91 a mano —
+       y un color escrito a mano es justo lo que el manual existe para impedir. */
+    --azul-cordillera-rgb: 23, 73, 91;
     /* El mismo azul, un paso mas oscuro: es el estado «el mouse encima».
        Vive aqui y no en app.css para que no vuelva a escribirse a mano. */
     --azul-cordillera-oscuro: #1d5a70;
@@ -28,5 +33,9 @@ h1, h2, .card-title { font-family: Georgia, serif; color: var(--azul-cordillera)
 .btn-danger  { --bs-btn-bg: var(--rojo-anulada); --bs-btn-border-color: var(--rojo-anulada);
                --bs-btn-hover-bg: #c94f3c; --bs-btn-hover-border-color: #c94f3c; }
 .table thead th { background-color: var(--azul-cordillera); color: #fff; }
+/* EL FOCO VA ENTERO EN AZUL CORDILLERA: borde Y sombra.
+   Antes el borde era azul y la sombra seguia en ambar (227,155,45) — la
+   correccion anterior se quedo a medias y nadie lo noto, porque un grep de
+   #rrggbb no encuentra un color escrito en rgba(). */
 .form-control:focus { border-color: var(--azul-cordillera);
-                      box-shadow: 0 0 0 .25rem rgba(227, 155, 45, .25); }
+                      box-shadow: 0 0 0 .25rem rgba(var(--azul-cordillera-rgb), .25); }

@@ -110,7 +110,7 @@ h2 {
        WCAG pide 3.0 para un indicador de interfaz. El azul da 8.76. */
     border-color: var(--azul-cordillera);
     outline: 0;
-    box-shadow: 0 0 0 .25rem rgba(23, 73, 91, .25);
+    box-shadow: 0 0 0 .25rem rgba(var(--azul-cordillera-rgb), .25);
 }
 
 .campos input:disabled {
@@ -161,7 +161,10 @@ button:hover {
 
 button:focus-visible {
     outline: 0;
-    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+    /* EL AZUL DE LA MARCA, no el de Bootstrap. rgba(13,110,253) es #0d6efd:
+       se colo al copiar el estilo, y un grep de #rrggbb NO lo encuentra
+       porque esta escrito en rgba. Son 23,73,91 = #17495B. */
+    box-shadow: 0 0 0 .25rem rgba(var(--azul-cordillera-rgb), .25);
 }
 
 button:disabled {

@@ -309,7 +309,7 @@ procedimiento puede manejar transacciones —abrir y cerrar—; la función no.
 Llamar «procedimientos almacenados» a un conjunto de funciones es enseñar mal
 una diferencia que sí importa.
 
-### Las tres trampas del físico, con ejemplo
+### Las tres cosas que se pasan por alto al bajar al físico, con ejemplo
 
 1. **El texto con forma de fecha.** Una columna `date` **no acepta** un
    parámetro de texto, aunque el texto se lea como fecha. Se descubre al correr

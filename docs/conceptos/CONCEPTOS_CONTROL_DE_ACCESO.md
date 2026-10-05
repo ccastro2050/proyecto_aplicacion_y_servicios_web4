@@ -205,7 +205,7 @@ sitios, y el día que cambie, cambia en uno.
 
 > **Esconder una entrada del menú NO es control de acceso.**
 
-Es la trampa en la que cae casi todo el mundo, porque *parece* que funciona: el
+Es el error en el que cae casi todo el mundo, porque *parece* que funciona: el
 vendedor entra, no ve «Usuarios», y se va tranquilo.
 
 **Pero el menú es HTML que ya está en su navegador.** Quien escriba la

@@ -128,7 +128,7 @@ que un handler que dependa de un servicio `scoped` puede recibir **el scope
 equivocado** — el token de otra sesión.
 
 > Es un problema conocido y **silencioso**. Inyectar `EstadoSesion` en cada
-> servicio es más largo de escribir y no tiene esa trampa.
+> servicio es más largo de escribir y no falla de esa manera.
 
 ### 4.3 El modo de renderizado se declara UNA vez, y el dibujo previo se APAGA
 

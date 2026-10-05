@@ -114,7 +114,7 @@ lo que el formulario tiene:      [1, 3]
 > nada y el usuario queda **sin roles — sin un solo error**. Se abre el
 > plpgsql y se lee.
 
-**Y la clave que devuelve, que es la trampa simétrica:**
+**Y la clave que devuelve, que es el error simétrico:**
 
 ```sql
 json_agg(json_build_object('idrol', r.id, 'nombre', r.nombre))

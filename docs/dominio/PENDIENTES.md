@@ -57,7 +57,7 @@ comentario es lo que queda cuando el recuerdo de la conversación se fue.
 | | Estado | Qué falta |
 |---|---|---|
 | [`VERSION_2.md`](../../ProyectosDeAula/docs/VERSION_2.md) | **Hecho** | Incluye el 20 % de interpretabilidad en su §8.1 |
-| **`VERSION_3.md`** | **No existe** | El equivalente para la v3: el control de acceso, con sus criterios y sus trampas |
+| **`VERSION_3.md`** | **No existe** | El equivalente para la v3: el control de acceso, con sus criterios y lo que suele salir mal |
 | **`VERSION_4.md`** | **No existe** | El equivalente para la v4: las 10 consultas, el tablero, la marca y la publicación |
 | **Los planes de versión** | **Hecho** | [`PLAN_V1`](PLAN_V1.md) · [`PLAN_V2`](PLAN_V2.md) · [`PLAN_V3`](PLAN_V3.md) · [`PLAN_V4`](PLAN_V4.md) |
 

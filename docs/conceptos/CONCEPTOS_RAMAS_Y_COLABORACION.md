@@ -133,7 +133,7 @@ git branch -a
 git branch -d rama-carlos
 ```
 
-### `git switch` o `git checkout`? La pregunta tiene trampa
+### `git switch` o `git checkout`? La pregunta está mal planteada
 
 **Para cambiar de rama son idénticos.** No hay matiz, no hay diferencia de
 comportamiento:

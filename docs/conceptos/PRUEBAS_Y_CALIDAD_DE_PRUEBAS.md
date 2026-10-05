@@ -259,7 +259,7 @@ empieza el problema de la sección siguiente.
 recorren 80 de 100 líneas, hay 80 % de cobertura de línea. También existe la
 **de rama**: ¿se probaron el `if` **y** el `else`?
 
-**La trampa:** *ejecutar* una línea no es *verificarla*. La prueba hueca de
+**Y aquí está el engaño:** *ejecutar* una línea no es *verificarla*. La prueba hueca de
 arriba **sube la cobertura igual** que la buena.
 
 **Cómo leerla bien:**

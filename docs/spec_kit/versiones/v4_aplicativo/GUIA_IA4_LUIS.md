@@ -38,7 +38,7 @@
 
 ---
 
-## 3. LA TRAMPA DE SU PARTE: dos de sus tres consultas devuelven VACÍO
+## 3. LO DIFÍCIL DE SU PARTE: dos de sus tres consultas devuelven VACÍO
 
 **Y es el resultado correcto.** Con los datos sembrados:
 

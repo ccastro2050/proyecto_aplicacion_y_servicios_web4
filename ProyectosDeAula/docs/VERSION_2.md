@@ -400,7 +400,7 @@ seguir funcionando»: se corren.
 
 ---
 
-## 12. Las trampas de esta versión
+## 12. Lo que suele salir mal en esta versión
 
 | | Qué pasa | Cómo se nota |
 |---|---|---|

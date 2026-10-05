@@ -53,14 +53,43 @@ GO
 
 -- ============================================================
 -- TABLAS INDEPENDIENTES (sin foreign keys)
+--
+-- Van primero porque NADA de aqui apunta a otra tabla. Y el orden no es
+-- estetico: una clave foranea solo se puede crear si la tabla a la que
+-- apunta YA existe. Si se intenta crear `cliente` antes que `persona`, el
+-- motor rechaza el script.
+--
+-- SON LAS SEIS DE LA VERSION 1: con estas seis se hace un CRUD completo sin
+-- tocar una sola clave foranea.
 -- ============================================================
 
+-- ------------------------------------------------------------
+-- empresa — las empresas a las que puede pertenecer un cliente.
+--
+-- PARA QUE: distinguir al cliente que compra por su cuenta del que compra a
+-- nombre de una empresa. En `cliente` esa relacion es OPCIONAL.
+--
+-- LA CLAVE ES EL CODIGO, no un autonumerico: el codigo lo pone el negocio
+-- (EM001), existe en el mundo real y se puede dictar por telefono. Un
+-- autonumerico solo existe dentro de esta base.
+-- ------------------------------------------------------------
 CREATE TABLE empresa (
     codigo NVARCHAR(10) NOT NULL,
     nombre NVARCHAR(100) NOT NULL,
     CONSTRAINT pk_empresa PRIMARY KEY (codigo)
 );
 
+-- ------------------------------------------------------------
+-- persona — los DATOS de una persona: nombre, correo, telefono.
+--
+-- PARA QUE: es la tabla raiz de la gente. `cliente` y `vendedor` NO repiten
+-- el nombre ni el telefono: apuntan aqui. La misma persona puede ser las dos
+-- cosas sin que sus datos existan dos veces y se contradigan.
+--
+-- OJO CON EL CORREO: aqui NO es unico, es un dato de contacto. El correo que
+-- no se puede repetir es el de `usuario`, que si es clave primaria. Son dos
+-- correos con dos oficios distintos.
+-- ------------------------------------------------------------
 CREATE TABLE persona (
     codigo NVARCHAR(10) NOT NULL,
     nombre NVARCHAR(100) NOT NULL,
@@ -69,6 +98,17 @@ CREATE TABLE persona (
     CONSTRAINT pk_persona PRIMARY KEY (codigo)
 );
 
+-- ------------------------------------------------------------
+-- producto — el catalogo: que se vende, a como, y cuanto hay.
+--
+-- PARA QUE: `valorunitario` es el precio con el que se calcula el subtotal
+-- de cada renglon de factura, y `stock` es lo que hay en bodega.
+--
+-- EL STOCK NO LO MUEVE LA API: lo mueven los disparadores de mas abajo, al
+-- insertar o borrar un renglon. Si alguien tambien lo baja desde C#, el
+-- stock baja DOS veces. Esta escrito aqui porque es el error mas caro del
+-- proyecto y no se ve leyendo el C#.
+-- ------------------------------------------------------------
 CREATE TABLE producto (
     codigo NVARCHAR(10) NOT NULL,
     nombre NVARCHAR(100) NOT NULL,
@@ -77,12 +117,37 @@ CREATE TABLE producto (
     CONSTRAINT pk_producto PRIMARY KEY (codigo)
 );
 
+-- ------------------------------------------------------------
+-- rol — los perfiles del sistema: Administrador, Vendedor, Cajero, Cliente.
+--
+-- PARA QUE: el permiso no se le da a una persona, se le da a un ROL, y la
+-- persona recibe el rol. Asi, cambiar lo que puede hacer un cargo se hace en
+-- un sitio y no usuario por usuario.
+--
+-- La clave es un autonumerico (IDENTITY) y el nombre NO es la clave: un rol
+-- se puede renombrar sin que se caigan los permisos que ya tiene asignados.
+-- ------------------------------------------------------------
 CREATE TABLE rol (
     id INT IDENTITY(1,1) NOT NULL,
     nombre NVARCHAR(50) NOT NULL,
     CONSTRAINT pk_rol PRIMARY KEY (id)
 );
 
+-- ------------------------------------------------------------
+-- ruta — LAS INTERFACES DEL SISTEMA: una fila por pantalla protegible
+-- (interfaz.usuarios, interfaz.facturas, ...).
+--
+-- PARA QUE: es el catalogo de lo que se puede permitir. El nombre que esta
+-- aqui es exactamente el que el codigo exige en C#:
+--
+--     [ExigePermiso("interfaz.usuarios")]
+--
+-- EL UNIQUE SOBRE `ruta` ES LO QUE SOSTIENE ESO: si el nombre se pudiera
+-- repetir, habria dos filas distintas respondiendo por la misma pantalla.
+--
+-- Y UNA RUTA QUE NO ESTE DECLARADA AQUI NO LA PUEDE USAR NADIE: el
+-- repositorio responde false sin preguntarle a nadie. Falla cerrado.
+-- ------------------------------------------------------------
 CREATE TABLE ruta (
     id INT IDENTITY(1,1) NOT NULL,
     ruta NVARCHAR(100) NOT NULL,
@@ -91,6 +156,19 @@ CREATE TABLE ruta (
     CONSTRAINT uq_ruta UNIQUE (ruta)
 );
 
+-- ------------------------------------------------------------
+-- usuario — quien puede entrar al sistema. El correo ES la clave.
+--
+-- PARA QUE: identificarse. Ojo con la diferencia: `persona` es quien es
+-- alguien; `usuario` es quien tiene llave. Hay personas sin usuario.
+--
+-- `contrasena` GUARDA EL HASH, NUNCA EL TEXTO. Es un hash BCrypt —unos 60
+-- caracteres— y de ahi el NVARCHAR(200): sobra espacio a proposito, para que
+-- cambiar de algoritmo no obligue a alterar la tabla.
+--
+-- Y el hash no se compara con otro hash: se VERIFICA con BCrypt. Dos hashes
+-- del mismo texto son distintos, porque cada uno lleva su propia sal dentro.
+-- ------------------------------------------------------------
 CREATE TABLE usuario (
     email NVARCHAR(100) NOT NULL,
     contrasena NVARCHAR(200) NOT NULL,
@@ -100,8 +178,31 @@ GO
 
 -- ============================================================
 -- TABLAS DEPENDIENTES (con foreign keys)
+--
+-- Cada una apunta a alguna de las seis de arriba, y por eso van despues.
+-- SON LAS SEIS DE LA VERSION 2, y traen tres cosas que la v1 no tenia:
+--
+--   1. LA CLAVE FORANEA, que en la interfaz grafica se vuelve un
+--      desplegable: se elige un padre que existe, no se digita.
+--   2. LA RELACION MAESTRO-DETALLE: factura y productosporfactura.
+--   3. LAS TABLAS PUENTE con llave compuesta: rol_usuario y rutarol.
 -- ============================================================
 
+-- ------------------------------------------------------------
+-- cliente — una persona que COMPRA.
+--
+-- PARA QUE: guarda lo que es propio de comprar —el credito— sin repetir los
+-- datos de la persona.
+--
+-- `fkcodempresa` ES LA UNICA CLAVE FORANEA OPCIONAL DEL ESQUEMA: fijese que
+-- no dice NOT NULL. No es un descuido — es la diferencia entre el cliente que
+-- compra por su cuenta y el que compra a nombre de una empresa. En la
+-- interfaz es la opcion «(ninguna)» del desplegable, y llega como null.
+--
+-- `credito DEFAULT 0`: un cliente nuevo no nace con credito. La consulta
+-- «credito contra consumo» de la v4 compara este numero con lo que de verdad
+-- ha comprado.
+-- ------------------------------------------------------------
 CREATE TABLE cliente (
     id INT IDENTITY(1,1) NOT NULL,
     credito DECIMAL(18,2) NOT NULL DEFAULT 0,
@@ -112,6 +213,15 @@ CREATE TABLE cliente (
     CONSTRAINT fk_cliente_empresa FOREIGN KEY (fkcodempresa) REFERENCES empresa(codigo)
 );
 
+-- ------------------------------------------------------------
+-- vendedor — una persona que VENDE. El otro papel de `persona`.
+--
+-- PARA QUE: cada factura tiene que saber quien la hizo, y el `carnet` y la
+-- `direccion` son datos del empleado, no de la persona.
+--
+-- La misma persona puede estar en `cliente` y en `vendedor`: son dos papeles,
+-- no dos personas. Esa es toda la razon de que `persona` exista aparte.
+-- ------------------------------------------------------------
 CREATE TABLE vendedor (
     id INT IDENTITY(1,1) NOT NULL,
     carnet INT NOT NULL,
@@ -121,6 +231,20 @@ CREATE TABLE vendedor (
     CONSTRAINT fk_vendedor_persona FOREIGN KEY (fkcodpersona) REFERENCES persona(codigo)
 );
 
+-- ------------------------------------------------------------
+-- factura — EL ENCABEZADO de la venta. El «maestro» del maestro-detalle.
+--
+-- PARA QUE: quien compro, quien vendio, cuando, y cuanto en total.
+--
+-- `total DEFAULT 0` Y ESO NO ES UN ERROR: la factura NACE EN CERO. El total
+-- lo calcula el disparador cada vez que entra o sale un renglon. Si la API
+-- mandara el total, estaria mandando un numero que no calculo — y dos
+-- fuentes para el mismo dato es una contradiccion esperando ocurrir.
+--
+-- `estado DEFAULT activa`: anular una factura NO la borra, le cambia el
+-- estado. Es el borrado logico, y es lo que permite que la consulta de
+-- anulaciones de la v4 tenga algo que contar. Lo borrado no se audita.
+-- ------------------------------------------------------------
 CREATE TABLE factura (
     numero INT IDENTITY(1,1) NOT NULL,
     fecha DATETIME2 NOT NULL DEFAULT GETDATE(),
@@ -133,6 +257,24 @@ CREATE TABLE factura (
     CONSTRAINT fk_factura_vendedor FOREIGN KEY (fkidvendedor) REFERENCES vendedor(id)
 );
 
+-- ------------------------------------------------------------
+-- productosporfactura — EL DETALLE: los renglones de cada factura.
+--
+-- PARA QUE: que producto, cuantos, y por cuanto. Es el «detalle» del
+-- maestro-detalle, y la tabla donde los disparadores hacen su trabajo.
+--
+-- LA CLAVE ES COMPUESTA (factura + producto), y eso decide una regla del
+-- negocio sin una linea de codigo: UN PRODUCTO NO PUEDE APARECER DOS VECES
+-- EN LA MISMA FACTURA. Si se pide mas, se cambia la cantidad del renglon que
+-- ya existe. Intentar meterlo dos veces es el 409 que responde la API.
+--
+-- `subtotal DEFAULT 0`: igual que el total, lo calcula el disparador
+-- (cantidad x valorunitario). La API no multiplica precios.
+--
+-- ON DELETE CASCADE: borrar la factura se lleva sus renglones. Es el unico
+-- sitio del esquema donde la cascada tiene sentido — un renglon sin su
+-- factura no significa nada.
+-- ------------------------------------------------------------
 CREATE TABLE productosporfactura (
     fknumfactura INT NOT NULL,
     fkcodproducto NVARCHAR(10) NOT NULL,
@@ -143,6 +285,17 @@ CREATE TABLE productosporfactura (
     CONSTRAINT fk_prodfact_producto FOREIGN KEY (fkcodproducto) REFERENCES producto(codigo)
 );
 
+-- ------------------------------------------------------------
+-- rol_usuario — TABLA PUENTE: que roles tiene cada usuario.
+--
+-- PARA QUE: un usuario puede tener varios roles, y un rol lo pueden tener
+-- varios usuarios. Eso es «muchos a muchos», y no cabe en ninguna de las dos
+-- tablas: necesita una tabla propia.
+--
+-- LA CLAVE ES LA PAREJA, y por eso esta tabla no tiene boton de editar en la
+-- interfaz: una pareja existe o no existe. Se asigna o se retira. Asignar
+-- dos veces lo mismo es el 409.
+-- ------------------------------------------------------------
 CREATE TABLE rol_usuario (
     fkemail NVARCHAR(100) NOT NULL,
     fkidrol INT NOT NULL,
@@ -151,6 +304,23 @@ CREATE TABLE rol_usuario (
     CONSTRAINT fk_rolusuario_rol FOREIGN KEY (fkidrol) REFERENCES rol(id)
 );
 
+-- ------------------------------------------------------------
+-- rutarol — TABLA PUENTE: a que interfaces entra cada rol.
+--
+-- ES LA TABLA DE PERMISOS DEL SISTEMA. Aqui vive la respuesta que el
+-- procedimiento `verificar_acceso_ruta` viene a buscar en CADA peticion:
+--
+--     usuario -> rol_usuario -> rutarol -> (la ruta permitida)
+--
+-- QUITAR UNA FILA DE AQUI LE QUITA EL PERMISO AL ROL DE INMEDIATO, sin que
+-- nadie vuelva a identificarse — porque el permiso no esta en el token, se
+-- consulta cada vez. Es el criterio 7 de la version 3, y se comprueba
+-- borrando una fila de esta tabla.
+--
+-- ON DELETE CASCADE en las dos claves: si se borra una interfaz o un rol,
+-- sus permisos se van con el. Un permiso que apunta a una ruta que ya no
+-- existe no es un permiso: es basura que confunde.
+-- ------------------------------------------------------------
 CREATE TABLE rutarol (
     fkidruta INT NOT NULL,
     fkidrol INT NOT NULL,
@@ -166,7 +336,24 @@ GO
 -- Se usan las tablas virtuales INSERTED y DELETED.
 -- ============================================================
 
--- TRIGGER INSERT
+-- ------------------------------------------------------------
+-- TRIGGER INSERT — cuando ENTRA un renglon a una factura.
+--
+-- QUE ES UN DISPARADOR: codigo que el motor ejecuta SOLO, sin que nadie lo
+-- llame, cuando alguien toca una tabla. No se invoca: se dispara. Por eso la
+-- regla vale igual para la API, para SSMS y para quien llegue manana.
+--
+-- `AFTER INSERT` = corre DESPUES de que la fila entro. En SQL Server no hay
+-- un BEFORE: si hay que corregir la fila, se corrige con un UPDATE (ver
+-- abajo). PostgreSQL si tiene BEFORE, y por eso alla el mismo trabajo se
+-- escribe distinto.
+--
+-- `inserted` ES UNA TABLA VIRTUAL con las filas que acaban de entrar. No es
+-- una variable: es una tabla, puede traer VARIAS filas, y por eso todo aqui
+-- esta escrito con JOIN contra ella en vez de con variables sueltas. Un
+-- disparador escrito con `SELECT @x = ...` solo atiende bien UNA fila, y el
+-- dia que alguien inserte tres de golpe, calcula mal dos.
+-- ------------------------------------------------------------
 CREATE TRIGGER trg_prodfact_insert
 ON productosporfactura
 AFTER INSERT
@@ -174,7 +361,12 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Validar stock suficiente para cada producto insertado
+    -- PASO 1 — ¿HAY STOCK? Esta es la regla mas importante del sistema:
+    -- «no se vende lo que no hay». Y esta aqui, no en C#.
+    --
+    -- El IF EXISTS pregunta si EXISTE AL MENOS UN renglon cuyo producto tenga
+    -- menos stock del pedido. No cuenta: solo averigua si hay alguno, que es
+    -- mas barato — al primero que encuentra, deja de buscar.
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -182,6 +374,13 @@ BEGIN
         WHERE p.stock < i.cantidad
     )
     BEGIN
+        -- Hay faltante. Ahora SI hay que saber cual, para poder decirlo: se
+        -- toma UNO de los que no alcanzan (TOP 1) y se guardan sus datos en
+        -- variables para armar el mensaje.
+        --
+        -- POR QUE TOP 1 Y NO TODOS: porque la operacion se va a deshacer
+        -- completa de todos modos. Nombrar el primero que falla es suficiente
+        -- para que quien pidio sepa que corregir.
         DECLARE @v_codigo_err NVARCHAR(10), @v_stock_err INT, @v_cantidad_err INT;
         SELECT TOP 1 @v_codigo_err = i.fkcodproducto, @v_stock_err = p.stock, @v_cantidad_err = i.cantidad
         FROM inserted i
@@ -191,23 +390,73 @@ BEGIN
         DECLARE @v_msg_err NVARCHAR(500);
         SET @v_msg_err = CONCAT(N'Stock insuficiente para producto ', @v_codigo_err,
             N'. Stock disponible: ', @v_stock_err, N', cantidad solicitada: ', @v_cantidad_err);
+
+        -- THROW: LEVANTA UN ERROR Y SE DETIENE TODO. Los tres argumentos son
+        -- (numero, mensaje, estado). El numero propio tiene que ser >= 50000:
+        -- los de abajo son del motor.
+        --
+        -- Y ESTO ES LO QUE HAY QUE SABER PARA SUSTENTARLO: este THROW deshace
+        -- la transaccion ENTERA que abrio el procedimiento — la factura y los
+        -- renglones que ya habian entrado—, y el mensaje llega INTACTO hasta
+        -- la respuesta HTTP. Medido contra la API en marcha:
+        --
+        --   POST /api/factura con cantidad 9999  ->  HTTP 500
+        --   {"estado":500,"mensaje":"Error interno.","detalle":
+        --    "Stock insuficiente para producto PR001. Stock disponible: 16,
+        --     cantidad solicitada: 9999"}
+        --
+        -- Que salga 500 y no 400 es una decision tomada y escrita en
+        -- docs/dominio/POLITICA_DE_ERRORES.md: el disparador es la ultima
+        -- defensa, y si se llego hasta el es porque la validacion de arriba
+        -- no vio venir el problema.
         THROW 50001, @v_msg_err, 1;
     END
 
-    -- Calcular subtotal = cantidad * valorunitario y actualizar la fila insertada
+    -- PASO 2 — EL SUBTOTAL. cantidad x valorunitario.
+    --
+    -- Fijese que es un UPDATE sobre la fila que ACABA de entrar: como el
+    -- disparador es AFTER, la fila ya esta escrita (con subtotal 0) y hay que
+    -- corregirla. En PostgreSQL, que si tiene BEFORE, esto es una asignacion
+    -- (`NEW.subtotal := ...`) y se ahorra la segunda escritura.
+    --
+    -- EL PRECIO SE LEE DE `producto`, NO LLEGA EN LA PETICION. Si el precio
+    -- viniera de afuera, cualquiera podria facturarse un portatil en $1000.
     UPDATE pf
     SET pf.subtotal = i.cantidad * p.valorunitario
     FROM productosporfactura pf
     JOIN inserted i ON pf.fknumfactura = i.fknumfactura AND pf.fkcodproducto = i.fkcodproducto
     JOIN producto p ON p.codigo = i.fkcodproducto;
 
-    -- Descontar stock del producto
+    -- PASO 3 — BAJAR EL STOCK. Lo vendido sale de la bodega.
+    --
+    -- AQUI ESTA EL ERROR MAS CARO QUE SE PUEDE COMETER EN ESTE PROYECTO: si
+    -- el codigo C# TAMBIEN descuenta el stock, el stock baja DOS veces por
+    -- cada venta. Y no falla nada — simplemente las cifras dejan de cuadrar
+    -- y nadie sabe desde cuando. El stock lo mueve ESTE disparador, punto.
     UPDATE p
     SET p.stock = p.stock - i.cantidad
     FROM producto p
     JOIN inserted i ON p.codigo = i.fkcodproducto;
 
-    -- Recalcular total de la factura
+    -- PASO 4 — EL TOTAL DE LA FACTURA. Y se RECALCULA, no se acumula.
+    --
+    -- Lo importante es que NO dice `total = total + subtotal`. Vuelve a sumar
+    -- TODOS los renglones de esa factura desde cero:
+    --
+    --   acumular  ->  si el disparador corre dos veces por un error, suma dos
+    --                 veces, y el numero malo se queda para siempre
+    --   recalcular -> corra una vez o diez, el resultado es el mismo
+    --
+    -- Eso se llama ser IDEMPOTENTE, y es la razon de que la consulta interna
+    -- (la que va entre parentesis y se llama `sub`) exista: agrupa por factura
+    -- y trae la suma de cada una.
+    --
+    -- `IN (SELECT DISTINCT fknumfactura FROM inserted)`: solo se recalculan
+    -- las facturas tocadas. Si entraron tres renglones de la misma factura,
+    -- DISTINCT evita recalcularla tres veces.
+    --
+    -- ISNULL(sub.suma, 0): si no quedo ningun renglon, SUM devuelve NULL — y
+    -- una factura en NULL no es una factura en cero. Se obliga a cero.
     UPDATE f
     SET f.total = ISNULL(sub.suma, 0)
     FROM factura f
@@ -221,6 +470,21 @@ END;
 GO
 
 -- TRIGGER UPDATE
+-- ------------------------------------------------------------
+-- TRIGGER UPDATE — cuando CAMBIA la cantidad de un renglon.
+--
+-- AQUI HAY DOS TABLAS VIRTUALES, Y ESA ES TODA LA DIFICULTAD:
+--
+--     `inserted` = como queda la fila   (lo nuevo)
+--     `deleted`  = como estaba la fila  (lo viejo)
+--
+-- En un UPDATE existen las dos, y hay que usar LAS DOS. Un disparador de
+-- UPDATE que solo mira `inserted` pierde la cuenta del stock, porque no sabe
+-- cuanto habia reservado antes.
+--
+-- Se emparejan por la clave compuesta (factura + producto): asi cada fila
+-- nueva se junta con su propia version vieja y no con la de otro renglon.
+-- ------------------------------------------------------------
 CREATE TRIGGER trg_prodfact_update
 ON productosporfactura
 AFTER UPDATE
@@ -228,7 +492,15 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Validar stock suficiente (considerando la devolucion del stock anterior)
+    -- ¿HAY STOCK? Pero ojo con la cuenta: NO se compara el stock contra la
+    -- cantidad nueva. Se compara contra `stock + cantidad_vieja`.
+    --
+    -- POR QUE: las unidades viejas estaban reservadas por este mismo renglon,
+    -- y al cambiarlo se devuelven. Si un renglon tenia 10 y se sube a 12, no
+    -- hacen falta 12 unidades libres: hacen falta 2.
+    --
+    -- Olvidar el `+ d.cantidad` produce un «stock insuficiente» falso, y es de
+    -- los errores que parecen del negocio y son de aritmetica.
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -257,7 +529,12 @@ BEGIN
     JOIN inserted i ON pf.fknumfactura = i.fknumfactura AND pf.fkcodproducto = i.fkcodproducto
     JOIN producto p ON p.codigo = i.fkcodproducto;
 
-    -- Ajustar stock: devolver old.cantidad y descontar new.cantidad
+    -- AJUSTAR EL STOCK EN UN SOLO MOVIMIENTO: se devuelve lo viejo y se
+    -- descuenta lo nuevo (`stock + d.cantidad - i.cantidad`).
+    --
+    -- Se hace en una sola sentencia a proposito. Devolver primero y descontar
+    -- despues, en dos pasos, deja un instante con el stock inflado — y si algo
+    -- falla en el medio, inflado se queda.
     UPDATE p
     SET p.stock = p.stock + d.cantidad - i.cantidad
     FROM producto p
@@ -277,7 +554,18 @@ BEGIN
 END;
 GO
 
--- TRIGGER DELETE
+-- ------------------------------------------------------------
+-- TRIGGER DELETE — cuando se QUITA un renglon de una factura.
+--
+-- Aqui solo existe `deleted`: lo que habia. No hay `inserted`, porque no
+-- queda fila nueva. Y el trabajo es el inverso del INSERT:
+--
+--     INSERT  ->  valida stock, calcula subtotal, BAJA stock,  recalcula total
+--     DELETE  ->  (nada que validar),            SUBE stock,  recalcula total
+--
+-- NO VALIDA NADA, y es correcto: devolver mercancia a la bodega nunca puede
+-- fallar por falta de espacio.
+-- ------------------------------------------------------------
 CREATE TRIGGER trg_prodfact_delete
 ON productosporfactura
 AFTER DELETE
@@ -285,13 +573,20 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Restaurar stock del producto
+    -- DEVOLVER EL STOCK. Esto es lo que hace que anular una factura reponga
+    -- la mercancia sin que nadie escriba codigo para reponerla: el
+    -- procedimiento de anular borra los renglones, y el stock vuelve solo.
     UPDATE p
     SET p.stock = p.stock + d.cantidad
     FROM producto p
     JOIN deleted d ON p.codigo = d.fkcodproducto;
 
-    -- Recalcular total de la factura
+    -- RECALCULAR EL TOTAL con los renglones que QUEDAN.
+    --
+    -- La subconsulta suma `productosporfactura` (la tabla real, ya sin la fila
+    -- borrada), no `deleted`. Y el ISNULL de adentro es el que importa: si se
+    -- borro el ULTIMO renglon, no queda nada que sumar y SUM devuelve NULL.
+    -- Sin ese ISNULL la factura quedaria con total NULL en vez de 0.
     UPDATE f
     SET f.total = ISNULL(sub.suma, 0)
     FROM factura f
@@ -321,25 +616,76 @@ GO
 --     "p_productos": "[{\"codigo\":\"PR001\",\"cantidad\":2},{\"codigo\":\"PR003\",\"cantidad\":3}]",
 --     "p_resultado": null }
 -- ------------------------------------------------------------
+-- ESTE ES EL PROCEDIMIENTO QUE HAY QUE ENTENDER. Es el unico que escribe en
+-- DOS tablas a la vez (el maestro y su detalle), el unico que abre una
+-- transaccion a mano, y el unico que recibe una lista. Si se entiende este,
+-- los otros quince son variaciones mas simples.
+--
+-- LO QUE HACE, EN UNA LINEA: crea el encabezado de la factura, le mete sus
+-- renglones uno por uno, y devuelve la factura completa en JSON — o no deja
+-- nada, si algo falla.
 CREATE PROCEDURE sp_insertar_factura_y_productosporfactura
+    -- EL MAESTRO: a quien se le factura y quien vende.
     @p_fkidcliente INT,
     @p_fkidvendedor INT,
+
+    -- EL DETALLE, QUE LLEGA COMO TEXTO JSON:
+    --     '[{"codigo":"PR001","cantidad":2},{"codigo":"PR003","cantidad":3}]'
+    --
+    -- ¿Por que texto y no una tabla? Porque un procedimiento recibe tipos
+    -- simples: numeros, textos, fechas. Para recibir UNA TABLA habria que
+    -- declarar antes un tipo de tabla en el motor, y entonces el
+    -- procedimiento solo serviria para quien conozca ese tipo. El JSON viaja
+    -- como texto —que cualquier cliente sabe mandar— y se abre aqui.
     @p_productos NVARCHAR(MAX),
+
+    -- Cuantos renglones exige el negocio como minimo. Lleva `= 1`, o sea
+    -- DEFAULT: si quien llama no lo manda, vale 1. Asi se puede endurecer la
+    -- regla sin cambiar a quienes ya llaman al procedimiento.
     @p_minimo_detalle INT = 1,
+
+    -- LA SALIDA, TAMBIEN JSON, POR UN PARAMETRO `OUTPUT`.
+    --
+    -- Fijese que NO termina con un SELECT que devuelva filas. Devuelve UN
+    -- texto por este parametro, y la API lo deserializa. Por que:
+    --   · el contrato es UN valor, no «cuantos result sets haya»
+    --   · un JSON puede traer la factura Y sus renglones anidados; un
+    --     conjunto de filas plano, no
+    --   · si manana se agrega un campo, el cliente viejo lo ignora y sigue
     @p_resultado NVARCHAR(MAX) OUTPUT
 AS
 BEGIN
+    -- SET NOCOUNT ON: apaga los mensajes de «(1 row affected)». No es
+    -- cosmetica: esos avisos viajan por la red en cada sentencia y algunos
+    -- clientes los confunden con resultados.
     SET NOCOUNT ON;
 
-    DECLARE @v_numero INT;
-    DECLARE @v_codigo NVARCHAR(10);
-    DECLARE @v_cantidad INT;
-    DECLARE @v_minimo INT;
-    DECLARE @v_count INT;
-    DECLARE @v_msg NVARCHAR(500);
+    -- LAS VARIABLES LOCALES. En T-SQL se declaran antes de usarlas, y la
+    -- costumbre es ponerlas todas arriba para poder leer de un vistazo con
+    -- que trabaja el procedimiento. El prefijo @v_ es de «variable», para no
+    -- confundirlas con los parametros @p_.
+    DECLARE @v_numero INT;          -- el numero de factura que asigne el motor
+    DECLARE @v_codigo NVARCHAR(10); -- el producto del renglon que se este leyendo
+    DECLARE @v_cantidad INT;        -- su cantidad
+    DECLARE @v_minimo INT;          -- el minimo de renglones ya resuelto
+    DECLARE @v_count INT;           -- cuantos renglones trajo el JSON
+    DECLARE @v_msg NVARCHAR(500);   -- el mensaje de error, si toca
 
-    -- Validar minimo de productos (antes de abrir transaccion)
-    -- COALESCE(NULLIF(@p_minimo_detalle, 0), 1): la API envia 0 cuando no se pasa el parametro
+    -- ============================================================
+    -- PRIMERO LO QUE SE PUEDE RECHAZAR SIN TOCAR NADA
+    --
+    -- Y ESO ES UNA DECISION, NO UN ORDEN CASUAL: validar ANTES de abrir la
+    -- transaccion. Abrir una transaccion toma recursos y bloquea filas; si la
+    -- peticion viene mal de entrada, no hay por que abrirla para cerrarla.
+    -- ============================================================
+
+    -- COALESCE(NULLIF(@p_minimo_detalle, 0), 1) — tres pasos en una linea:
+    --   NULLIF(x, 0)  -> si x es 0, devuelve NULL; si no, devuelve x
+    --   COALESCE(a,b) -> el primero de los dos que no sea NULL
+    --
+    -- O SEA: «si me mandaron 0, usa 1». Y hace falta porque la API manda 0
+    -- cuando el parametro no viene — y un minimo de 0 renglones significaria
+    -- aceptar facturas vacias, que es justo lo que esto evita.
     SET @v_minimo = COALESCE(NULLIF(@p_minimo_detalle, 0), 1);
 
     IF @p_productos IS NULL
@@ -348,10 +694,24 @@ BEGIN
         THROW 50002, @v_msg, 1;
     END
 
+    -- CUANTOS RENGLONES TRAE EL JSON. `OPENJSON` convierte el texto en una
+    -- tabla —una fila por elemento del arreglo—, y sobre una tabla ya se
+    -- puede hacer COUNT(*). Es la primera de las dos veces que aparece.
     SELECT @v_count = COUNT(*) FROM OPENJSON(@p_productos);
     IF @v_count < @v_minimo
     BEGIN
         SET @v_msg = CONCAT(N'La factura requiere minimo ', @v_minimo, N' producto(s).');
+
+        -- OJO CON ESTE THROW, PORQUE ES EL QUE SE MALINTERPRETA:
+        --
+        -- Por la API, una factura sin renglones NO llega hasta aqui — el
+        -- controlador la rechaza antes con **422** (medido: POST /api/factura
+        -- con "productos":[] responde 422). Entonces, ¿para que sirve?
+        --
+        -- PARA QUIEN NO PASE POR LA API. Quien ejecute el procedimiento desde
+        -- SSMS tambien tiene que chocar con la regla. Es la misma idea del
+        -- disparador del stock: la regla vive donde estan los datos, y la
+        -- validacion de la API es comodidad, no la defensa.
         THROW 50002, @v_msg, 1;
     END
 
@@ -361,44 +721,168 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        -- Crear la factura con total 0 (el trigger actualiza el total)
+        -- PASO 1 — EL ENCABEZADO, CON TOTAL 0.
+        --
+        -- No es un descuido mandar 0: el total lo calculan los disparadores
+        -- cuando entren los renglones. Mandar aqui un total seria mandar un
+        -- numero que este procedimiento no calculo.
         INSERT INTO factura (fkidcliente, fkidvendedor, total)
         VALUES (@p_fkidcliente, @p_fkidvendedor, 0);
 
+        -- PASO 2 — ¿QUE NUMERO LE TOCO A ESA FACTURA?
+        --
+        -- `numero` es IDENTITY: lo asigna el motor, y hasta que la fila no
+        -- entra nadie sabe cual fue. Los renglones necesitan ese numero para
+        -- saber de quien son, asi que hay que preguntarlo.
+        --
+        -- POR QUE `SCOPE_IDENTITY()` Y NO `@@IDENTITY`. Y AQUI NO ES TEORIA:
+        --
+        --   SCOPE_IDENTITY() -> el ultimo id generado EN ESTE AMBITO, o sea
+        --                       por este procedimiento
+        --   @@IDENTITY       -> el ultimo id generado EN LA SESION, SIN
+        --                       IMPORTAR QUIEN LO GENERO
+        --
+        -- ESTA TABLA TIENE DISPARADORES. Si un disparador insertara en otra
+        -- tabla con IDENTITY —una auditoria, por ejemplo—, `@@IDENTITY`
+        -- devolveria el id de ESA fila, no el de la factura. Y entonces los
+        -- renglones se colgarian de una factura que no existe.
+        --
+        -- Es el error clasico de este patron: funciona hoy, y el dia que
+        -- alguien agrega un disparador de bitacora se rompe sin tocar este
+        -- archivo. `IDENT_CURRENT('factura')` tiene el problema contrario:
+        -- devuelve el ultimo de la TABLA, incluso si lo inserto otro usuario.
         SET @v_numero = SCOPE_IDENTITY();
 
-        -- Recorrer cada producto del JSON e insertar detalle
-        -- El trigger calcula subtotal, descuenta stock y actualiza total
+        -- ============================================================
+        -- PASO 3 — LOS RENGLONES, UNO POR UNO. Esta es la parte larga, y lo
+        -- es porque SQL no tiene un `for` como C#: para recorrer filas de a
+        -- una se usa un CURSOR.
+        --
+        -- QUE ES UN CURSOR: un apuntador que se para en la primera fila de un
+        -- resultado y se va moviendo. Cuatro tiempos, siempre los mismos:
+        --
+        --     DECLARE  -> se define QUE consulta va a recorrer
+        --     OPEN     -> se ejecuta la consulta y el apuntador se posiciona
+        --     FETCH    -> se trae la fila donde esta parado y se avanza
+        --     CLOSE    -> se suelta
+        --
+        -- `LOCAL`        = el cursor muere con este procedimiento. Sin esto
+        --                  queda vivo en la sesion, y el proximo que declare
+        --                  uno con el mismo nombre choca.
+        -- `FAST_FORWARD` = solo lectura y solo hacia adelante. Es el mas
+        --                  barato que hay: no permite retroceder ni editar, y
+        --                  aqui no hace falta ninguna de las dos cosas.
+        -- ============================================================
         DECLARE producto_cursor CURSOR LOCAL FAST_FORWARD FOR
+            -- LA CONSULTA QUE EL CURSOR VA A RECORRER: el JSON convertido en
+            -- tabla. Dos funciones hacen el trabajo:
+            --
+            --   OPENJSON(texto)  -> una FILA por elemento del arreglo. Para un
+            --     arreglo, cada fila trae las columnas `key` (la posicion),
+            --     `value` (el elemento completo, todavia como texto JSON) y
+            --     `type`. Aqui solo interesa `value`.
+            --
+            --   JSON_VALUE(value, '$.codigo') -> saca UN campo de ese texto.
+            --     El `$` es la raiz del objeto y `.codigo` la propiedad, o sea
+            --     «de este elemento, dame codigo».
+            --
+            -- Y EL `CAST(... AS INT)` NO ES OPCIONAL: JSON_VALUE SIEMPRE
+            -- devuelve texto, aunque en el JSON el numero vaya sin comillas.
+            -- Sin el CAST se estaria insertando el texto '2' en una columna
+            -- INT: a veces el motor lo convierte solo y a veces falla, que es
+            -- la peor de las dos.
             SELECT
                 JSON_VALUE(value, '$.codigo'),
                 CAST(JSON_VALUE(value, '$.cantidad') AS INT)
             FROM OPENJSON(@p_productos);
 
         OPEN producto_cursor;
+
+        -- EL PRIMER FETCH VA ANTES DEL BUCLE, y sorprende a todo el mundo.
+        -- Es porque `@@FETCH_STATUS` solo tiene valor DESPUES de un FETCH:
+        -- preguntar antes del primero seria preguntar por el resultado de
+        -- algo que no ha pasado.
+        --
+        -- `INTO @v_codigo, @v_cantidad` reparte las dos columnas de la fila en
+        -- las dos variables, EN ESE ORDEN. Si se invierten, el procedimiento
+        -- compila igual y empieza a guardar cantidades en el codigo.
         FETCH NEXT FROM producto_cursor INTO @v_codigo, @v_cantidad;
 
+        -- @@FETCH_STATUS = 0 significa «el ultimo FETCH SI trajo una fila».
+        -- Cuando se acaban, pasa a -1 y el bucle termina. Es el equivalente
+        -- de preguntar «¿hay siguiente?» en un recorrido de C#.
         WHILE @@FETCH_STATUS = 0
         BEGIN
+            -- EL RENGLON, CON SUBTOTAL 0 — igual que el total de la factura:
+            -- lo calcula el disparador. Y cada uno de estos INSERT dispara
+            -- `trg_prodfact_insert`, que valida el stock, calcula el subtotal,
+            -- descuenta la bodega y recalcula el total.
+            --
+            -- POR ESO ESTE BUCLE ES LA PIEZA CLAVE DEL PROYECTO: en estas dos
+            -- lineas se ve el maestro-detalle completo. El renglon sabe de que
+            -- factura es (@v_numero) y la regla de negocio no esta aqui.
             INSERT INTO productosporfactura (fknumfactura, fkcodproducto, cantidad, subtotal)
             VALUES (@v_numero, @v_codigo, @v_cantidad, 0);
 
+            -- Y EL SEGUNDO FETCH, AL FINAL DEL BUCLE. Si se olvida, el
+            -- apuntador no avanza, @@FETCH_STATUS se queda en 0 y el
+            -- procedimiento inserta el mismo renglon para siempre. Es el
+            -- bucle infinito clasico de los cursores.
             FETCH NEXT FROM producto_cursor INTO @v_codigo, @v_cantidad;
         END
 
+        -- CERRAR Y LIBERAR. CLOSE suelta las filas; DEALLOCATE borra la
+        -- definicion del cursor. Son dos cosas distintas: un cursor cerrado
+        -- se puede volver a abrir, uno liberado ya no existe.
         CLOSE producto_cursor;
         DEALLOCATE producto_cursor;
 
         -- Retornar resultado como JSON
+        -- ============================================================
+        -- PASO 4 — DEVOLVER LA FACTURA RECIEN HECHA, EN JSON.
+        --
+        -- Y se vuelve a LEER de la base en vez de armarla con lo que se
+        -- recibio. Es a proposito: el total y los subtotales los puso el
+        -- disparador, no este procedimiento. Devolver lo que se mando seria
+        -- devolver ceros.
+        -- ============================================================
         DECLARE @v_factura_json NVARCHAR(MAX);
         DECLARE @v_productos_json NVARCHAR(MAX);
 
+        -- EL ENCABEZADO, COMO UN OBJETO SUELTO.
+        --
+        -- `FOR JSON PATH` convierte el resultado del SELECT en JSON: cada
+        -- columna se vuelve una propiedad y cada fila un objeto.
+        --
+        -- Y `WITHOUT_ARRAY_WRAPPER` SE LEE LITERAL: «sin la envoltura de
+        -- arreglo». Sin el, esto devolveria [ { ... } ] — con corchetes —
+        -- porque SQL Server piensa en conjuntos y envuelve el resultado
+        -- aunque traiga UNA sola fila. La factura es una, y con corchetes el
+        -- cliente tendria que escribir resultado[0] para siempre.
         SELECT @v_factura_json = (
             SELECT f.numero, f.fecha, f.total, f.estado, f.fkidcliente, f.fkidvendedor
             FROM factura f WHERE f.numero = @v_numero
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         );
 
+        -- Y LOS RENGLONES, ESTE SI COMO ARREGLO: `FOR JSON PATH` a secas
+        -- devuelve `[ {...}, {...} ]`, que es lo que se quiere para una lista.
+        --
+        -- LA DIFERENCIA CON EL DE ARRIBA ES ESA UNICA PALABRA:
+        --
+        --     FOR JSON PATH                          ->  [ { ... } ]
+        --     FOR JSON PATH, WITHOUT_ARRAY_WRAPPER   ->    { ... }
+        --
+        -- Se lee LITERAL: «sin la envoltura de arreglo». SQL Server siempre
+        -- piensa en conjuntos, asi que por defecto envuelve el resultado en
+        -- corchetes aunque traiga una sola fila. Para la factura —que es UNA—
+        -- esos corchetes obligarian al cliente a escribir `resultado[0]`, y
+        -- entonces el contrato diria «un arreglo» cuando siempre hay uno.
+        --
+        -- Los `AS` tambien cuentan: el alias es el NOMBRE DE LA PROPIEDAD en
+        -- el JSON. `pf.fkcodproducto AS codigo_producto` sale como
+        -- "codigo_producto", no como "fkcodproducto" — el nombre interno de la
+        -- columna no se le filtra al cliente.
         SELECT @v_productos_json = (
             SELECT pf.fkcodproducto AS codigo_producto, pr.nombre AS nombre_producto,
                    pf.cantidad, pr.valorunitario, pf.subtotal
@@ -408,22 +892,51 @@ BEGIN
             FOR JSON PATH
         );
 
+        -- SE ARMA EL SOBRE FINAL pegando los dos pedazos:
+        --     {"factura": {...}, "productos": [...]}
+        --
+        -- ISNULL(@v_productos_json, N'[]') — y aqui hay una trampa real: si
+        -- no hubiera renglones, `FOR JSON` devuelve NULL, no '[]'. Y en T-SQL
+        -- concatenar texto con NULL da NULL: el JSON ENTERO se volveria NULL
+        -- y la API recibiria nada, sin un solo error. Ese ISNULL es lo unico
+        -- que lo evita.
         SET @p_resultado = N'{"factura":' + @v_factura_json + N',"productos":' + ISNULL(@v_productos_json, N'[]') + N'}';
 
         COMMIT TRANSACTION;
     END TRY
+    -- ============================================================
+    -- SI ALGO FALLO: DESHACER, LIMPIAR Y CONTARLO. En ese orden.
+    -- ============================================================
     BEGIN CATCH
+        -- @@TRANCOUNT dice cuantas transacciones hay abiertas. Se pregunta
+        -- antes de deshacer porque si el error ya la cerro, un ROLLBACK sin
+        -- transaccion abierta es OTRO error — y entonces el mensaje que llega
+        -- es el del rollback y no el del problema de verdad.
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        -- Cerrar cursor si quedo abierto
+        -- EL CURSOR NO LO DESHACE EL ROLLBACK. Si el error salto a mitad del
+        -- bucle, el cursor quedo abierto: las filas siguen reservadas y el
+        -- nombre sigue tomado en la sesion. CURSOR_STATUS >= 0 significa que
+        -- existe, y entonces hay que cerrarlo a mano.
+        --
+        -- Es la fuga mas comun de este patron, y no se nota en una prueba:
+        -- se nota en el segundo intento, que falla por un nombre ocupado.
         IF CURSOR_STATUS('local', 'producto_cursor') >= 0
         BEGIN
             CLOSE producto_cursor;
             DEALLOCATE producto_cursor;
         END;
 
-        -- Relanzar el error original (del trigger u otro)
+        -- `THROW` SIN ARGUMENTOS RELANZA EL ERROR ORIGINAL, con su numero y
+        -- su mensaje intactos. Es lo que hace que el «Stock insuficiente para
+        -- producto PR001...» que escribio el disparador llegue hasta la
+        -- respuesta HTTP.
+        --
+        -- Si en vez de esto se hiciera `THROW 50000, 'Error', 1`, se perderia
+        -- la unica informacion util. Y tragarse el error —un CATCH vacio— es
+        -- peor todavia: el procedimiento terminaria «bien» sin haber hecho
+        -- nada, y quien llamo creeria que su factura existe.
         THROW;
     END CATCH
 END;
@@ -1347,6 +1860,18 @@ INSERT INTO producto (codigo, nombre, stock, valorunitario) VALUES
 (N'PR008', N'Disco Duro Seagate 1TB', 32, 280000);
 
 -- Roles (con IDENTITY_INSERT para IDs explícitos)
+--
+-- QUE HACE IDENTITY_INSERT: le dice al motor «dejame poner yo el id, no lo
+-- generes tu». Normalmente un IDENTITY no se puede escribir a mano.
+--
+-- PARA QUE SE NECESITA AQUI: porque las semillas de `rutarol` mas abajo dicen
+-- (1,1), (2,1), (3,2)... Esos numeros son ids de rol y de ruta. Si el motor
+-- los repartiera por su cuenta, los permisos quedarian apuntando a roles
+-- distintos de los que se pensaron — y el sistema arrancaria con los permisos
+-- cruzados, sin un solo error.
+--
+-- Se apaga en cuanto termina (IDENTITY_INSERT OFF): de ahi en adelante los
+-- ids los vuelve a poner el motor.
 SET IDENTITY_INSERT rol ON;
 INSERT INTO rol (id, nombre) VALUES
 (1, N'Administrador'),

@@ -1,5 +1,4 @@
 @page "/facturas"
-@page "/facturas/{Numero:int}"
 @inject ServicioFactura Servicio
 @inject ServicioCliente ServicioClientes
 @inject ServicioVendedor ServicioVendedores
@@ -10,20 +9,30 @@
 
 @*
    ============================================================
-   FACTURAS — las tres vistas del recurso, EN UN SOLO ARCHIVO.
+   FACTURAS — el maestro-detalle del curso, en UN archivo y con UNA ruta.
 
-   El maestro-detalle de este curso es `factura` + `productosporfactura`, y es
-   el ejemplo que los estudiantes copian. Por eso vive COMPLETO aqui: quien lo
-   quiera entender abre UN archivo y lo ve entero, en vez de saltar entre tres.
+   TRES VISTAS, Y UN CAMPO QUE DECIDE CUAL:
 
-   LA MISMA FORMA QUE `usuario-con-roles`, QUE ES EL OTRO MAESTRO-DETALLE DEL
-   SISTEMA: el formulario arriba, la lista debajo, en la misma pantalla.
+       vista == "listar"      la tabla de facturas
+       vista == "formulario"  el maestro-detalle para emitir
+       vista == "ver"         una factura, de solo lectura
 
-       /facturas            el formulario Y la lista
-       /facturas/{numero}   el detalle de una, de solo lectura
+   SE CAMBIA DE VISTA CON BOTONES, NO CON DIRECCIONES. Es la misma forma del
+   tutorial de Blazor del curso (Factura.razor) y la misma de
+   `usuario-con-roles`, que es el otro maestro-detalle del sistema. Los tres se
+   leen igual: quien entienda uno entiende los otros dos.
 
-   Los dos maestro-detalle del curso se ven y se usan igual. Un estudiante que
-   entienda uno entiende el otro, y eso vale mas que ahorrar unas lineas.
+   POR QUE ASI Y NO CON UNA RUTA POR VISTA: una ruta por vista obliga a entender
+   parametros de ruta, OnParametersSetAsync y que pasa cuando Blazor REUSA el
+   componente al navegar — tres conceptos que este curso todavia no enseño. Con
+   un campo y tres @if, la pantalla se lee de arriba abajo sin saber nada de
+   enrutado.
+
+   LO QUE SE PIERDE, Y SE ACEPTA A SABIENDAS: /facturas/7 no existe, asi que una
+   factura no se puede enlazar ni marcar, y el boton «atras» del navegador no
+   vuelve a la lista. Para un sistema interno que se usa con la sesion abierta,
+   eso no cuesta nada. Para algo publico donde se comparten enlaces, si — y ahi
+   si valdria la pena una ruta por vista.
 
    LO QUE NO ES DE ADORNO, Y ES LO QUE HAY QUE APRENDER AQUI:
 
@@ -50,262 +59,61 @@
    ============================================================
 *@
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h2 mb-0">
-        @switch (modo)
-        {
-            case Modo.Detalle:
-                <text>Factura @Numero</text>
-                @if (factura is not null)
-                {
-                    <span class="badge @(factura.Estado == "activa" ? "bg-success" : "bg-danger")">
-                        @factura.Estado
-                    </span>
-                }
-                break;
-            default:
-                <text>Facturas</text>
-                break;
-        }
-    </h1>
-
-    @if (modo == Modo.Detalle)
-    {
-        <a class="btn btn-outline-secondary" href="facturas">Volver</a>
-    }
-</div>
+<h1 class="h2 mb-3">Facturas</h1>
 
 <Aviso Texto="@aviso" EsError="@avisoEsError" />
 
-@if (cargando)
+@* ==========================================================
+   VISTA 1 — LA LISTA
+   ========================================================== *@
+@if (vista == "listar")
 {
-    <p>Cargando…</p>
-}
-else
-{
-    @* ==========================================================
-       EL FORMULARIO Y LA LISTA — la misma pantalla, como en
-       usuario-con-roles: el maestro-detalle arriba, lo que hay abajo.
-       ========================================================== *@
-    @if (modo == Modo.Lista)
+    <button class="btn btn-primary mb-3" @onclick="MostrarFormulario">Nueva factura</button>
+
+    @if (cargando)
     {
-        @* --- EL MAESTRO-DETALLE: el formulario, arriba --- *@
-        <section class="card mb-4">
-            <div class="card-body">
-
-                @* --- EL MAESTRO: a quién y quién vende --- *@
-                <h2 class="h5 card-title mb-3">El maestro</h2>
-                <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label" for="cliente">Cliente</label>
-                        <select class="form-select" id="cliente" @bind="idCliente">
-                            <option value="0">— elija un cliente —</option>
-                            @foreach (var c in clientes)
-                            {
-                                <option value="@c.Id">@NombrePersona(c.Fkcodpersona) (cliente @c.Id)</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label" for="vendedor">Vendedor</label>
-                        <select class="form-select" id="vendedor" @bind="idVendedor">
-                            <option value="0">— elija un vendedor —</option>
-                            @foreach (var v in vendedores)
-                            {
-                                <option value="@v.Id">@NombrePersona(v.Fkcodpersona) (carnet @v.Carnet)</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-                <hr />
-
-                @* --- EL DETALLE: los renglones, que se arman AQUI sin tocar la API --- *@
-                <h2 class="h5">El detalle — los renglones</h2>
-
-                <div class="row g-3 align-items-end">
-                    <div class="col-12 col-md-7">
-                        <label class="form-label" for="producto">Producto</label>
-                        <select class="form-select" id="producto" @bind="codigoProducto">
-                            <option value="">— elija un producto —</option>
-                            @foreach (var p in productos)
-                            {
-                                <option value="@p.Codigo">@p.Nombre — @p.Valorunitario.ToString("N0") (stock @p.Stock)</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <label class="form-label" for="cantidad">Cantidad</label>
-                        <input class="form-control" type="number" min="1" id="cantidad" @bind="cantidad" />
-                    </div>
-                    <div class="col-6 col-md-2">
-                        @* Este boton NO habla con la API. Agrega a la tabla de abajo. *@
-                        <button class="btn btn-outline-primary w-100" @onclick="AgregarRenglon">Agregar al detalle</button>
-                    </div>
-                </div>
-
-                @if (renglones.Count == 0)
-                {
-                    <div class="alert alert-secondary mt-3 text-center">Agregue al menos un renglón.</div>
-                }
-                else
-                {
-                    <div class="table-responsive mt-3">
-                        <table class="table table-sm align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th class="text-end">Cantidad</th>
-                                    <th class="text-end">Valor unitario</th>
-                                    <th class="text-end">Subtotal</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var r in renglones)
-                                {
-                                    <tr>
-                                        <td>@r.NombreParaMostrar</td>
-                                        <td class="text-end font-monospace">@r.Cantidad</td>
-                                        <td class="text-end font-monospace">@r.PrecioParaMostrar.ToString("N0")</td>
-                                        <td class="text-end font-monospace">@((r.Cantidad * r.PrecioParaMostrar).ToString("N0"))</td>
-                                        <td class="text-end">
-                                            @* Quitar un renglon de ESTA lista tampoco llama a
-                                               la API: todavia no se ha enviado nada. *@
-                                            <button class="btn btn-sm btn-danger" @onclick="() => QuitarRenglon(r)">Quitar</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="text-end"><strong>Total estimado</strong></td>
-                                    <td class="text-end font-monospace"><strong>@TotalEstimado().ToString("N0")</strong></td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-
-                    <p class="small text-body-secondary">
-                        Este total es un cálculo para que usted sepa cuánto va.
-                        <strong>No se envía:</strong> el total que queda guardado lo calcula
-                        el disparador de la base de datos, y es el que manda.
-                    </p>
-                }
-
-                <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
-                    @* UN SOLO ENVIO con el maestro y el detalle juntos. *@
-                    <button class="btn btn-primary" disabled="@enviando" @onclick="Emitir">
-                        @(enviando ? "Emitiendo…" : "Emitir la factura")
-                    </button>
-                    <button class="btn btn-link" @onclick="LimpiarFormulario">Empezar de nuevo</button>
-                </div>
-
-                @if (clientes.Count == 0 || vendedores.Count == 0 || productos.Count == 0)
-                {
-                    <p class="small text-body-secondary mt-3 mb-0">
-                        Para emitir una factura hacen falta un <a href="clientes">cliente</a>,
-                        un <a href="vendedores">vendedor</a> y al menos un
-                        <a href="productos">producto</a>.
-                    </p>
-                }
-            </div>
-        </section>
-
-        @* --- LO QUE YA HAY: la lista, debajo --- *@
-        <h2 class="h4">Las facturas emitidas</h2>
-        @if (lista.Count == 0)
-        {
-            @* Vacío NO es error: es un recuadro que lo dice. *@
-            <div class="alert alert-secondary">Todavía no hay facturas.</div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>No.</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th>
-                            <th class="text-end">Total</th><th>Estado</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var f in lista)
-                        {
-                            <tr>
-                                <td class="font-monospace">@f.Numero</td>
-                                <td>@FechaCorta(f.Fecha)</td>
-                                @* Estos nombres NO los buscó el front: vienen resueltos
-                                   porque el JOIN lo hizo el procedimiento almacenado. *@
-                                <td>@f.NombreCliente</td>
-                                <td>@f.NombreVendedor</td>
-                                <td class="text-end font-monospace">@f.Total.ToString("N0")</td>
-                                <td>
-                                    <span class="badge @(f.Estado == "activa" ? "bg-success" : "bg-danger")">
-                                        @f.Estado
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <a class="btn btn-sm btn-outline-primary" href="@($"facturas/{f.Numero}")">Ver</a>
-                                    @if (f.Estado == "activa")
-                                    {
-                                        @* ANULAR, no eliminar. Y el texto lo dice. *@
-                                        <button class="btn btn-sm btn-danger" @onclick="() => Anular(f.Numero)">Anular</button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
+        <p>Cargando…</p>
     }
-    else if (factura is not null)
+    else if (lista.Count == 0)
     {
-        @* ==========================================================
-           EL DETALLE DE UNA FACTURA — de solo lectura.
-           Los subtotales NO los calcula esta vista: vienen de la base,
-           puestos por el disparador cuando la factura se emitio.
-           ========================================================== *@
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-6 col-md-3"><strong>Fecha:</strong><br />@FechaCorta(factura.Fecha)</div>
-                    @* Estos nombres NO los busco el front: vienen resueltos porque
-                       el JOIN lo hizo el procedimiento almacenado. *@
-                    <div class="col-6 col-md-3"><strong>Cliente:</strong><br />@factura.NombreCliente</div>
-                    <div class="col-6 col-md-3"><strong>Vendedor:</strong><br />@factura.NombreVendedor</div>
-                    <div class="col-6 col-md-3">
-                        <strong>Total:</strong><br />
-                        <span class="font-monospace">@factura.Total.ToString("N0")</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="h4">Renglones (los subtotales los calculó la base de datos)</h2>
+        @* Vacío NO es error: es un recuadro que lo dice. *@
+        <div class="alert alert-secondary">Todavía no hay facturas.</div>
+    }
+    else
+    {
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped align-middle">
                 <thead>
                     <tr>
-                        <th>Producto</th><th>Nombre</th>
-                        <th class="text-end">Cantidad</th>
-                        <th class="text-end">Valor unitario</th>
-                        <th class="text-end">Subtotal</th>
+                        <th>No.</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th>
+                        <th class="text-end">Total</th><th>Estado</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var p in factura.Productos)
+                    @foreach (var f in lista)
                     {
                         <tr>
-                            <td class="font-monospace">@p.CodigoProducto</td>
-                            <td>@p.NombreProducto</td>
-                            <td class="text-end font-monospace">@p.Cantidad</td>
-                            <td class="text-end font-monospace">@p.Valorunitario.ToString("N0")</td>
-                            @* El subtotal lo calculo el trigger. *@
-                            <td class="text-end font-monospace">@p.Subtotal.ToString("N0")</td>
+                            <td class="font-monospace">@f.Numero</td>
+                            <td>@FechaCorta(f.Fecha)</td>
+                            @* Estos nombres NO los buscó el front: vienen resueltos
+                               porque el JOIN lo hizo el procedimiento almacenado. *@
+                            <td>@f.NombreCliente</td>
+                            <td>@f.NombreVendedor</td>
+                            <td class="text-end font-monospace">@f.Total.ToString("N0")</td>
+                            <td>
+                                <span class="badge @(f.Estado == "activa" ? "bg-success" : "bg-danger")">
+                                    @f.Estado
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-primary" @onclick="() => Ver(f.Numero)">Ver</button>
+                                @if (f.Estado == "activa")
+                                {
+                                    @* ANULAR, no eliminar. Y el texto lo dice. *@
+                                    <button class="btn btn-sm btn-danger" @onclick="() => Anular(f.Numero)">Anular</button>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -314,26 +122,210 @@ else
     }
 }
 
+@* ==========================================================
+   VISTA 2 — EL FORMULARIO MAESTRO-DETALLE
+   ========================================================== *@
+@if (vista == "formulario")
+{
+    <button class="btn btn-secondary mb-3" @onclick="Volver">Volver</button>
+
+    <section class="card mb-4">
+        <div class="card-body">
+
+            @* --- EL MAESTRO: a quién y quién vende --- *@
+            <h2 class="h5 card-title mb-3">El maestro</h2>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="cliente">Cliente</label>
+                    <select class="form-select" id="cliente" @bind="idCliente">
+                        <option value="0">— elija un cliente —</option>
+                        @foreach (var c in clientes)
+                        {
+                            <option value="@c.Id">@NombrePersona(c.Fkcodpersona) (cliente @c.Id)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="vendedor">Vendedor</label>
+                    <select class="form-select" id="vendedor" @bind="idVendedor">
+                        <option value="0">— elija un vendedor —</option>
+                        @foreach (var v in vendedores)
+                        {
+                            <option value="@v.Id">@NombrePersona(v.Fkcodpersona) (carnet @v.Carnet)</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+
+            @* --- EL DETALLE: los renglones, que se arman AQUI sin tocar la API --- *@
+            <h2 class="h5">El detalle — los renglones</h2>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-7">
+                    <label class="form-label" for="producto">Producto</label>
+                    <select class="form-select" id="producto" @bind="codigoProducto">
+                        <option value="">— elija un producto —</option>
+                        @foreach (var p in productos)
+                        {
+                            <option value="@p.Codigo">@p.Nombre — @p.Valorunitario.ToString("N0") (stock @p.Stock)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label" for="cantidad">Cantidad</label>
+                    <input class="form-control" type="number" min="1" id="cantidad" @bind="cantidad" />
+                </div>
+                <div class="col-6 col-md-2">
+                    @* Este boton NO habla con la API. Agrega a la tabla de abajo. *@
+                    <button class="btn btn-outline-primary w-100" @onclick="AgregarRenglon">Agregar al detalle</button>
+                </div>
+            </div>
+
+            @if (renglones.Count == 0)
+            {
+                <div class="alert alert-secondary mt-3 text-center">Agregue al menos un renglón.</div>
+            }
+            else
+            {
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Valor unitario</th>
+                                <th class="text-end">Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in renglones)
+                            {
+                                <tr>
+                                    <td>@r.NombreParaMostrar</td>
+                                    <td class="text-end font-monospace">@r.Cantidad</td>
+                                    <td class="text-end font-monospace">@r.PrecioParaMostrar.ToString("N0")</td>
+                                    <td class="text-end font-monospace">@((r.Cantidad * r.PrecioParaMostrar).ToString("N0"))</td>
+                                    <td class="text-end">
+                                        @* Quitar un renglon de ESTA lista tampoco llama a
+                                           la API: todavia no se ha enviado nada. *@
+                                        <button class="btn btn-sm btn-danger" @onclick="() => QuitarRenglon(r)">Quitar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total estimado</strong></td>
+                                <td class="text-end font-monospace"><strong>@TotalEstimado().ToString("N0")</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <p class="small text-body-secondary">
+                    Este total es un cálculo para que usted sepa cuánto va.
+                    <strong>No se envía:</strong> el total que queda guardado lo calcula
+                    el disparador de la base de datos, y es el que manda.
+                </p>
+            }
+
+            <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+                @* UN SOLO ENVIO con el maestro y el detalle juntos. *@
+                <button class="btn btn-success" disabled="@enviando" @onclick="Emitir">
+                    @(enviando ? "Emitiendo…" : "Emitir la factura")
+                </button>
+                <button class="btn btn-secondary" @onclick="Volver">Cancelar</button>
+            </div>
+
+            @if (clientes.Count == 0 || vendedores.Count == 0 || productos.Count == 0)
+            {
+                <p class="small text-body-secondary mt-3 mb-0">
+                    Para emitir una factura hacen falta un <a href="clientes">cliente</a>,
+                    un <a href="vendedores">vendedor</a> y al menos un
+                    <a href="productos">producto</a>.
+                </p>
+            }
+        </div>
+    </section>
+}
+
+@* ==========================================================
+   VISTA 3 — UNA FACTURA, DE SOLO LECTURA
+   ========================================================== *@
+@if (vista == "ver" && factura is not null)
+{
+    <button class="btn btn-secondary mb-3" @onclick="Volver">Volver</button>
+
+    <h2 class="h4">
+        Factura @factura.Numero
+        <span class="badge @(factura.Estado == "activa" ? "bg-success" : "bg-danger")">
+            @factura.Estado
+        </span>
+    </h2>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6 col-md-3"><strong>Fecha:</strong><br />@FechaCorta(factura.Fecha)</div>
+                @* Estos nombres NO los busco el front: vienen resueltos porque
+                   el JOIN lo hizo el procedimiento almacenado. *@
+                <div class="col-6 col-md-3"><strong>Cliente:</strong><br />@factura.NombreCliente</div>
+                <div class="col-6 col-md-3"><strong>Vendedor:</strong><br />@factura.NombreVendedor</div>
+                <div class="col-6 col-md-3">
+                    <strong>Total:</strong><br />
+                    <span class="font-monospace">@factura.Total.ToString("N0")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="h5">Renglones (los subtotales los calculó la base de datos)</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Producto</th><th>Nombre</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-end">Valor unitario</th>
+                    <th class="text-end">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in factura.Productos)
+                {
+                    <tr>
+                        <td class="font-monospace">@p.CodigoProducto</td>
+                        <td>@p.NombreProducto</td>
+                        <td class="text-end font-monospace">@p.Cantidad</td>
+                        <td class="text-end font-monospace">@p.Valorunitario.ToString("N0")</td>
+                        @* El subtotal lo calculo el trigger. *@
+                        <td class="text-end font-monospace">@p.Subtotal.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
 @code {
     // ============================================================
-    // QUE VISTA SE PINTA. Lo decide la ruta, no un boton: las tres
-    // direcciones siguen existiendo y se pueden enlazar y marcar.
+    // QUE VISTA SE PINTA. Un campo y tres @if, igual que en el
+    // tutorial de Blazor del curso. Se cambia con BOTONES, no con
+    // direcciones: toda la pantalla vive en /facturas.
     // ============================================================
-    private enum Modo { Lista, Detalle }
-    private Modo modo = Modo.Lista;
-    private Modo? modoCargado;
+    private string vista = "listar";
 
-    /// <summary>Llega solo cuando la ruta es /facturas/{numero}. En las otras
-    /// dos queda en null, y eso es lo que distingue el detalle.</summary>
-    [Parameter] public int? Numero { get; set; }
-
-    // --- estado de la lista ---
+    // --- la lista ---
     private List<Factura> lista = [];
 
-    // --- estado del detalle ---
+    // --- el detalle ---
     private Factura? factura;
 
-    // --- estado del formulario ---
+    // --- el formulario ---
     private List<Cliente> clientes = [];
     private List<Vendedor> vendedores = [];
     private List<Persona> personas = [];
@@ -350,10 +342,7 @@ else
     private string? aviso;
     private bool avisoEsError;
 
-    /// <summary>Se ejecuta tambien al navegar ENTRE las tres rutas, porque
-    /// Blazor reusa el componente: por eso la carga va aqui y no en
-    /// OnInitializedAsync, que solo correria la primera vez.</summary>
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         // v3 — SIN SESION NO SE LE PIDE NADA A LA API.
         //
@@ -366,28 +355,38 @@ else
             return;
         }
 
-        modo = Numero is not null ? Modo.Detalle : Modo.Lista;
+        await CargarLista();
+    }
 
-        // Sin esto se recargaria en cada render y el formulario perderia lo
-        // que la persona lleva escrito.
-        if (modoCargado == modo && modo != Modo.Detalle) { return; }
-        modoCargado = modo;
+    // ============================================================
+    // CAMBIAR DE VISTA — los tres botones
+    // ============================================================
 
+    /// <summary>Abre el formulario en blanco, con sus desplegables cargados.</summary>
+    private async Task MostrarFormulario()
+    {
         aviso = null;
-        cargando = true;
+        LimpiarFormulario();
+        await CargarDesplegables();
+        vista = "formulario";
+    }
 
-        if (modo == Modo.Detalle)
-        {
-            await CargarFactura();
-        }
-        else
-        {
-            // La lista Y los desplegables del formulario, que viven en la misma
-            // pantalla. A la vez, no en fila.
-            await Task.WhenAll(CargarLista(), CargarDesplegables());
-        }
+    /// <summary>Trae UNA factura con sus renglones y la muestra.</summary>
+    private async Task Ver(int numero)
+    {
+        aviso = null;
+        factura = null;
+        var r = await Servicio.ConsultarAsync(numero);
+        if (r.Bien) { factura = r.Dato; vista = "ver"; }
+        else { Avisar(r.Mensaje!, true); }
+    }
 
-        cargando = false;
+    /// <summary>Vuelve a la tabla, y la recarga para que refleje lo que pasó.</summary>
+    private async Task Volver()
+    {
+        aviso = null;
+        await CargarLista();
+        vista = "listar";
     }
 
     // ============================================================
@@ -395,7 +394,10 @@ else
     // ============================================================
     private async Task CargarLista()
     {
+        cargando = true;
         var r = await Servicio.ListarAsync();
+        cargando = false;
+
         if (r.Bien) { lista = r.Dato!; } else { Avisar(r.Mensaje!, true); }
     }
 
@@ -408,16 +410,6 @@ else
             await CargarLista();
         }
         else { Avisar(r.Mensaje!, true); }
-    }
-
-    // ============================================================
-    // EL DETALLE
-    // ============================================================
-    private async Task CargarFactura()
-    {
-        factura = null;
-        var r = await Servicio.ConsultarAsync(Numero!.Value);
-        if (r.Bien) { factura = r.Dato; } else { Avisar(r.Mensaje!, true); }
     }
 
     // ============================================================
@@ -501,9 +493,9 @@ else
         if (r.Bien)
         {
             LimpiarFormulario();
-            // A la lista, que es donde se ve la factura recien emitida.
-            modoCargado = null;
-            Navegador.NavigateTo("/facturas");
+            await CargarLista();
+            vista = "listar";
+            Avisar("Factura emitida.", false);
         }
         else
         {

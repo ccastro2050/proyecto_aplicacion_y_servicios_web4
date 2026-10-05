@@ -1,9 +1,10 @@
 // ============================================================
-// FabricaPostgres — la fábrica del SEGUNDO motor (v4).
+// FabricaPostgres — la fábrica del SEGUNDO motor (v5).
 //
 // La gemela de FabricaSqlServer, dialecto PostgreSQL. Compárelas
 // lado a lado: misma forma, otra familia — eso ES el patrón.
-// La v5 (MariaDB) será la tercera gemela: una clase y un case.
+// Un TERCER motor costaría una clase más y un case más: eso es
+// exactamente lo que el patrón compra.
 // ============================================================
 
 using ApiFacturas.Repositorios;

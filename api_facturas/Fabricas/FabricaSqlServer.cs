@@ -1,5 +1,5 @@
 // ============================================================
-// FabricaSqlServer — la fábrica del PRIMER motor (v4).
+// FabricaSqlServer — la fábrica del PRIMER motor (v5).
 //
 // Entrega los 11 repositorios en dialecto SQL Server, cada uno con
 // la cadena de conexión que recibió al construirse. Construir un

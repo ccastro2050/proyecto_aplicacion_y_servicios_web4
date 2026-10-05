@@ -202,6 +202,23 @@ simple. Entrégamelo archivo por archivo, y NO sigas con `cliente` hasta
 que yo te diga que vendedor ya me funcionó.
 ```
 
+> **Y ahora la parte que el prompt no puede hacer por usted: LEER esos
+> comentarios.** La IA comenta lo que **cree** que hizo, y no siempre coincide
+> con lo que hizo. **Un comentario equivocado es peor que ninguno**, porque el
+> siguiente que lo lea le va a creer.
+>
+> | | |
+> |---|---|
+> | El comentario **como producto** | sirve para quien llegue en seis meses |
+> | El comentario **como ejercicio** | **revisarlo lo obliga a entender.** Ahí está el valor para quien aprende |
+> | El comentario **como evidencia** | vale poco: se puede generar sin entender nada |
+>
+> **Por eso la interpretabilidad se califica HABLANDO.** Un comentario se puede
+> recitar; una respuesta a *«¿y si cambiamos esto?»* no. Si usted no puede juzgar
+> si un comentario es **cierto**, no entendió el código — y ésa es exactamente la
+> señal que hay que buscar mientras revisa.
+
+
 > **Y fíjese en el orden que pide el prompt: `vendedor` primero.** Tiene una
 > clave foránea obligatoria y nada más. `cliente` trae la opcional, que es donde
 > está el problema del `""`. Aprenda el caso simple antes de pelear con el raro.

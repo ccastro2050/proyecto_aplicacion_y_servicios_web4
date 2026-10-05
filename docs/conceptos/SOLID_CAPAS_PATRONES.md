@@ -312,6 +312,49 @@ builder.Services.AddScoped<IRepositorioProducto>(_ => fabrica.CrearRepositorioPr
 > catorce **del mismo motor**. Eso es lo que significa que entregue una
 > «familia» y no objetos sueltos.
 
+### Un caso real: el comentario que mintió, y arrastró a este documento
+
+**Hasta el 4 de octubre de 2026 este documento decía que la fábrica entregaba
+ONCE repositorios. Son CATORCE.** Y el error no se inventó aquí: estaba en el
+comentario del propio código.
+
+```csharp
+// IFabricaRepositorios.cs — lo que decía la cabecera
+// decide el motor de las ONCE rebanadas a la vez
+// Los 11 métodos "aburridos" SON la lección
+```
+
+> **La interfaz tiene 14 métodos.** Se cuenta en un comando:
+> ```powershell
+> Select-String api_facturas\Fabricas\IFabricaRepositorios.cs -Pattern 'Crear' |
+>   Measure-Object | Select-Object Count
+> ```
+
+**Y el comentario tenía tres mentiras más, todas en la cabecera de la fábrica:**
+
+| Decía | Es |
+|---|---|
+| «el contrato de la FÁBRICA (**v4**)» | **v5** |
+| «la fábrica del SEGUNDO motor (**v4**)» | **v5** |
+| «agregar un motor (**MariaDB, v5**) costará una clase» | la v5 **es** PostgreSQL; MariaDB no está en el mapa |
+
+> **Esto es exactamente lo que la regla de interpretabilidad advierte, y ocurrió
+> de verdad en este repositorio:** alguien leyó *«los 11 métodos»* en el
+> comentario, le creyó, y lo copió a la documentación. **Un comentario
+> equivocado es peor que ninguno**, porque el siguiente que lo lea le va a creer
+> — y lo va a repetir.
+>
+> **Ninguna de las cuatro mentiras rompía nada.** El proyecto compilaba, la
+> fábrica funcionaba y los catorce repositorios se entregaban bien. Lo único roto
+> era **lo que el código decía de sí mismo** — y por eso un compilador no lo
+> puede defender.
+
+> **De ahí la frase del curso:** pedirle a la IA que comente es necesario y no es
+> suficiente. **Hay que LEER lo que comentó.** Y la única prueba de que usted lo
+> leyó de verdad es que pueda decir si es **cierto**.
+
+---
+
 ### DTO por verbo — el body aterriza en un objeto que solo valida forma
 
 ```csharp

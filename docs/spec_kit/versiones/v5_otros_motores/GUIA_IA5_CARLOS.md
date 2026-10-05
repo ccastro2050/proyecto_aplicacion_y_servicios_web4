@@ -200,6 +200,23 @@ interruptor, y de último el repositorio de producto en PostgreSQL. Dime
 qué archivos creaste en cada paso.
 ```
 
+> **Y ahora la parte que el prompt no puede hacer por usted: LEER esos
+> comentarios.** La IA comenta lo que **cree** que hizo, y no siempre coincide
+> con lo que hizo. **Un comentario equivocado es peor que ninguno**, porque el
+> siguiente que lo lea le va a creer.
+>
+> | | |
+> |---|---|
+> | El comentario **como producto** | sirve para quien llegue en seis meses |
+> | El comentario **como ejercicio** | **revisarlo lo obliga a entender.** Ahí está el valor para quien aprende |
+> | El comentario **como evidencia** | vale poco: se puede generar sin entender nada |
+>
+> **Por eso la interpretabilidad se califica HABLANDO.** Un comentario se puede
+> recitar; una respuesta a *«¿y si cambiamos esto?»* no. Si usted no puede juzgar
+> si un comentario es **cierto**, no entendió el código — y ésa es exactamente la
+> señal que hay que buscar mientras revisa.
+
+
 > **Fíjese en el orden del prompt:** la fábrica se monta **primero con SQL Server
 > solo**, y todo tiene que seguir funcionando igual. Si algo se rompe ahí, se
 > rompió por la fábrica y no por PostgreSQL — y eso es mucho más fácil de

@@ -34,9 +34,16 @@ var builder = WebApplication.CreateBuilder(args);
 //   - pide IServicioProducto    → recibe ServicioProducto
 // El controlador y el servicio JAMÁS hacen "new" de clases concretas:
 // las reciben por constructor (inyección de dependencias).
-// v4: llegó el segundo motor y la promesa se cumplió — SOLO estas
+// v5: llegó el segundo motor y la promesa se cumplió — SOLO estas
 // líneas cambiaron. El motor se decide en UN switch y los
 // repositorios los entrega la FÁBRICA (Fabricas/).
+//
+// OJO con cómo se lee «nadie hace new de clases concretas»: NO
+// significa que esté prohibido nombrarlas. Dos líneas más abajo se
+// registra ServicioProducto POR SU NOMBRE, y está bien — de ése hay
+// UNO SOLO. La regla aplica donde hay DOS implementaciones y hay que
+// poder cambiar entre ellas: los repositorios, que por eso pasan
+// por la fábrica.
 
 // Las cadenas de conexión: vienen de appsettings.json, y en Docker las
 // sobreescriben las variables ConnectionStrings__SqlServer / __Postgres.

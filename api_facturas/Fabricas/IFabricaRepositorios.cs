@@ -1,16 +1,22 @@
 // ============================================================
-// IFabricaRepositorios — el contrato de la FÁBRICA (v4).
+// IFabricaRepositorios — el contrato de la FÁBRICA (v5).
 //
 // El patrón fábrica abstracta: quien implementa esta interfaz
-// decide el motor de las ONCE rebanadas a la vez. El ensamblador
+// decide el motor de las CATORCE rebanadas a la vez. El ensamblador
 // (Program.cs) elige UNA fábrica al arrancar y le pide todo; nadie
 // más en el sistema vuelve a pensar en motores.
 //
-// Los 11 métodos "aburridos" SON la lección: la fábrica promete la
-// familia COMPLETA de repositorios, no repositorios sueltos — por
-// eso agregar un motor (MariaDB, v5) costará UNA clase, y agregar
-// una entidad obligará a los DOS motores a soportarla (el compilador
-// no deja fábricas incompletas).
+// Los 14 métodos "aburridos" SON la lección: la fábrica promete la
+// familia COMPLETA de repositorios, no repositorios sueltos.
+//
+// POR QUÉ ESO IMPORTA, y es lo que un «14 métodos repetidos» esconde:
+// sin la fábrica, Program.cs tendría CATORCE decisiones de motor, y
+// nada impediría que la catorceava se quedara en SQL Server mientras
+// las otras trece pasaron a PostgreSQL. Un sistema mitad en un motor
+// y mitad en otro — que compila y arranca. Aquí se escoge UNA VEZ.
+//
+// Y agregar una entidad obliga a los DOS motores a soportarla: el
+// compilador no deja fábricas incompletas.
 // ============================================================
 
 using ApiFacturas.Repositorios;

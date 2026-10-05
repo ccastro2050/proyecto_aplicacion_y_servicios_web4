@@ -388,6 +388,7 @@ escritos desde el código, el esquema y la API corriendo, no de memoria.
 | [DATOS_DE_PRUEBA](docs/dominio/DATOS_DE_PRUEBA.md) | Qué trae la base sembrada y **para qué sirve cada fila** |
 | [MANUAL_DE_MARCA](docs/dominio/MANUAL_DE_MARCA.md) | La paleta **con sus contrastes WCAG calculados**, no estimados |
 | [PLAN_V1](docs/dominio/PLAN_V1.md) · [PLAN_V2](docs/dominio/PLAN_V2.md) · [PLAN_V3](docs/dominio/PLAN_V3.md) · [PLAN_V4](docs/dominio/PLAN_V4.md) | Las decisiones antes de programar, y los tropiezos de cada versión |
+| [**PENDIENTES**](docs/dominio/PENDIENTES.md) | **Lo que este repositorio todavia NO tiene**, con como se comprueba cada cosa |
 | [CRONOGRAMA](docs/dominio/CRONOGRAMA.md) | Contado de `git log`, con sus huecos dichos |
 | [FUENTES](docs/dominio/FUENTES.md) | **De dónde salió todo, y de dónde NO** |
 | [SUSTENTACION_DEL_CODIGO](docs/dominio/SUSTENTACION_DEL_CODIGO.md) | **Diez preguntas sobre este código, respondidas** |

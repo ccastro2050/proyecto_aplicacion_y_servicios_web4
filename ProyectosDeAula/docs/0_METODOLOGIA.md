@@ -455,7 +455,7 @@ Aplica en cada versión. Cada criterio se califica en una de dos franjas:
 | **Imagen corporativa y responsive (v4)** | **Existe un manual de marca** —propio o el del ejemplo— y la interfaz gráfica lo cumple: los colores y las tipografías salen de él, no de un gusto; todo responsive | No hay manual, o lo hay y la interfaz gráfica no lo respeta, o no es responsive |
 | **Publicación (v4)** | Publicado, funcional, con secretos en variables de entorno del servidor | No publicado o con secretos expuestos |
 | **Spec kit + prompts + código, y que correspondan** | Están las **tres** cosas: el spec kit de la versión, el prompt de **cada integrante** y el código. El profesor ejecuta ese spec kit y esos prompts **en otra IA** y lo que sale **corresponde en gran medida** con el repositorio | Falta una de las tres, o lo que sale al volver a ejecutarlos no se parece a lo entregado |
-| **Interpretabilidad (desde la v2) — 20 %** | Cada integrante **explica en voz alta** el código que entregó: qué hace, por qué está escrito así, qué pasa si falla y qué haría distinto. El código está comentado y los comentarios dicen el **porqué** | No puede explicar lo que entregó; lo lee en voz alta sin poder decir por qué; o atribuye a la IA decisiones que nadie revisó |
+| **Interpretabilidad (desde la v2) — 20 %** | Cada integrante **explica en voz alta** el código que entregó: qué hace, por qué está escrito así, qué pasa si falla y qué haría distinto. El código está comentado y los comentarios dicen el **porqué** | Todavía no puede contar lo que entregó, o lo lee sin poder decir por qué está así |
 
 Dentro de la franja "Cumple", la nota (3.0 a 5.0) refleja la calidad:
 completitud, solidez ante errores, claridad del código y de la spec, y la

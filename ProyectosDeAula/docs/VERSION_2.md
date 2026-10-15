@@ -311,11 +311,10 @@ se comprueba **hablando** — y esta versión es donde empieza a calificarse.
 | **Dónde** | **En voz alta y presencial.** No se recibe por escrito |
 | **A quién** | A **cada integrante por separado**, sobre **lo que ese integrante entregó** |
 
-> **Un equipo puede pasar los doce criterios y sacar 2.9 aquí.** No es un
-> descuido de la rúbrica: es el único criterio que **no se puede delegar**. La
+> Es la parte de la nota que **cada quien se gana con su propio trabajo**. La
 > API puede funcionar porque la IA la escribió bien, y el front puede verse
-> bien por lo mismo. **Decir por qué está así solo lo puede hacer quien
-> entendió.**
+> bien por lo mismo; **decir por qué está así es lo que muestra que usted lo
+> entendió** — y es lo que este criterio reconoce.
 
 **De ahí que la guía de IA exija que la IA comente lo que genera** — pero ojo
 con confundir comentar y entender. El comentario **facilita** la
@@ -417,7 +416,7 @@ seguir funcionando»: se corren.
 | **El sobre de la respuesta** | La API devuelve `{tabla, limite, total, datos}`, no una lista pelada. Leerlo mal deja la pantalla **vacía sin ningún error** | Una tabla sin filas y sin mensaje |
 | **La tabla puente con botón de editar** | Una pareja existe o no existe; no se edita | — |
 | **El procedimiento que no devuelve la fila** | La interfaz no puede mostrar lo que acaba de crear | — |
-| **El archivo que nadie leyó** | Se entrega código generado y nadie lo abrió. Pasa los doce criterios y **falla el único que no se puede delegar** | §8.1 — y el archivo lo elige el profesor, no usted |
+| **El archivo que nadie leyó** | Se entrega código generado sin abrirlo. Léanlo: el archivo de la sustentación lo elige el profesor, y leerlo antes es lo único que hace falta | §8.1 |
 
 ---
 

@@ -8,6 +8,19 @@
 > [Innovación Curricular](modulo_innovacion_curricular.md) ·
 > [Mapa de Conocimiento](modulo_mapa_conocimiento.md) ·
 > [Proyecto Completo](proyecto_completo.md).
+>
+> **Cada equipo de trabajo tiene sus propios repositorios en GitHub** y hace
+> su propia entrega (§4).
+>
+> ### Y lo que más sube y baja la nota no es el código: es poder explicarlo
+>
+> Desde la **v2**, **4 de los 10 puntos individuales de cada versión son
+> INTERPRETABILIDAD**: el profesor abre un archivo que **él** elige y usted lo
+> cuenta en voz alta. Qué hace, por qué está así, qué pasa si falla y qué
+> cambiaría.
+>
+> Es el criterio que cada quien responde por su cuenta, y está desarrollado al
+> final de la §7.
 
 ---
 
@@ -80,6 +93,40 @@ grupo la fija el profesor en clase (anótela en el espacio en blanco).
 
 ## 3. El spec kit que cada equipo ESCRIBE (por versión)
 
+### Lo que se entrega son TRES cosas, y las tres se califican
+
+| | Qué | Cuántas |
+|---|---|---|
+| **1** | **Los `.md` del spec kit**, por versión | Una carpeta por versión. **La constitución es la MISMA para todas las versiones**: se escribe una vez y no se repite por versión |
+| **2** | **Los prompts de cada integrante**, los que **junto con el spec kit generan el código** | Uno por integrante, con su nombre. No uno del equipo |
+| **3** | **El código** generado con esos spec kit y esos prompts | El sistema de la versión |
+
+Las tres van juntas: el spec kit dice **qué** construir, el prompt es **cómo
+se le pidió**, y el código es **lo construido**. Falta una y no se puede ver
+de dónde salió lo otro.
+
+### Y así se comprueba: el profesor los vuelve a ejecutar
+
+**El profesor toma el spec kit del equipo y los prompts de cada integrante,
+los ejecuta en OTRA IA, y compara.** Lo que espera es que el código que le
+salga **corresponda en gran medida** con el código que está en el
+repositorio.
+
+Eso es lo que hace que las tres piezas tengan que ser de verdad:
+
+- si el spec kit no dice lo que el código hace, el resultado no se parece;
+- si los prompts no son los que se usaron, el resultado no se parece;
+- y si el código salió de otra parte, tampoco.
+
+**No se trata de que salga idéntico** —dos IA no escriben el mismo archivo—,
+sino de que salga **lo mismo**: las mismas tablas, los mismos endpoints, las
+mismas capas, las mismas reglas.
+
+Y lo que ninguna IA puede devolver es la otra mitad de la nota:
+**explicarlo**. En la sustentación cada integrante cuenta en voz alta el
+archivo que el profesor elija de lo que él entregó — el código se puede
+volver a generar; el entendimiento no.
+
 Antes de programar cada versión, el equipo escribe su especificación en
 `docs/spec_kit/` del repositorio de la API (el mismo formato del curso):
 
@@ -88,6 +135,8 @@ docs/spec_kit/
 ├── 1_constitution.md            ← UNA vez (los principios del equipo: stack
 │                                   elegido, capas, español, borrado lógico,
 │                                   secretos por variables de entorno…)
+│                                   Se escribe UNA vez: es la misma para las
+│                                   cuatro versiones, no una por versión
 └── versiones/
     ├── 0_mapa_versiones.md      ← la tabla de la sección 2, con estados
     ├── v1_<nombre>/             ← 2_spec.md · 3_plan.md · 4_research.md ·
@@ -405,6 +454,7 @@ Aplica en cada versión. Cada criterio se califica en una de dos franjas:
 | **Dashboard y consultas (v4)** | 10 consultas de 4+ tablas con gráficos claros | Menos de 10 consultas, consultas de menos de 4 tablas, o sin dashboard |
 | **Imagen corporativa y responsive (v4)** | **Existe un manual de marca** —propio o el del ejemplo— y la interfaz gráfica lo cumple: los colores y las tipografías salen de él, no de un gusto; todo responsive | No hay manual, o lo hay y la interfaz gráfica no lo respeta, o no es responsive |
 | **Publicación (v4)** | Publicado, funcional, con secretos en variables de entorno del servidor | No publicado o con secretos expuestos |
+| **Spec kit + prompts + código, y que correspondan** | Están las **tres** cosas: el spec kit de la versión, el prompt de **cada integrante** y el código. El profesor ejecuta ese spec kit y esos prompts **en otra IA** y lo que sale **corresponde en gran medida** con el repositorio | Falta una de las tres, o lo que sale al volver a ejecutarlos no se parece a lo entregado |
 | **Interpretabilidad (desde la v2) — 20 %** | Cada integrante **explica en voz alta** el código que entregó: qué hace, por qué está escrito así, qué pasa si falla y qué haría distinto. El código está comentado y los comentarios dicen el **porqué** | No puede explicar lo que entregó; lo lee en voz alta sin poder decir por qué; o atribuye a la IA decisiones que nadie revisó |
 
 Dentro de la franja "Cumple", la nota (3.0 a 5.0) refleja la calidad:

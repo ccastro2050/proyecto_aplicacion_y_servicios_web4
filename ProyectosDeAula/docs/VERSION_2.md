@@ -1,16 +1,22 @@
 # Qué se espera de la VERSIÓN 2 del proyecto de aula
 
-> Para el **equipo**. Qué tiene que estar listo al entregar la v2, cómo se
+> **Esto es POR EQUIPO.** Cada equipo entrega su propia v2, en sus propios
+> repositorios: lo que sigue es lo que tiene que estar listo, cómo se
 > comprueba y qué se entrega.
 >
 > **Entrega: última semana de octubre · 20%** — 10% de sustentación individual
 > (incluidos sus commits) + 10% de entrega en equipo. La fecha exacta la fija
 > el profesor en clase.
 >
-> **Y esta es la PRIMERA versión en la que se califica la interpretabilidad:
-> 4 de esos 20 puntos.** Salen de los 10 individuales —no de los del equipo— y
-> se ganan **hablando**, no entregando. En la v1 no se evaluaba; desde aquí sí.
-> Está en §8.1.
+> **En la versión 2 se califica la interpretabilidad: 4 de esos 20 puntos.**
+> Salen de los 10 individuales, no de los del equipo. Está en §8.1.
+>
+> **Y se entregan TRES cosas, no una:** el spec kit de la versión, **el prompt
+> de cada integrante** —los que junto con el spec kit generaron el código— y
+> el código. El profesor ejecuta ese spec kit y esos prompts **en otra IA**, y
+> espera que lo que salga **corresponda en gran medida** con lo que está en el
+> repositorio. Está en la §3 de
+> [0_METODOLOGIA.md](0_METODOLOGIA.md).
 >
 > El método, el calendario y la rúbrica están en
 > [0_METODOLOGIA.md](0_METODOLOGIA.md). Esto es **el detalle de la v2**.

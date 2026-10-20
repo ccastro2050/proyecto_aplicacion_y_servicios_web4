@@ -138,6 +138,12 @@ services:
   front-blazor:
     build: ./front_blazor
     container_name: facturas-front-aysw-v4
+    # Vuelve a arrancar solo. Los demas servicios de este compose ya lo
+    # tenian y este no: el 17 de octubre de 2026 Docker se reinicio, las
+    # bases y la API volvieron, y el front se quedo abajo — que es como se
+    # descubrio. Si el contenedor se detiene a mano (`docker stop`), NO
+    # vuelve: eso es lo que significa `unless-stopped`.
+    restart: unless-stopped
     ports:
       - "8099:8099"
     volumes:

@@ -399,9 +399,9 @@ habría dado:
 
 > **Si su elicitación se lee así de limpia, sospeche de ella.** Las respuestas de
 > verdad traen tramos confusos, frases a medias y cosas que el usuario dice sin
-> darse cuenta de que son requisitos. La transcripción de `proyecto_catedras2`
-> tiene un tramo entero recuperado y un rol **mal nombrado por la propia
-> fuente** — ese tipo de ruido es la señal de que la fuente es real.
+> darse cuenta de que son requisitos. Una transcripción real suele traer tramos
+> recuperados a medias y hasta un rol **mal nombrado por la propia fuente** —
+> ese tipo de ruido es la señal de que la fuente existió.
 
 ---
 

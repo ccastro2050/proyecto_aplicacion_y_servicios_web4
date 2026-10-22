@@ -82,9 +82,6 @@ Las que cada módulo ya tiene en su esquema. **Busque las del suyo.**
 | Mapa de Conocimiento | **`proyecto`** | producto |
 |  | **`tipo_producto`** | producto |
 |  | **`linea_investigacion`** | docente |
-| Cátedras | **`asistente`** | ponencia · documento_asistente · consentimiento_datos · clave_acceso |
-|  | **`encuesta`** | pregunta · respuesta_encuesta · sesion |
-|  | **`sesion`** | ponencia · enlace_registro |
 
 > **Qué significa que algo sea detalle.** Un `estudios_realizados` **no existe
 > sin su `docente`**. No se crea suelto y después se le busca padre.
@@ -157,10 +154,10 @@ END;
 **lógico**: `sp_eliminar_<tabla>` hace un `UPDATE ... SET activo = 0`, **no un
 `DELETE`**, y **todos los listados filtran los inactivos**.
 
-> No es igual en todos los módulos: en los cuatro módulos de docencia casi
-> todas las tablas la tienen; en Cátedras, menos de la mitad. **Lo que mande es
-> su esquema**, y si su tabla no tiene `activo` y usted cree que debería, eso
-> es una decisión de la v2 — tómenla y escríbanla en el `2_spec.md`.
+> No es igual en todos los módulos: en algunos casi todas las tablas la tienen
+> y en otros menos de la mitad. **Lo que mande es su esquema**, y si su tabla no
+> tiene `activo` y usted cree que debería, eso es una decisión de la v2 —
+> tómenla y escríbanla en el `2_spec.md`.
 
 ---
 

@@ -221,8 +221,9 @@ una fuente.
 
 > **Lo que no se puede simular es la incomodidad.** Una elicitación real tiene
 > tramos confusos, contradicciones entre el minuto 12 y el 58, y cosas que el
-> usuario reconoce no saber. Para eso está `proyecto_catedras2`, donde la reunión
-> ocurrió y la transcripción existe con todo su ruido.
+> usuario reconoce no saber. Eso solo se aprende conduciendo una reunión de
+> verdad y guardando la transcripción con todo su ruido — y la del proyecto de
+> aula lo es.
 >
 > **Y de ahí la señal de alarma para el proyecto de aula: si su elicitación se
 > lee demasiado limpia, sospeche de ella.** Ese ruido es la prueba de que la

@@ -856,11 +856,10 @@ lenguajes**. Multiplicando:
 | Aplicación y Servicios Web | 5 |
 | PHP | 4 |
 | Evaluaciones del ITM | 3 |
-| Cátedras | 2 |
 | Módulos del proyecto de aula y variantes | 26 |
-| **Total de sistemas levantables** | **64** |
+| **Total de sistemas levantables** | **62** |
 
-**Sesenta y cuatro proyectos independientes, cada uno con su propia red.**
+**Sesenta y dos proyectos independientes, cada uno con su propia red.**
 Contra un techo de unas **30**.
 
 Por eso el error no aparece por hacer algo mal: aparece porque **la suma da

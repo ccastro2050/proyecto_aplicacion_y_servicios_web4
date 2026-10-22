@@ -1,0 +1,89 @@
+# El encabezado común de los ocho documentos de una versión
+
+> **Esto no es un documento del spec kit.** Es el bloque que va **arriba de
+> todo** en `2_spec`, `3_plan`, `4_research`, `5_data_model`, `6_contracts`,
+> `7_quickstart`, `8_tasks` y `9_checklist` — idéntico en los ocho, salvo dos
+> cosas que se marcan.
+>
+> Está aquí una sola vez para no repetirlo ocho veces en las plantillas.
+
+---
+
+## El bloque, para copiar
+
+```markdown
+> **Versión {{N}}** del desarrollo incremental ([mapa de versiones](../0_mapa_versiones.md)).
+> Rige la constitución: [../../1_constitution.md](../../1_constitution.md).
+> **Acumulativa:** contiene TODO lo de v1 a v{{N-1}} — las {{OPERACIONES_ANTERIORES}} operaciones
+> existentes no se tocan y sus contratos siguen vigentes tal cual. La v{{N}}
+> **suma {{OPERACIONES_NUEVAS}}**.
+>
+> | Documento de esta versión | Contenido |
+> |---|---|
+> | [2_spec.md](2_spec.md) | QUÉ agrega la v{{N}} y sus criterios de aceptación |
+> | [3_plan.md](3_plan.md) | CÓMO: {{EN_UNA_LINEA_QUE_SE_CONSTRUYE}} |
+> | [4_research.md](4_research.md) | Decisiones y alternativas *(lectura opcional)* |
+> | [5_data_model.md](5_data_model.md) | {{QUE_PASA_CON_EL_MODELO_EN_ESTA_VERSION}} |
+> | [6_contracts.md](6_contracts.md) | {{LAS_OPERACIONES_QUE_AGREGA}} |
+> | [7_quickstart.md](7_quickstart.md) | Arranque y el smoke test de {{LO_NUEVO}} |
+> | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
+> | [9_checklist.md](9_checklist.md) | Lo que tiene que estar antes de cerrar |
+> | [GUIA_IA{{N}}.md](GUIA_IA{{N}}.md) | Construirla con IA, sobre su proyecto v{{N-1}} |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`{{DOC_DOMINIO_1}}`](../../../dominio/{{DOC_DOMINIO_1}}) | {{QUE_APORTA_1}} |
+> | [`{{DOC_DOMINIO_2}}`](../../../dominio/{{DOC_DOMINIO_2}}) | {{QUE_APORTA_2}} |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
+```
+
+---
+
+## Las dos cosas que cambian de documento a documento
+
+### 1. El documento actual va en negrita y SIN enlace
+
+En `2_spec.md`, la primera fila de la tabla se escribe así:
+
+```markdown
+> | **2_spec.md** (este) | QUÉ agrega la v{{N}} y sus criterios de aceptación |
+```
+
+Y en `6_contracts.md`, la que cambia es la quinta. **Es un detalle, y se nota
+cuando falta**: un enlace que apunta al archivo que uno ya tiene abierto hace
+dudar de si se hizo clic.
+
+### 2. La tabla «De dónde sale este documento»
+
+Es distinta en cada uno, y **no se elige: está medida**. Cada documento del
+spec kit se alimenta de documentos de dominio concretos:
+
+| El documento | Sale de |
+|---|---|
+| `2_spec` | `REQUISITOS_FUNCIONALES` · `REGLAS_DE_NEGOCIO` · `PLAN_V{{N}}` |
+| `3_plan` | `ARQUITECTURA` · `REQUISITOS_NO_FUNCIONALES` |
+| `4_research` | `FUENTES` · `PENDIENTES` |
+| `5_data_model` | `DISENO_BD` · `DATOS_DE_PRUEBA` |
+| `6_contracts` | `REQUISITOS_FUNCIONALES` · `POLITICA_DE_ERRORES` · `GLOSARIO` |
+| `7_quickstart` | `DATOS_DE_PRUEBA` · `POLITICA_DE_ERRORES` |
+| `8_tasks` | `PLAN_V{{N}}` · `PLAN_DE_TRABAJO` |
+| `9_checklist` | `PLAN_V{{N}}` · `REQUISITOS_FUNCIONALES` |
+
+> **Esta tabla es la que hace que el generador funcione.** Es la razón por la
+> que cada fase recibe solo dos o tres documentos de dominio en vez de los
+> diecinueve: **ya se sabe cuál alimenta a cuál.** El mapa completo está en
+> [`MAPA_DE_DOCUMENTOS.md`](../docs/dominio/MAPA_DE_DOCUMENTOS.md).
+
+---
+
+## Por qué este bloque existe
+
+Quien abre cualquiera de los ocho ve de entrada cuatro cosas: **en qué versión
+está**, **que la versión contiene a las anteriores**, **qué más hay en la
+carpeta** y **de qué documento de dominio salió lo que va a leer**.
+
+> Un spec kit en el que cada archivo arranca distinto obliga a reorientarse
+> ocho veces. Éste se lee una vez y después se reconoce.

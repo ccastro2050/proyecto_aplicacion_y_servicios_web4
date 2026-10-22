@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 700" width="860" height="700" font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A4A4A"/>
+    </marker>
+  </defs>
+
+  <rect width="860" height="700" fill="#F4F2EC"/>
+
+  <!-- ===== CARRIL DEL INGENIERO(A) DE SOFTWARE ===== -->
+  <rect x="24" y="52" width="812" height="404" rx="10"
+        fill="#ffffff" stroke="#17495B" stroke-width="2"/>
+  <rect x="24" y="52" width="812" height="34" rx="10" fill="#17495B"/>
+  <rect x="24" y="76" width="812" height="10" fill="#17495B"/>
+  <text x="44" y="75" fill="#ffffff" font-size="16" font-weight="bold"
+        letter-spacing="1">INGENIERO(A) DE SOFTWARE</text>
+  <text x="818" y="75" fill="#ffffff" font-size="13" text-anchor="end"
+        font-family="system-ui, sans-serif">lo que no se delega</text>
+
+  <!-- 1 -->
+  <rect x="56" y="104" width="748" height="56" rx="8"
+        fill="#F4F2EC" stroke="#17495B" stroke-width="1.5"/>
+  <circle cx="86" cy="132" r="15" fill="#17495B"/>
+  <text x="86" y="138" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="bold">1</text>
+  <text x="116" y="127" fill="#17495B" font-size="16" font-weight="bold">Levanta los requisitos</text>
+  <text x="116" y="147" fill="#4A4A4A" font-size="13"
+        font-family="system-ui, sans-serif">habla con quien tiene el problema</text>
+
+  <!-- 2 -->
+  <rect x="56" y="172" width="748" height="56" rx="8"
+        fill="#F4F2EC" stroke="#17495B" stroke-width="1.5"/>
+  <circle cx="86" cy="200" r="15" fill="#17495B"/>
+  <text x="86" y="206" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="bold">2</text>
+  <text x="116" y="195" fill="#17495B" font-size="16" font-weight="bold">Los elicita</text>
+  <text x="116" y="215" fill="#4A4A4A" font-size="13"
+        font-family="system-ui, sans-serif">preguntas · respuestas · historias propuestas</text>
+
+  <!-- 3 -->
+  <rect x="56" y="240" width="748" height="56" rx="8"
+        fill="#F4F2EC" stroke="#17495B" stroke-width="1.5"/>
+  <circle cx="86" cy="268" r="15" fill="#17495B"/>
+  <text x="86" y="274" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="bold">3</text>
+  <text x="116" y="263" fill="#17495B" font-size="16" font-weight="bold">Crea los documentos de diseño</text>
+  <text x="116" y="283" fill="#4A4A4A" font-size="13"
+        font-family="system-ui, sans-serif">la ingeniería de software: modelo relacional · formularios · historias de usuario · casos de uso · secuencias</text>
+
+  <!-- 4 · EL DOMINIO, destacado -->
+  <rect x="56" y="308" width="748" height="64" rx="8"
+        fill="#ffffff" stroke="#E39B2D" stroke-width="3.5"/>
+  <circle cx="86" cy="340" r="15" fill="#E39B2D"/>
+  <text x="86" y="346" fill="#4A4A4A" font-size="16" text-anchor="middle" font-weight="bold">4</text>
+  <text x="116" y="333" fill="#17495B" font-size="16" font-weight="bold">Con base en los CONCEPTOS, crea los DOCUMENTOS DE DOMINIO</text>
+  <text x="116" y="355" fill="#B4402F" font-size="13" font-weight="bold"
+        font-family="system-ui, sans-serif">y los crea YA FRACCIONADOS, uno por plantilla · hay UN SOLO dominio</text>
+
+  <!-- 5 -->
+  <rect x="56" y="384" width="748" height="56" rx="8"
+        fill="#F4F2EC" stroke="#17495B" stroke-width="1.5"/>
+  <circle cx="86" cy="412" r="15" fill="#17495B"/>
+  <text x="86" y="418" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="bold">5</text>
+  <text x="116" y="407" fill="#17495B" font-size="16" font-weight="bold">Lanza los prompts</text>
+  <text x="116" y="427" fill="#4A4A4A" font-size="13"
+        font-family="system-ui, sans-serif">una conversación nueva por cada documento del spec kit</text>
+
+  <!-- flechas internas del carril humano -->
+  <line x1="430" y1="160" x2="430" y2="170" stroke="#4A4A4A" stroke-width="2" marker-end="url(#flecha)"/>
+  <line x1="430" y1="228" x2="430" y2="238" stroke="#4A4A4A" stroke-width="2" marker-end="url(#flecha)"/>
+  <line x1="430" y1="296" x2="430" y2="306" stroke="#4A4A4A" stroke-width="2" marker-end="url(#flecha)"/>
+  <line x1="430" y1="372" x2="430" y2="382" stroke="#4A4A4A" stroke-width="2" marker-end="url(#flecha)"/>
+
+  <!-- paso del humano a la IA -->
+  <line x1="430" y1="456" x2="430" y2="492" stroke="#4A4A4A" stroke-width="2.5" marker-end="url(#flecha)"/>
+
+  <!-- ===== CARRIL DE LA IA ===== -->
+  <rect x="24" y="500" width="812" height="176" rx="10"
+        fill="#ffffff" stroke="#2F7D5C" stroke-width="2"/>
+  <rect x="24" y="500" width="812" height="34" rx="10" fill="#2F7D5C"/>
+  <rect x="24" y="524" width="812" height="10" fill="#2F7D5C"/>
+  <text x="44" y="523" fill="#ffffff" font-size="17" font-weight="bold"
+        letter-spacing="2">LA IA</text>
+  <text x="818" y="523" fill="#ffffff" font-size="13" text-anchor="end"
+        font-family="system-ui, sans-serif">transforma lo que ya está escrito</text>
+
+  <!-- 6 -->
+  <rect x="56" y="552" width="748" height="52" rx="8"
+        fill="#F4F2EC" stroke="#2F7D5C" stroke-width="1.5"/>
+  <circle cx="86" cy="578" r="15" fill="#2F7D5C"/>
+  <text x="86" y="584" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="bold">6</text>
+  <text x="116" y="573" fill="#17495B" font-size="16" font-weight="bold">Genera el SPEC KIT</text>
+  <text x="116" y="592" fill="#4A4A4A" font-size="13"
+        font-family="system-ui, sans-serif">plantillas + dominio · nueve documentos por versión</text>
+
+  <!-- 7 -->
+  <rect x="56" y="616" width="748" height="52" rx="8"
+        fill="#F4F2EC" stroke="#2F7D5C" stroke-width="1.5"/>
+  <circle cx="86" cy="642" r="15" fill="#2F7D5C"/>
+  <text x="86" y="648" fill="#ffffff" font-size="16" text-anchor="middle" font-weight="bold">7</text>
+  <text x="116" y="637" fill="#17495B" font-size="16" font-weight="bold">Genera el CÓDIGO</text>
+  <text x="116" y="656" fill="#4A4A4A" font-size="13"
+        font-family="system-ui, sans-serif">a partir del spec kit · con el prompt de la GUIA_IA</text>
+
+  <line x1="430" y1="604" x2="430" y2="614" stroke="#4A4A4A" stroke-width="2" marker-end="url(#flecha)"/>
+
+  <!-- ===== LA CADENA, ARRIBA ===== -->
+  <text x="430" y="32" fill="#17495B" font-size="18" text-anchor="middle" font-weight="bold">
+    requisitos → elicitación → diseño → <tspan fill="#B4402F">DOMINIO</tspan> → spec kit → código
+  </text>
+
+</svg>

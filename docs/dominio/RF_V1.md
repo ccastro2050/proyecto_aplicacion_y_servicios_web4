@@ -9,7 +9,7 @@
 > **Por qué está partido por versión.** Porque la conversación que genera el
 > spec kit de la v1 **solo necesita los requisitos de la v1**: los de las otras
 > cuatro compiten por la atención con el único que importa. Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **El catálogo completo**, los cinco verbos recurso por recurso y la matriz de
 > trazabilidad están en

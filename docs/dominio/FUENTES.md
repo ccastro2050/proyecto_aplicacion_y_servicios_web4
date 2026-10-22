@@ -9,7 +9,7 @@
 >
 > **Por qué está partido.** Porque tiene **dos lectores que necesitan cosas
 > distintas**. Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > Versión 2.0 · 22 de octubre de 2026.
 

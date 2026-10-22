@@ -11,7 +11,7 @@
 > lo mismo: la constitución necesita la tabla de códigos y nada más; la
 > traducción de los errores del motor solo aparece cuando llegan las llaves
 > foráneas. Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Sigue siendo una política:** rige en todas las versiones y no se renegocia en
 > cada `6_contracts.md`.

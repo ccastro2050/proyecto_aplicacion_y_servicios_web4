@@ -12,7 +12,7 @@
 > constitución; esto solo lo necesitan los contratos desde que aparecen las
 > llaves foráneas. La tabla está en
 > [`CODIGOS_DE_ESTADO.md`](CODIGOS_DE_ESTADO.md). Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Material académico simulado**, pero las traducciones son las que el código
 > hace de verdad.

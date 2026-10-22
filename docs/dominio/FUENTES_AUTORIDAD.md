@@ -10,7 +10,7 @@
 > constitución necesita de dónde viene el esquema —y eso está en
 > [`FUENTES_PROCEDENCIA.md`](FUENTES_PROCEDENCIA.md)—; el `4_research` necesita
 > la jerarquía y los límites. Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Material académico simulado.**
 >

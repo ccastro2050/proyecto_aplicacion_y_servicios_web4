@@ -11,7 +11,7 @@
 > constitución necesita las capas y las prohibiciones; el `3_plan` necesita los
 > procesos y el despliegue, que están en
 > [`ARQUITECTURA_PROCESOS.md`](ARQUITECTURA_PROCESOS.md). Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Los conceptos detrás:**
 > [`SOLID_CAPAS_PATRONES.md`](../conceptos/SOLID_CAPAS_PATRONES.md) y

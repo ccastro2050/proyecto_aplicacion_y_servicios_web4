@@ -10,7 +10,7 @@
 > lectores: la constitución necesita saber de dónde viene el esquema; el
 > `4_research` necesita saber **qué manda sobre qué**, y eso está en
 > [`FUENTES_AUTORIDAD.md`](FUENTES_AUTORIDAD.md). Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Material académico simulado.** La empresa es ficticia y no hubo ningún
 > cliente. Lo que sí es real es el reparto que este documento describe, y se

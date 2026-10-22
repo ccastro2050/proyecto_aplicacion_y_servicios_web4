@@ -12,7 +12,7 @@
 > distintos: esto lo necesitan tres plantillas; la traducción de los errores del
 > motor solo la necesitan los contratos de la v2 en adelante, y está en
 > [`ERRORES_DEL_MOTOR.md`](ERRORES_DEL_MOTOR.md). Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Por qué existe.** Sin esta política, cada versión inventa sus códigos, y la
 > v1 y la v2 del mismo sistema acaban respondiendo distinto al mismo error.

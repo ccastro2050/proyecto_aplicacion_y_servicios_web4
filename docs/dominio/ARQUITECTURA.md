@@ -12,7 +12,7 @@
 > los procesos y el despliegue. Mandarle a cada conversación el documento
 > completo es mandarle la mitad que no usa — y esa mitad compite por la
 > atención con la que sí. Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > Versión 2.0 · 22 de octubre de 2026.
 

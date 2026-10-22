@@ -18,7 +18,7 @@
 
 **requisitos → elicitación → diseño → DOMINIO → spec kit → código**
 
-![El recorrido del método, paso por paso](docs/conceptos/img/flujo_del_metodo.svg)
+![El recorrido del método, paso por paso](../conceptos/img/flujo_del_metodo.svg)
 
 | # | Paso | Quién | Qué queda escrito |
 |---|---|---|---|
@@ -112,8 +112,9 @@ entrada de la generación y el presupuesto de tokens no le aplica.
 | `MAPA_DE_DOCUMENTOS` | **Qué documento alimenta a qué plantilla** | Es el mapa, y **se escribe primero** |
 | `CRONOGRAMA` | Qué se hizo y cuándo | Se saca de `git log`, no se redacta de memoria |
 | `SUSTENTACION_DEL_CODIGO` | Las preguntas que se van a hacer sobre el código | Es material para la sustentación |
+| `METODOLOGIA_CONSTRUCCION_DOMINIOS` | **Cómo se construye el dominio**: qué documentos hay, en qué orden se escriben y cómo se parten | Es este documento. Lo lee **ingeniero(a) de software**, no una plantilla |
 
-> **A estos tres no les aplica el presupuesto de tokens**, porque no entran a
+> **A estos cuatro no les aplica el presupuesto de tokens**, porque no entran a
 > ninguna conversación de generación. Confundirlos con los otros lleva a partir
 > documentos que no hacía falta partir.
 

@@ -18,7 +18,7 @@
 > **Por qué están partidos.** La conversación que genera el spec kit de una
 > versión **solo necesita los requisitos de esa versión**: los de las otras
 > compiten por la atención con el único que importa. Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Qué NO es.** No reemplaza los `2_spec.md` de cada versión, que son los que
 > **mandan**.

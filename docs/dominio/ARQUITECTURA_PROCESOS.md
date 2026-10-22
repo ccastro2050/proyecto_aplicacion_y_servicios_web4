@@ -10,7 +10,7 @@
 > necesita los procesos y el despliegue; la constitución necesita las capas y
 > sus prohibiciones, que están en
 > [`ARQUITECTURA_CAPAS.md`](ARQUITECTURA_CAPAS.md). Ver
-> [`DOMINIO_PARA_GENERAR.md`](../../DOMINIO_PARA_GENERAR.md).
+> [`METODOLOGIA_CONSTRUCCION_DOMINIOS.md`](METODOLOGIA_CONSTRUCCION_DOMINIOS.md).
 >
 > **Material académico simulado**, pero el reparto es real y se puede comprobar
 > abriendo las carpetas.

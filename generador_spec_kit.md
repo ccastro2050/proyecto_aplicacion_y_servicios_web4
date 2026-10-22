@@ -153,10 +153,38 @@ MATERIAL (al final de este mensaje):
   3. La plantilla 1_constitution.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - NO invente reglas que el material no respalde. Si algo falta, escriba
   [NECESITA ACLARACIÓN: la pregunta concreta] y siga. No lo rellene.
@@ -225,10 +253,38 @@ MATERIAL (al final de este mensaje):
   4. La plantilla 2_spec.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - EL ALCANCE LO FIJA PLAN_V{n}.md. Si un requisito funcional no está en
   el alcance de esta versión, NO entra — aunque sea importante.
@@ -301,10 +357,38 @@ MATERIAL:
   4. La plantilla 3_plan.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - NO amplíe el alcance del 2_spec. Si el plan necesita algo que el
   2_spec no pide, eso es una señal: escríbalo como
@@ -375,10 +459,38 @@ MATERIAL:
   4. La plantilla 4_research.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - Una decisión por sección, numeradas D1, D2, D3…
 - LAS OPCIONES DESCARTADAS SE ESCRIBEN CON SU MEJOR ARGUMENTO. Un
@@ -446,10 +558,38 @@ MATERIAL:
   3. La plantilla 5_data_model.plantilla.md
 
 REGLAS — Y LA PRIMERA ES LA IMPORTANTE:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - NO PROPONGA NI UN CREATE TABLE. El modelo ya está diseñado y salió de
   la elicitación con el usuario experto. Este documento DESCRIBE qué
   parte usa la versión; no lo rediseña. Si cree que al modelo le falta
@@ -518,10 +658,38 @@ MATERIAL:
   4. La plantilla 6_contracts.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - LOS CÓDIGOS DE ESTADO SALEN DE POLITICA_DE_ERRORES.md. No los elija
   usted. Si el documento no dice qué responder en un caso, escriba
@@ -593,10 +761,38 @@ MATERIAL:
   4. La plantilla 7_quickstart.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - UNA SECCIÓN POR CRITERIO DE ACEPTACIÓN del 2_spec, numerada igual y
   titulada «CRITERIO n — …». Ninguno se queda sin su comprobación.
@@ -666,10 +862,38 @@ MATERIAL:
   4. La plantilla 8_tasks.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - CADA FASE TERMINA EN UNA VERIFICACIÓN ESCRITA. Una lista de tareas
   sin verificación es una lista de deseos en orden.
@@ -739,10 +963,38 @@ MATERIAL:
   4. La plantilla 9_checklist.plantilla.md
 
 REGLAS:
-- DEVUELVA TODO EL RESULTADO DENTRO DE UN ÚNICO BLOQUE DE CÓDIGO
-  MARKDOWN, es decir entre ```markdown y ```, para poder copiarlo de un
-  clic. NO lo parta en varios bloques, NO lo muestre como texto con
-  formato, y NO lo acompañe de comentarios fuera del bloque.
+- ANTES DE ESCRIBIR, REVISE SI LE ALCANZA EL MATERIAL, y dígalo. Son tres
+  cosas distintas, y las tres se reportan:
+    (a) un documento que el prompt nombra en el MATERIAL y no llegó;
+    (b) algo que LA PLANTILLA pide —una sección, una tabla, una marca
+        {{ASI}}— y que ningún documento del material responde;
+    (c) algo que ESTE PROMPT le exige y que el material no sustenta.
+  Pídalo por su nombre antes de empezar: «para la sección X me falta Y».
+  NO lo reemplace con lo que usted supondría que dice.
+- Y SI ESO NO EXISTE O NO SE LE PUEDE ENTREGAR, no lo invente: deje
+  [NECESITA ACLARACIÓN: ...] en esa sección, y DESPUÉS del bloque de
+  código escriba, COMO TEXTO CORRIENTE y NO en otro bloque, un apartado
+  titulado «SUGERENCIAS PARA EL INGENIERO(A) DE SOFTWARE» con, por cada
+  hueco: cuál de los tres casos es, qué documento de dominio haría falta
+  —o qué tendría que agregarse a uno que ya existe—, qué debería
+  responder, y qué parte del spec kit queda sin sustento mientras no
+  exista.
+- ESCRIBA UN SOLO DOCUMENTO .md, EN UN SOLO BLOQUE DE CÓDIGO, Y EL BLOQUE
+  DE AFUERA LLEVA CUATRO COMILLAS INVERTIDAS, no tres: abre con
+  ````markdown y cierra con ````. Es obligatorio porque el documento
+  puede llevar adentro sus propios bloques de tres comillas —XML, SQL,
+  C#, PowerShell, diagramas— y con tres afuera el primero de adentro
+  CIERRA el de afuera: a partir de ahí todo sale crudo y las tablas se
+  rompen. No genere dos archivos .md, no parta el documento en varios
+  bloques, y no ponga las sugerencias en un bloque aparte. Adentro va
+  ÚNICAMENTE el documento pedido, para
+  poder copiarlo de un clic.
+- NADA DE MARCADORES DE CITA. No agregue [cite: 1], [cite: 3, 5] ni
+  referencias parecidas a los documentos que le pasé: el documento sale
+  limpio, como para publicarlo. Si necesita señalar de dónde salió algo,
+  nómbrelo en el texto.
+- LOS DIAGRAMAS VAN DENTRO DE UN BLOQUE DE CÓDIGO, para que las flechas
+  y la sangría no se descuadren al renderizar.
 - En castellano. Trato de usted.
 - CUATRO SECCIONES, EN ESTE ORDEN: El código · La interfaz gráfica ·
   Lo medido, no lo supuesto · Los documentos.

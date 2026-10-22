@@ -2,75 +2,126 @@
 PLANTILLA — 9_checklist.md
 En Spec Kit oficial: checklists/<dominio>.md — VARIOS, uno por dominio
 (ux.md, api.md, security.md…). Comando /speckit.checklist
-Aquí es uno solo: un proyecto de aula no sostiene cinco listas. Es una
-simplificación nuestra, y se declara.
+Aquí es uno solo: un proyecto de aula no sostiene cinco listas.
 
-Sale de: PLAN_V{{N}}.md + REQUISITOS_FUNCIONALES.md  (+ el 2_spec ya generado)
-Un ejemplo lleno: ../docs/spec_kit/versiones/v4_aplicativo/9_checklist.md
+Sale de: PLAN_V{{N}}.md + RF_V{{N}}.md  (+ el 2_spec ya generado)
 
-LAS CUATRO SECCIONES SON FIJAS, y el orden también:
-  El código · La interfaz gráfica · Lo medido, no lo supuesto · Los documentos
+================================================================
+CUIDADO: ESTE DOCUMENTO NO AUDITA EL CÓDIGO. AUDITA EL SPEC KIT.
+================================================================
 
-LA TERCERA ES LA QUE DISTINGUE ESTA LISTA DE UNA LISTA DE TAREAS: no pregunta
-si se escribió, pregunta SI SE CORRIÓ.
+Se firma **ANTES de escribir la primera línea de código**, no después. Es la
+compuerta 3 del método: si una casilla no se puede marcar, la versión **no
+arranca** — y lo que falta se arregla en los documentos, que es barato.
+
+Y coincide con Spec Kit oficial, cuyo /speckit.checklist revisa la CALIDAD DE
+LOS REQUISITOS, no la implementación.
+
+ESTRUCTURA CANÓNICA, tomada de las v1, v2 y v3:
+
+   A. La especificación está completa
+   B. El alcance está cerrado
+   C. El contrato es exacto
+   D. El plan no anticipa
+   E. Las tareas son verificables
+   F. El entorno está listo
+   + Firma
+
+Ejemplos llenos: ../docs/spec_kit/versiones/v2_con_fk/9_checklist.md (3.728 car)
+                 ../docs/spec_kit/versiones/v3_control_acceso/9_checklist.md (4.365 car)
 -->
 
-# Lista de verificación — Versión {{N}}: {{TITULO_VERSION}}
+# Lista de chequeo — Versión {{N}}: antes de la primera línea de código
+
+> **Cuándo se firma esto:** **antes** de escribir código, no después. Es la
+> compuerta 3 del método: si una casilla no se puede marcar, la versión no
+> arranca — y lo que falta se arregla en los documentos, que es barato.
 
 <!-- ENCABEZADO COMÚN. Ver _ENCABEZADO_COMUN.md.
      Aquí la fila de 9_checklist.md va en negrita y sin enlace. -->
 
 ---
 
-## El código
+## A. La especificación está completa
 
-<!-- Lo que tiene que existir, con nombre y cantidad. Cada casilla verificable
-     mirando el repositorio, sin ejecutar nada. -->
+<!-- Lo que se audita es el 2_spec: que no quede nada abierto y que lo que
+     dice sea verificable. Con CANTIDADES, para que la casilla se pueda
+     responder sí o no. -->
 
-- [ ] {{LAS_PIEZAS_CON_SU_CANTIDAD}}.
-- [ ] {{LA_REGLA_DE_LA_VERSION}}.
-- [ ] {{LO_QUE_SE_INCUMPLE_SIN_QUE_NADA_FALLE}}.
-- [ ] {{LA_CAPA_QUE_EXISTE_AUNQUE_ESTE_VACIA}}, y está escrito por qué.
-- [ ] **{{EL_REGISTRO_DE_DEPENDENCIAS_ESTA}}**.
+- [ ] **No queda ningún `[NECESITA ACLARACIÓN: …]`** en [2_spec.md](2_spec.md).
+- [ ] Los **{{CUANTOS}}** requisitos funcionales dicen **qué** tiene que
+      pasar, no cómo programarlo.
+- [ ] Los **{{CUANTOS}}** criterios de aceptación son **verificables**: cada
+      uno dice qué hacer y qué tiene que pasar.
+- [ ] Los criterios están **separados** en los de la API y los de las
+      interfaces gráficas. {{CUANTOS}} y {{CUANTOS}}.
+- [ ] Las **clarificaciones** tienen su **razón**, no solo la decisión.
 
-## La interfaz gráfica
+## B. El alcance está cerrado
 
-- [ ] {{COMO_SE_PIDEN_LOS_DATOS}}.
-- [ ] Si {{UNA_PARTE}} falla, {{EL_RESTO}} se dibuja, y el aviso dice **cuál**.
-- [ ] {{LA_RESPUESTA_VACIA}} se muestra **con palabras**, no como una tabla vacía.
-- [ ] {{LAS_REGLAS_DE_LA_MARCA_O_DEL_ESTILO}}.
-- [ ] La entrada está en el menú, con su permiso.
+<!-- Que no se haya colado nada de otra versión, y que esté ESCRITO a qué
+     versión pertenece lo que no entra. -->
 
-## Lo medido, no lo supuesto
+- [ ] La versión es **{{EL_CRITERIO_QUE_LA_DEFINE}}**, y {{LO_DE_LA_VERSION_ANTERIOR}} **no se toca**.
+- [ ] Está escrito que **{{LO_QUE_SE_CONFUNDE}}** es de la v{{M}} y no de ésta.
+- [ ] Está escrito qué **NO se expone**, y por qué.
+- [ ] {{LO_QUE_FALLA_A_PROPOSITO}} está **declarado como deliberado**, no omitido.
 
-<!-- LA SECCIÓN QUE SOSTIENE LA LISTA. Cada casilla es una EJECUCIÓN, no una
-     lectura. El «(¿se corrió?)» entre paréntesis no es un chiste: es la
-     diferencia entre una lista honesta y una lista llena de buena fe. -->
+## C. El contrato es exacto
 
-- [ ] {{LO_NUEVO}} responde **{{CODIGO_ESPERADO}}**. *(¿se corrió?)*
-- [ ] Los rechazos: {{401_403_422_LO_QUE_APLIQUE}}.
-- [ ] {{LA_PRUEBA_DE_QUE_EL_PERMISO_NO_ESTA_EN_EL_TOKEN_O_EQUIVALENTE}}.
-- [ ] {{LA_PRUEBA_DE_QUE_EL_SISTEMA_ESTA_VIVO}}: {{QUE_SE_MUEVE_CUANDO_ALGO_CAMBIA}}.
-- [ ] **La regresión de {{LAS_VERSIONES_ANTERIORES}} pasa completa.**
+<!-- Que el 6_contracts no tenga ambigüedades: las rutas con su forma, los
+     códigos con su causa, y lo que NO se manda. -->
 
-## Los documentos
+- [ ] [6_contracts.md](6_contracts.md) nombra **las {{CUANTAS}} rutas**, con su
+      forma exacta.
+- [ ] Está dicho **cuál lleva guion y cuál no**, y por qué.
+- [ ] Está dicho qué **NO se envía** en cada operación.
+- [ ] Los códigos de estado **salen de la política de errores**, no se
+      eligieron aquí.
+- [ ] {{EL_CODIGO_NUEVO_DE_ESTA_VERSION}} aparece con **sus causas**.
 
-<!-- Que las razones estén ESCRITAS. Es lo que se pregunta en la sustentación,
-     y es lo que hace que el spec kit valga para el que llega después.
-     Cada casilla nombra la razón concreta, no «está documentado». -->
+## D. El plan no anticipa
 
-- [ ] Está escrito **por qué {{LA_DECISION_PRINCIPAL}}** — {{LAS_RAZONES_CONCRETAS}}.
-- [ ] Está escrito por qué {{LA_SEGUNDA_DECISION}}.
-- [ ] Está escrito el **tropiezo de {{LO_QUE_FUE}}**, y por qué se resolvió así
-      y no de la otra forma.
-- [ ] Está escrito por qué {{LA_DISTINCION_DE_CODIGOS}}.
-- [ ] **Lo pendiente está declarado como pendiente** —{{LA_LISTA}}— y no
-      descrito como si existiera.
+<!-- La compuerta de YAGNI. Una fila por cosa que pertenece a una versión
+     posterior y que el plan NO debe traer. -->
 
-> **La última casilla es la que sostiene a las demás.** Un spec kit que
-> describe lo que no existe le enseña a quien lo lee que los documentos no se
-> pueden creer — y a partir de ahí deja de leerlos todos.
+- [ ] [3_plan.md](3_plan.md) no mete **ningún paquete nuevo** que la
+      especificación no pida.
+- [ ] No hay **{{LO_DE_LA_VERSION_SIGUIENTE}}**: eso es la **v{{M}}**.
+- [ ] No hay **{{LO_DE_OTRA_VERSION}}**: eso es la **v{{M}}**.
+- [ ] Las **capas** siguen estrictas: el servicio **no** devuelve códigos HTTP.
+- [ ] **El chequeo de constitución del plan se hizo contra la constitución**,
+      artículo por artículo — y ningún ✅ se puso sobre un artículo que el
+      propio plan viola.
 
-<!-- Y la compuerta del método, que se comprueba aquí:
-     - [ ] No queda ningún [NECESITA ACLARACIÓN] en los ocho documentos.
-     Buscar «NECESITA» en la carpeta de la versión. -->
+## E. Las tareas son verificables
+
+- [ ] Las **{{CUANTAS}}** fases de [8_tasks.md](8_tasks.md) tienen cada una
+      **su** verificación escrita.
+- [ ] Cada fase es **un commit**.
+- [ ] Las fases del **front** están en la lista. Una versión sin interfaz
+      gráfica no está cerrada.
+- [ ] {{LA_CASILLA_QUE_MAS_SE_OLVIDA}} tiene su propia casilla.
+
+## F. El entorno está listo
+
+- [ ] `{{EL_COMANDO}}` levanta {{LO_ANTERIOR}} **y su prueba de humo pasa**.
+- [ ] Los **puertos** del proyecto no chocan con nada — se revisó el registro.
+- [ ] La base de datos trae {{LO_QUE_TIENE_QUE_TRAER}}: **se comprueba, no se
+      supone**.
+
+---
+
+## Firma
+
+| | |
+|---|---|
+| **Quién** | |
+| **Fecha** | |
+| **Casillas sin marcar, y por qué** | |
+
+> **Si queda una casilla sin marcar, se escribe aquí por qué.** Una lista con
+> huecos sin explicar es peor que no tenerla: da la impresión de que se revisó.
+
+<!-- Y LA FIRMA LA PONE UNA PERSONA, no una IA. Una IA puede decir que un
+     criterio se cumple; solo una persona puede haberlo visto cumplirse. -->

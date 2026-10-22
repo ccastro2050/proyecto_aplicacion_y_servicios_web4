@@ -148,8 +148,9 @@ ficticia y «don Hernán», el jefe de ventas que responde en
 > el ejercicio, y se puede hacer aunque la persona sea inventada.
 >
 > **Para qué NO sirve:** como ejemplo de **cómo se conduce** una elicitación
-> real, con su incomodidad, sus silencios y sus contradicciones. Para eso está
-> `proyecto_catedras2`, donde la reunión ocurrió y la transcripción existe.
+> real, con su incomodidad, sus silencios y sus contradicciones. Eso solo se
+> aprende conduciendo una reunión de verdad y guardando la transcripción con
+> todo su ruido — y la del proyecto de aula lo es.
 
 > **Y la señal que vale para el proyecto de aula: si su elicitación se lee
 > demasiado limpia, sospeche de ella.** Una de verdad tiene tramos confusos,

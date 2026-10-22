@@ -16,6 +16,16 @@
 > | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
 > | [9_checklist.md](9_checklist.md) | Lo que tiene que estar antes de cerrar |
 > | [GUIA_IA4.md](GUIA_IA4.md) | Construirla con IA, sobre su proyecto v3 |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`REQUISITOS_FUNCIONALES.md`](../../../dominio/REQUISITOS_FUNCIONALES.md) | qué operación corresponde a cada requisito |
+> | [`POLITICA_DE_ERRORES.md`](../../../dominio/POLITICA_DE_ERRORES.md) | **de aquí salen los códigos de estado**: qué responde el sistema ante cada fallo y quién lo decide |
+> | [`GLOSARIO.md`](../../../dominio/GLOSARIO.md) | qué significa cada término del contrato |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

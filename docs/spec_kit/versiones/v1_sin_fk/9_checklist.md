@@ -5,6 +5,15 @@
 > 2 a 8 de esta versión están escritos y ANTES de programar la primera
 > línea. Es el equivalente a mano de `checklists/requirements.md`, que en
 > Spec Kit genera `/speckit.checklist`.
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`PLAN_V1.md`](../../../dominio/PLAN_V1.md) | los criterios de aceptación de la versión |
+> | [`REQUISITOS_FUNCIONALES.md`](../../../dominio/REQUISITOS_FUNCIONALES.md) | lo que hay que poder comprobar |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ## Cómo se usa
 

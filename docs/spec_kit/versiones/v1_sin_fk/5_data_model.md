@@ -3,6 +3,15 @@
 > **Versión 1** · La base de datos NO se diseña en esta versión: **viene
 > dada** ([4_research.md](4_research.md) D4). Este documento describe lo que
 > hay y lo único que la v1 puede tocar.
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`DISENO_BD.md`](../../../dominio/DISENO_BD.md) | el modelo completo: las tablas, sus llaves y sus restricciones |
+> | [`DATOS_DE_PRUEBA.md`](../../../dominio/DATOS_DE_PRUEBA.md) | qué filas se siembran y de dónde salió cada una |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

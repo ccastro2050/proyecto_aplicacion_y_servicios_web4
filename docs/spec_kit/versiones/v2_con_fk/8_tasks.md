@@ -5,6 +5,15 @@
 > | **Qué** | [2_spec.md](2_spec.md) |
 > | **Cómo** | [3_plan.md](3_plan.md) · [6_contracts.md](6_contracts.md) |
 > | **La verificación final** | [7_quickstart.md](7_quickstart.md) |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`PLAN_V2.md`](../../../dominio/PLAN_V2.md) | el alcance de la versión, que es lo que estas tareas reparten |
+> | [`PLAN_DE_TRABAJO.md`](../../../dominio/PLAN_DE_TRABAJO.md) | quién hace qué, y en qué rama |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 **Cada fase termina con algo que se puede VERIFICAR**, y la verificación está
 escrita. Una fase que no se puede comprobar no es una fase: es una esperanza.

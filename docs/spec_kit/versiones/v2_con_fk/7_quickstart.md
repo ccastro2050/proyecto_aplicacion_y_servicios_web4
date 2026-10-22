@@ -6,6 +6,15 @@
 > | **Los formatos** | [6_contracts.md](6_contracts.md) |
 > | **La API** | `http://localhost:8035` · Swagger en `/swagger` |
 > | **La interfaz gráfica** | `http://localhost:8099` |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`DATOS_DE_PRUEBA.md`](../../../dominio/DATOS_DE_PRUEBA.md) | las cuentas y las filas con las que se prueba |
+> | [`POLITICA_DE_ERRORES.md`](../../../dominio/POLITICA_DE_ERRORES.md) | qué código tiene que responder cada comprobación |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

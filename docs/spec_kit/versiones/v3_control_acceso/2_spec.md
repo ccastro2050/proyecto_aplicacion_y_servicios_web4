@@ -5,6 +5,16 @@
 > | **La ruta** | [0_mapa_versiones.md](../0_mapa_versiones.md) |
 > | **Lo anterior** | [v1](../v1_sin_fk/2_spec.md) las seis sin FK · [v2](../v2_con_fk/2_spec.md) las seis con FK — **las 12 tablas ya están** |
 > | **Lo que rige** | [1_constitution.md](../../1_constitution.md) |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`REQUISITOS_FUNCIONALES.md`](../../../dominio/REQUISITOS_FUNCIONALES.md) | qué tiene que hacer el sistema, requisito por requisito |
+> | [`REGLAS_DE_NEGOCIO.md`](../../../dominio/REGLAS_DE_NEGOCIO.md) | lo que no puede dejar de ser cierto, y quién lo defiende |
+> | [`PLAN_V3.md`](../../../dominio/PLAN_V3.md) | qué entra en ESTA versión y qué se deja para la siguiente |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ## 1. Propósito de la v3
 

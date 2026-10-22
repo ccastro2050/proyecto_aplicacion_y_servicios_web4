@@ -4,6 +4,15 @@
 > alternativas que se descartaron, con su razón**. No es relleno: su utilidad
 > aparece el día que alguien pregunte «¿y por qué no hicieron…?» — y la
 > respuesta esté escrita en vez de olvidada.
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`FUENTES.md`](../../../dominio/FUENTES.md) | qué se heredó, qué se escribió aquí y qué manda sobre qué |
+> | [`PENDIENTES.md`](../../../dominio/PENDIENTES.md) | lo que se decidió NO hacer, con su razón |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

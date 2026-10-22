@@ -5,6 +5,15 @@
 >
 > Lo único que cambia en la base de datos es **la semilla de `usuario`**: sus
 > contraseñas se vuelven a sembrar con hash.
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`DISENO_BD.md`](../../../dominio/DISENO_BD.md) | el modelo completo: las tablas, sus llaves y sus restricciones |
+> | [`DATOS_DE_PRUEBA.md`](../../../dominio/DATOS_DE_PRUEBA.md) | qué filas se siembran y de dónde salió cada una |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

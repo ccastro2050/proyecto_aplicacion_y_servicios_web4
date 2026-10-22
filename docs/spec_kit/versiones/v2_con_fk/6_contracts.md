@@ -6,6 +6,16 @@
 > | **Lo anterior** | [v1](../v1_sin_fk/6_contracts.md) — **sigue vigente sin un solo cambio** |
 > | **La API** | `http://localhost:8035` · Swagger en `/swagger` |
 > | **La interfaz gráfica** | `http://localhost:8099` |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`REQUISITOS_FUNCIONALES.md`](../../../dominio/REQUISITOS_FUNCIONALES.md) | qué operación corresponde a cada requisito |
+> | [`POLITICA_DE_ERRORES.md`](../../../dominio/POLITICA_DE_ERRORES.md) | **de aquí salen los códigos de estado**: qué responde el sistema ante cada fallo y quién lo decide |
+> | [`GLOSARIO.md`](../../../dominio/GLOSARIO.md) | qué significa cada término del contrato |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 **Aquí está solo lo NUEVO.** Las convenciones son las mismas de la v1 y no se
 repiten: el sobre en los listados, los errores como

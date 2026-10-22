@@ -16,6 +16,15 @@
 > | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
 > | [9_checklist.md](9_checklist.md) | Lo que tiene que estar antes de cerrar |
 > | [GUIA_IA4.md](GUIA_IA4.md) | Construirla con IA, sobre su proyecto v3 |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`ARQUITECTURA.md`](../../../dominio/ARQUITECTURA.md) | las capas y la regla de dependencias que este plan respeta |
+> | [`REQUISITOS_NO_FUNCIONALES.md`](../../../dominio/REQUISITOS_NO_FUNCIONALES.md) | rendimiento, seguridad y portabilidad: lo que el plan tiene que cumplir |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

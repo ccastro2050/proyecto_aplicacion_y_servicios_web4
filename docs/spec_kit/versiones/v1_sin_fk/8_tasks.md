@@ -4,6 +4,15 @@
 > termina en algo **verificable**. Requisitos: [2_spec.md](2_spec.md) ·
 > técnica: [3_plan.md](3_plan.md) · contratos: [6_contracts.md](6_contracts.md) ·
 > validación final: [7_quickstart.md](7_quickstart.md).
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`PLAN_V1.md`](../../../dominio/PLAN_V1.md) | el alcance de la versión, que es lo que estas tareas reparten |
+> | [`PLAN_DE_TRABAJO.md`](../../../dominio/PLAN_DE_TRABAJO.md) | quién hace qué, y en qué rama |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

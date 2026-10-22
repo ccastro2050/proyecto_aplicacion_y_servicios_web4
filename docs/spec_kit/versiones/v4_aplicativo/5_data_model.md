@@ -16,6 +16,15 @@
 > | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
 > | [9_checklist.md](9_checklist.md) | Lo que tiene que estar antes de cerrar |
 > | [GUIA_IA4.md](GUIA_IA4.md) | Construirla con IA, sobre su proyecto v3 |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`DISENO_BD.md`](../../../dominio/DISENO_BD.md) | el modelo completo: las tablas, sus llaves y sus restricciones |
+> | [`DATOS_DE_PRUEBA.md`](../../../dominio/DATOS_DE_PRUEBA.md) | qué filas se siembran y de dónde salió cada una |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

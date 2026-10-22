@@ -16,6 +16,16 @@
 > | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
 > | [9_checklist.md](9_checklist.md) | Lo que tiene que estar antes de cerrar |
 > | [GUIA_IA4.md](GUIA_IA4.md) | Construirla con IA, sobre su proyecto v3 |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`REQUISITOS_FUNCIONALES.md`](../../../dominio/REQUISITOS_FUNCIONALES.md) | qué tiene que hacer el sistema, requisito por requisito |
+> | [`REGLAS_DE_NEGOCIO.md`](../../../dominio/REGLAS_DE_NEGOCIO.md) | lo que no puede dejar de ser cierto, y quién lo defiende |
+> | [`PLAN_V4.md`](../../../dominio/PLAN_V4.md) | qué entra en ESTA versión y qué se deja para la siguiente |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

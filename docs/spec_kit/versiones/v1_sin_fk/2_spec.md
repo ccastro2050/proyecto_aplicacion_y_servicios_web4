@@ -15,6 +15,16 @@
 > | [6_contracts.md](6_contracts.md) | Los 7 endpoints con formatos exactos |
 > | [7_quickstart.md](7_quickstart.md) | Arranque y smoke test |
 > | [8_tasks.md](8_tasks.md) | Orden de construcción por fases verificables |
+>
+> ### De dónde sale este documento
+>
+> | Documento de dominio | Qué aporta |
+> |---|---|
+> | [`REQUISITOS_FUNCIONALES.md`](../../../dominio/REQUISITOS_FUNCIONALES.md) | qué tiene que hacer el sistema, requisito por requisito |
+> | [`REGLAS_DE_NEGOCIO.md`](../../../dominio/REGLAS_DE_NEGOCIO.md) | lo que no puede dejar de ser cierto, y quién lo defiende |
+> | [`PLAN_V1.md`](../../../dominio/PLAN_V1.md) | qué entra en ESTA versión y qué se deja para la siguiente |
+>
+> El orden del método es **dominio → spec kit → código**: lo de arriba se escribió antes, y este documento lo aplica a esta versión. Si los dos se contradicen, primero se averigua cuál está mal —ver [`FUENTES.md`](../../../dominio/FUENTES.md) §2—.
 
 ---
 

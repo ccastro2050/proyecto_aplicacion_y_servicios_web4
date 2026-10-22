@@ -10,36 +10,29 @@
 
 ---
 
-## 1. El problema, con un caso real de este proyecto
+## 1. El problema que el glosario resuelve
 
-En la reunión del 18 de junio, el usuario experto corrigió expresamente un
-nombre:
+**El caso típico no es que falte una palabra: es que la misma palabra nombra
+dos cosas distintas, y nadie lo nota.**
 
-> *«si dejamos eso al administrador, **el administrador es la unidad de
-> tecnología**, y la unidad de tecnología no debe estar subiendo cátedras ni
-> descargando archivos del ASIS, nada de esas cosas»* — `1:44:28`
+Pasa así. En una reunión de elicitación alguien usa un término —digamos
+«administrador»— para el rol que va a tener permisos en el sistema. Y en la
+misma frase lo usa para referirse al área que administra la infraestructura.
+Son dos cosas: un rol del sistema y un equipo de la organización. El usuario
+experto **sí lo distingue** —habla de los dos en la misma oración— pero nadie
+lo anota, porque **no hay dónde anotarlo**.
 
-> **Esta cita es textual y es de OTRO proyecto** —la grabación de una entrevista
-> real del sistema de cátedras—, y se deja tal cual a propósito: una cita no se
-> reescribe para que encaje. Lo que enseña vale igual aquí: en esa frase, «el
-> administrador» significa **dos cosas distintas** en la misma oración, y nadie
-> en la reunión lo notó.
->
-> *«Creo que es como todo eso, **es como el líder**»* — `1:44:46`
+Lo que pasa después es previsible:
 
-Y sin embargo, cuando se cuenta lo que quedó escrito:
-
-| Dónde | Qué dice |
+| Dónde | Qué queda |
 |---|---|
-| Las diez historias de usuario | «administrador», **21 veces**. «líder», **cero** |
-| La tabla `rol` de la base de datos | `Administrador`, `Coordinador de dependencia`, `Consulta` |
+| Las historias de usuario | el término ambiguo, repetido |
+| La tabla de roles | el mismo término, como valor |
+| La conversación donde se distinguieron | en la memoria de quien estuvo |
 
-**El nombre que la fuente corrigió es el que quedó en todo el sistema.**
-
-Y no es una cuestión de etiqueta. En esa universidad «administrador» **ya
-significa otra cosa**: la unidad de tecnología. Con ese nombre, el rol se le
-va a asignar a quien no debe tenerlo. La reunión lo vio venir, lo dijo, y el
-documento no lo recogió — porque **no había dónde recogerlo**.
+**El nombre que la fuente matizó es el que termina en todo el sistema.** Y no
+es una cuestión de etiqueta: si en esa organización la palabra **ya significa
+otra cosa**, el rol se le va a asignar a quien no debe tenerlo.
 
 **Para eso es el glosario:** para que una decisión sobre cómo se llama algo
 tenga un sitio, una fecha y una firma, en vez de vivir en la memoria de quien

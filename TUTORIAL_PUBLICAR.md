@@ -1538,6 +1538,26 @@ renglones y **uno de ellos tranquiliza de verdad**.
 > puede hacerlo sin miedo — pero sepa que lo único que cambia es cómo lo ve
 > él mismo en el panel. **La dirección pública sigue siendo la misma.**
 
+#### Guardado, así queda en la lista
+
+<!-- PENDIENTE DE CAPTURA: la lista de sitios con la descripción ya guardada -->
+
+Al cerrar el diálogo, el renglón del sitio trae ahora **cuatro etiquetas**
+debajo del dominio:
+
+```
+apifacturas-carloscastro.runasp.net
+API facturas v4 - demostracion de clase - AySW 20   Free   EU   site101125
+```
+
+**Y se cortó donde la vista previa anunciaba:** `AySW 20`, sin el `26-2`. No fue
+sorpresa — la pantalla anterior ya lo había mostrado. **Por eso vale mirar la
+vista previa antes de guardar**, en vez de descubrirlo en la lista.
+
+> **La descripción también se busca.** El campo `Search` de arriba dice *«Search
+> by name, description or domain alias»*. Con cinco sitios descritos, escribir
+> `equipo 3` los encuentra. Es la razón práctica para llenar ese campo.
+
 #### De paso: el menú del sitio
 
 Al entrar a un sitio, el menú de la izquierda **cambia**: ya no son los

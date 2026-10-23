@@ -961,6 +961,53 @@ modelo están creadas.
 **Oprima `Detail`** en la fila de la importación: ahí está el registro
 instrucción por instrucción, que es donde se ve si alguna falló en silencio.
 
+### 4.6 · El registro, que es donde se comprueba
+
+![El detalle de la importación: Errors 0, Exit code 0](docs/tutorial_publicar/img/23_import_detalle.png)
+
+**Aquí sí está la confirmación**, y son dos números:
+
+| Campo | Valor | Qué significa |
+|---|---|---|
+| **Errors** | **`0`** | **Ninguna instrucción falló.** Es lo que el `Success` no garantizaba |
+| **Exit code** | **`0`** | `sqlcmd` terminó bien. Cualquier otro número sería un fallo |
+| **Rows affected** | `116` | Las filas sembradas |
+| **Duration** | `0 seconds` | Noventa mil caracteres en menos de un segundo |
+| **Log size** | `0.2 KB` | Un registro corto **es buena señal**: si hubiera errores, pesaría mucho más |
+
+**Y el registro de la derecha tiene un detalle que vale la pena notar:**
+
+```
+(3 rows affected)    (8 rows affected)    (6 rows affected)
+(6 rows affected)    (4 rows affected)    (12 rows affected)
+(8 rows affected)    (3 rows affected)    (21 rows affected)
+(5 rows affected)                         (25 rows affected)
+(15 rows affected)
+```
+
+**Son doce líneas, y suman 116.** Doce líneas para doce tablas: cada una es un
+bloque de inserciones. Si faltara una tabla por sembrar, aquí habría once.
+
+> **Esto es lo que hay que mirar, y no el color del `Success`.** Un script puede
+> terminar en verde con procedimientos sin crear; lo que no miente es
+> `Errors: 0` y `Exit code: 0`.
+
+> **Y `Copy log`, arriba a la derecha**, copia el registro completo. Útil para
+> pegarlo en una entrega como evidencia de que la carga salió bien — sobre todo
+> porque el panel avisa que **los registros se borran solos** pasado un tiempo.
+
+#### La comprobación final del paso 4
+
+| Qué mirar | Qué tiene que decir |
+|---|---|
+| **Errors** y **Exit code** | **0** los dos |
+| **Tables**, en el menú izquierdo | **12** |
+| **Overview → Contents** | `12 tables` |
+
+**Con eso la base está lista.** Tiene las doce tablas, los tres disparadores,
+los dieciséis procedimientos y los datos de ejemplo. Lo que falta es la API que
+la use.
+
 ## Paso 5 — pendiente
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

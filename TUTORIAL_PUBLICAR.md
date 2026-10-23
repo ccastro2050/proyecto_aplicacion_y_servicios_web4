@@ -3093,4 +3093,111 @@ git status
 > lleva a esconder configuración que a todo el equipo le serviría ver.
 
 
+### 7.2 · El segundo sitio
+
+**Es el asistente del Paso 5, otra vez.** Nada nuevo que explicar — solo lo que
+cambia:
+
+| Paso | Qué escoger |
+|---|---|
+| **Plan** | `Select FREE website` |
+| **Domain** | `Free subdomain` → **`facturas-carloscastro`** → `.runasp.net` |
+| **DNS · Subscription** | Se saltan solos |
+| **Location** | **Europa** — el mismo de la API y de la base de datos |
+| **Example** | `My own application` |
+
+> **El nombre, sin el `api` adelante.** Así, en la lista, se distinguen de un
+> vistazo: `apifacturas-…` es la API, `facturas-…` es la interfaz. Con cinco
+> sitios permitidos y dos por equipo, esa diferencia de cuatro letras es lo que
+> evita publicar el front encima de la API.
+
+**Quedó creado como `site101138`** — distinto del `site101125` de la API, como
+era de esperarse.
+
+#### Y la descripción, esta vez que quepa
+
+```
+Front facturas v4 - demo clase - AySW 2026-2
+```
+
+**44 caracteres**, a propósito. Al de la API le pusimos
+`API facturas v4 - demostracion de clase - AySW 2026-2` y **en la lista se cortó
+en `AySW 20`**. Las dos filas juntas son el ejemplo:
+
+```
+facturas-carloscastro.runasp.net
+Front facturas v4 - demo clase - AySW 2026-2      site101138
+
+apifacturas-carloscastro.runasp.net
+API facturas v4 - demostracion de clase - AySW 20  site101125
+```
+
+#### Las credenciales, nuevas otra vez
+
+`Deploy` → **`Visual Studio access`** → **`Enabled`**, igual que en el Paso 5.9
+— **la cuenta de WebDeploy tampoco existe hasta encenderla.**
+
+| | La API | **El front** |
+|---|---|---|
+| **Site / Login** | `site101125` | **`site101138`** |
+| **Server** | `site101125.siteasp.net` | **`site101138.siteasp.net`** |
+| **Password** | `c+3LK6h#-iM4` | **`Na4_e#T36Bg@`** |
+
+**Y `Test connection` antes de seguir:** `OK - Connected in 102 ms`.
+
+### 7.3 · Compilar y subir el front
+
+**Son los dos comandos del Paso 6**, cambiando la carpeta y el sitio.
+
+#### Compilar
+
+```powershell
+cd ...\proyecto_aplicacion_y_servicios_web4\front_blazor
+dotnet publish -c Release -o publicado
+```
+
+> **El front pesa más que la API**, y tiene sentido: trae los archivos
+> estáticos — el CSS, los iconos, el JavaScript que mantiene abierto el
+> circuito de Blazor. La API no tiene nada de eso: solo manda JSON.
+
+#### Subir
+
+```powershell
+& "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
+  -verb:sync `
+  -source:contentPath="C:\...\front_blazor\publicado" `
+  -dest:contentPath="site101138",computerName="https://site101138.siteasp.net:8172/msdeploy.axd?site=site101138",userName="site101138",password="Na4_e#T36Bg@",authType="Basic" `
+  -enableRule:AppOffline `
+  -allowUntrusted
+```
+
+**Cuatro cambios respecto al de la API, y todos son el mismo:** otro sitio.
+
+| Qué cambió | De | A |
+|---|---|---|
+| La carpeta de origen | `api_facturas\publicado` | **`front_blazor\publicado`** |
+| El `contentPath` del destino | `site101125` | **`site101138`** |
+| El `computerName` — **dos veces** | `site101125` | **`site101138`** |
+| `userName` y `password` | los de la API | **los del front** |
+
+> **Y aquí está el único error de este paso que cuesta caro:** si deja el
+> `site101125` por descuido, **no falla — publica el front encima de la API**,
+> y se la borra, porque `sync` deja el destino igual al origen. Se arregla
+> volviendo a publicar la API, pero mientras tanto el sistema está caído.
+>
+> **Revise los números antes de oprimir Enter.** Son cinco apariciones del
+> identificador en un solo comando.
+
+#### Y el certificado de este sitio también
+
+**`HTTPS` → `Enable HTTPS` → y después `HTTPS Redirect` → `Enabled`**, igual
+que en el Paso 6.7.
+
+> **Aquí importa doble.** El front va a quedar en `https` y llama a una API en
+> `https`: **los dos cifrados, y el navegador no tiene nada que objetar.** Si el
+> front se quedara en `http`, el navegador vería una página insegura llamando a
+> un servicio seguro — funciona, pero es la mitad de la protección y la barra
+> va a seguir diciendo `Not secure` a sus estudiantes.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

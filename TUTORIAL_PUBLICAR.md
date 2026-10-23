@@ -2459,4 +2459,119 @@ La respuesta esperada:
 > publicado.
 
 
+### 6.5 · Ver con los propios ojos lo que llegó
+
+**`Files`**, en el menú del sitio. Es el equivalente a lo que hicimos con la
+base de datos cuando contamos las doce tablas: **comprobar que lo que uno mandó
+es lo que llegó**, en vez de creerle al mensaje de «éxito».
+
+#### La raíz: dos carpetas y ningún archivo
+
+![El administrador de archivos en Home](docs/tutorial_publicar/img/40_archivos_raiz.png)
+
+```
+2 folders  ·  0 files
+```
+
+| Carpeta | `SOURCE` | Qué es |
+|---|---|---|
+| **`wwwroot`** | `System` | **La raíz del sitio.** Lo que esté aquí es lo que se sirve por internet |
+| **`private`** | `System` | **Fuera del alcance de la web.** Nada de lo que esté aquí se puede pedir desde un navegador |
+
+> **Las dos las creó el hospedaje**, no nosotros — eso dice el `SOURCE:
+> System`. Y `private` existe por una razón: **hay cosas que una aplicación
+> necesita guardar pero nadie debe poder descargar.** Si un día guarda archivos
+> subidos por usuarios, documentos o respaldos, **van ahí, no en `wwwroot`**.
+
+> **Ojo con el `Disk usage` de arriba: dice `0 B used`.** Y acabamos de subir 18
+> MB. **No es un error: es un número viejo** — el panel lo calcula cada tanto,
+> no en cada cambio. El botón **`Recalculate`** lo pone al día.
+
+#### Dentro de `wwwroot`
+
+![El contenido de wwwroot](docs/tutorial_publicar/img/41_archivos_wwwroot.png)
+
+```
+14 folders  ·  36 files  ·  8.9 MB
+```
+
+**Y ese renglón se puede comprobar contra su propia carpeta.** En
+`api_facturas\publicado` hay, medido:
+
+| | En su máquina | En el servidor |
+|---|---|---|
+| Carpetas en la raíz | **14** | **14** |
+| Archivos en la raíz | **36** | **36** |
+
+**Coinciden exactamente.** Lo que mandó es lo que llegó.
+
+#### ¿Por qué dice 8.9 MB si `msdeploy` dijo 18 MB?
+
+**Porque no están midiendo lo mismo**, y vale la pena saberlo para no salir a
+buscar un problema que no existe:
+
+| Número | Qué cuenta |
+|---|---|
+| **`18.647.083 bytes`** de `msdeploy` | **Todo**: los 36 archivos de la raíz **más** los de las 14 carpetas |
+| **`8.9 MB`** del administrador | **Solo los 36 archivos de este nivel.** Las carpetas aparecen con `—` en la columna `SIZE` |
+
+> **Comprobado:** sumando solo los 36 archivos de la raíz en el disco local dan
+> **9.321.867 bytes = 8,9 MB**. El total con subcarpetas da **18.647.083
+> bytes** — **el mismo número exacto que reportó `msdeploy`**.
+>
+> **La diferencia son los `runtimes`**: la misma biblioteca de SQL Server
+> compilada para `win-x64`, `win-x86`, `win-arm64` y `unix`. **Casi la mitad
+> del peso de la aplicación son copias de una sola biblioteca** para
+> plataformas que este servidor no usa.
+
+#### La columna `SOURCE` dice quién puso cada cosa
+
+| Valor | Significa |
+|---|---|
+| **`WebDeploy`** | **Llegó con nuestro comando.** Lo tienen las catorce carpetas |
+| `System` | Lo puso el hospedaje al crear el sitio |
+
+> **Es más útil de lo que parece.** Si un día aparece un archivo con otro
+> origen —subido a mano, por FTP— **esa columna lo delata**. Y recuerde que en
+> la siguiente publicación `sync` lo va a borrar.
+
+#### Las carpetas de idiomas, explicadas
+
+`cs`, `de`, `es`, `fr`, `it`, `ja`, `ko`, `pl`, `pt-BR`, `ru`, `tr`, `zh-Hans`,
+`zh-Hant` — trece.
+
+**No son suyas, y no son el idioma de la aplicación.** Cada una trae un
+`Microsoft.Data.SqlClient.resources.dll`: **los mensajes de error del conector
+de SQL Server traducidos**. Si el servidor estuviera en alemán, el error de
+conexión saldría en alemán.
+
+> **Y `es` está entre ellas**, así que un error de base de datos puede salirle
+> **en español** — lo cual confunde, porque uno cree que el mensaje lo escribió
+> alguien del proyecto.
+
+#### Ver el `appsettings.Production.json` que llegó
+
+Los 36 archivos están repartidos en **cuatro páginas**. Para no pasarlas una a
+una, **escriba `appsettings` en el `Search`**.
+
+**Ábralo con el menú `...` del renglón**, con la opción de ver o editar.
+
+**Debe decir exactamente lo mismo que el de su máquina**, con la contraseña de
+la base de datos adentro.
+
+> **Y ahí, viendo el archivo en el servidor, se entiende la regla del proyecto
+> de aula.** Esa contraseña **está en texto plano en un archivo del
+> hospedaje**, y cualquiera que entre a este panel puede leerla. Para una
+> demostración de clase está bien. **Para el proyecto calificado, por eso se
+> exigen variables de entorno**: no quedan en ningún archivo que alguien pueda
+> abrir.
+
+> **No lo edite desde aquí**, aunque el panel lo permita. **Lo que cambie en el
+> servidor lo borra la siguiente publicación**, porque `sync` deja el destino
+> igual al origen. Lo que haya que cambiar se cambia en su máquina y se vuelve
+> a publicar. **La única excepción razonable** es encender el
+> `stdoutLogEnabled` del `web.config` para diagnosticar un arranque fallido — y
+> sabiendo que se pierde en la próxima subida.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

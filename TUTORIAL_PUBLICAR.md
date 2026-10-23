@@ -4559,4 +4559,72 @@ de que las dos bases se cargaron por caminos distintos**: una por el panel con
 | **Los errores aparecen donde uno no mira** | Las tildes, el `401` por el redirect, la carpeta anidada — **ninguno dio un mensaje que dijera lo que pasaba** |
 
 
+### 8.13 · El certificado del tercer sitio — y por qué no funciona en seguida
+
+**Es el mismo procedimiento de los pasos 6.7 y 7.7**, en el tercer sitio:
+`HTTPS` → `Enable HTTPS` → esperar a `Secured 1 of 1` → `HTTPS Redirect` →
+`Enabled`.
+
+![La seccion HTTPS del sitio de PostgreSQL, asegurado y redirigiendo](docs/tutorial_publicar/img/63_https_postgres.png)
+
+```
+Secured 1 of 1 domain      HTTPS redirect on
+apifacturas-pg-carloscastro.runasp.net -> HTTPS
+Let's Encrypt - renews automatically - expires in 60 days (22.12.2026)
+```
+
+#### Y aquí pasa algo que confunde: **la dirección no abre todavía**
+
+Con el panel diciendo `Secured`, `https://apifacturas-pg-carloscastro.runasp.net`
+**no responde**. Parece que algo quedó mal.
+
+**No quedó mal.** Medido desde la misma máquina, en el mismo minuto:
+
+```
+http  -> 307 redirige a https://apifacturas-pg-carloscastro.runasp.net/   (bien)
+https -> sin respuesta                                                     (todavia no)
+```
+
+**Y la comparación que lo prueba:** el sitio de SQL Server, encendido una hora
+antes, **sí responde `200` por `https`** desde ese mismo sitio y en ese mismo
+momento.
+
+| Sitio | `https` | Cuándo se encendió |
+|---|---|---|
+| `apifacturas-carloscastro` | **`200`** | hace una hora |
+| `apifacturas-pg-carloscastro` | **sin respuesta** | hace un momento |
+
+#### Qué está pasando
+
+| | |
+|---|---|
+| **El `307` prueba que la configuración ya se aplicó** | El servidor **sabe** que debe mandar a `https` |
+| **Lo que falta es el enlace cifrado** | El servidor web tarda en **empezar a atender en el puerto 443 con el certificado nuevo** |
+| **El panel se adelanta** | Dice `Secured 1 of 1` cuando el certificado **se emitió y se registró**, no cuando ya está sirviendo |
+
+> **Son unos minutos.** Al volver a medir, la misma dirección respondió:
+>
+> ```
+> https -> 200
+> {"mensaje":"API Facturas funcionando","version":"v4","motor":"postgres", ...}
+> ```
+
+#### Cómo no perder media hora con esto
+
+| Haga | En vez de |
+|---|---|
+| **Espere dos o tres minutos y recargue** | Volver a emitir el certificado |
+| **Recargue con `Ctrl+F5`**, o en una ventana de incógnito | Creer que sigue roto — **el navegador recuerda los fallos de conexión un rato** |
+| **Compruebe que el `http` dé `307`** | Mirar la configuración otra vez |
+
+> **Ese `307` es el diagnóstico barato:** si el sitio **redirige** a `https`,
+> la configuración está bien y **lo único que falta es tiempo**. Si respondiera
+> `200` por `http`, entonces sí: la redirección no se aplicó.
+
+> **Y vale la pena decirlo en voz alta en clase**, porque es un patrón que se
+> repite con todo lo que se publica: **un panel que dice «listo» antes de que
+> la cosa funcione no está mintiendo** — está informando de otro paso. Lo que
+> hay que aprender es **cuál señal mirar mientras tanto.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

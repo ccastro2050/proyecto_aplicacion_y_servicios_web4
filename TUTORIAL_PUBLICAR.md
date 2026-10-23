@@ -1830,4 +1830,189 @@ entendería de dónde sale cada dato. Pero **en el texto van como
 > en capturas de un repositorio público.**
 
 
+### 5.11 · La prueba de conexión, antes de salir de aquí
+
+![WEBDEPLOY CHECK en verde: OK, Connected in 79 ms](docs/tutorial_publicar/img/38_webdeploy_prueba.png)
+
+```
+OK   Connected in 79 ms
+```
+
+| Lo que cambió | Qué significa |
+|---|---|
+| El recuadro se puso **verde** | El servidor de WebDeploy **responde** |
+| **`OK`** | Y estas credenciales **entran** |
+| `Connected in 79 ms` | Lo que tardó el saludo |
+| El botón dice ahora **`Test again`** | Se puede repetir cuando quiera |
+
+> **Esto no es un adorno: es una línea de corte.** De aquí en adelante, si algo
+> falla al publicar, **ya sabemos que no son las credenciales ni el servidor**.
+> El problema va a estar del lado de acá — en el proyecto, en el comando o en
+> la red de su máquina— y se busca ahí.
+
+> **Los 79 ms también dicen algo:** el servidor está en Europa y contestó en
+> menos de una décima de segundo. Si un día esa prueba tarda mucho o falla
+> intermitente, es la red, no el hospedaje.
+
+#### Y el `Show more` confirma por qué WebDeploy y no FTP
+
+<!-- PENDIENTE DE CAPTURA: esta misma pantalla con el Show more abierto -->
+
+Debajo de `When to use Visual Studio WebDeploy` hay un **`Show more`**. Abierto,
+dice **en dos renglones** lo mismo que la tabla del paso anterior — con las
+palabras del hospedaje:
+
+> *«**Incremental upload** — only changed files are transferred, so
+> subsequent deploys are quick»*
+>
+> *«Site is **briefly stopped** during publish and **restarted automatically**
+> — no manual AppPool recycle needed»*
+
+| Lo que dice | Qué significa para usted |
+|---|---|
+| **Sube solo lo que cambió** | La primera publicación sube todo; **las siguientes son cuestión de segundos**. Por FTP, cada una es como la primera |
+| **Para y reanuda el sitio solo** | **No hay que oprimir `Restart`** después de publicar. Lo hace él |
+
+> **Y eso último corrige a medias algo que dijimos:** en el paso 5.8 anotamos
+> `Restart` por si el sitio sigue respondiendo como antes. Con WebDeploy **no
+> debería hacer falta** — él reinicia. `Restart` queda como recurso para
+> cuando algo se queda pegado, no como parte del procedimiento.
+
+#### Los tres pasos que sugiere el panel — y por qué no son los nuestros
+
+El recuadro `GET STARTED` propone:
+
+| | El panel dice | Nosotros |
+|---|---|---|
+| 1 | *Click **Download publish profile*** | **No** |
+| 2 | *In Visual Studio: right-click your project → **Publish** → Import profile* | **No** |
+| 3 | *Hit **Publish*** | **No** |
+
+**Ese camino es para Visual Studio**, con clic derecho y ventanas. **Nosotros
+vamos por la línea de comandos**, con los cinco datos que ya anotamos.
+
+> **No es por purismo.** Es por tres razones que importan en un curso:
+>
+> | | |
+> |---|---|
+> | **Se ve lo que pasa** | Un comando dice **qué** se manda, **a dónde** y **con qué usuario**. Un botón esconde las tres cosas |
+> | **Funciona igual en cualquier parte** | Visual Studio Code, Rider, una terminal pelada o un servidor de integración continua |
+> | **Se puede repetir y automatizar** | Un comando se guarda, se comparte y se corre otra vez. Un clic derecho no |
+
+**Ya tenemos todo lo del hospedaje.** Lo que sigue ya no es el panel: es el
+proyecto.
+
+## Paso 6 — Publicar la API
+
+**Tres cosas, en este orden:**
+
+| | Qué | Dónde |
+|---|---|---|
+| **6.1** | Decirle a la API **a cuál base de datos conectarse al publicarse** | Un archivo del proyecto |
+| **6.2** | **Compilar** para producción | `dotnet publish` |
+| **6.3** | **Subirla** | `msdeploy` |
+
+### 6.1 · La configuración de producción
+
+#### El problema
+
+La API sabe conectarse a la base de datos **de su máquina**:
+
+```json
+"SqlServer": "Server=localhost,11466; Database=bdfacturas_sqlserver_local; User Id=sa; ..."
+```
+
+Eso está en `api_facturas/appsettings.json`, apunta al contenedor de Docker, y
+**está bien que siga así** — es lo que usa cuando trabaja en su computador.
+
+**Publicada necesita otra cadena.** Pero no vamos a cambiar ese archivo: si lo
+cambia, deja de poder trabajar local, y tarde o temprano sube a GitHub una
+contraseña del hospedaje.
+
+#### La solución: un archivo que solo existe publicado
+
+ASP.NET Core lee **dos archivos de configuración, uno encima del otro**:
+
+| Orden | Archivo | Cuándo manda |
+|---|---|---|
+| 1º | `appsettings.json` | **Siempre.** Es la base |
+| 2º | `appsettings.<Entorno>.json` | **Si el entorno coincide.** Lo que repita, **gana** |
+
+**¿Y cuál es el entorno?** Lo dice la variable `ASPNETCORE_ENVIRONMENT`. En su
+máquina vale `Development`; **en el hospedaje no está puesta, y cuando no está
+puesta el valor por defecto es `Production`**.
+
+> **De ahí sale el truco, y no es un truco:** un archivo llamado
+> **`appsettings.Production.json`** **se ignora en su computador y manda en el
+> hospedaje**, sin tocar nada más y sin un solo `if` en el código.
+
+#### El archivo
+
+**Ya quedó creado** en el proyecto, en dos versiones:
+
+| Archivo | Qué es | ¿Va a GitHub? |
+|---|---|---|
+| `api_facturas/appsettings.Production.json`**`.ejemplo`** | **La plantilla**, con `SU_CONTRASENA` | **Sí** |
+| `api_facturas/appsettings.Production.json` | **El de verdad**, con la contraseña puesta | **No** — está en `.gitignore` |
+
+Su contenido:
+
+```json
+{
+  "Motor": "sqlserver",
+
+  "ConnectionStrings": {
+    "SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=SU_CONTRASENA; Encrypt=False; MultipleActiveResultSets=True;"
+  }
+}
+```
+
+**Dos renglones, y los dos importan:**
+
+| Renglon | Por qué está |
+|---|---|
+| **`"Motor": "sqlserver"`** | La v4 habla con **dos motores** — SQL Server y PostgreSQL— y esta clave escoge. En el hospedaje solo tenemos SQL Server |
+| **La cadena** | Es la de **`Local access`**, copiada del panel. **No la de `Remote access`** |
+
+> **Por qué la local y no la remota, otra vez.** La API va a correr **en el
+> mismo centro de datos** que la base de datos. No necesita salir a internet
+> para hablarle — por eso el servidor **no lleva `.public`** y por eso
+> **`Encrypt=False`**. Es más rápida, y además funciona **aunque el
+> `Remote access` esté apagado**.
+
+#### Lo único que usted tiene que hacer
+
+**Abra `api_facturas/appsettings.Production.json` y reemplace `SU_CONTRASENA`**
+por la contraseña real de la base de datos.
+
+**¿Dónde está?** En el panel: **`Databases` → `bdfacturas` → `Local access` →
+`Password` → `Show`**. Hay un botón de copiar al lado.
+
+> **Ojo con un detalle que cuesta tiempo:** copie la contraseña **con el botón
+> de copiar**, no seleccionándola con el ratón. Estas claves traen símbolos
+> como `#`, `+` y `-`, y un espacio de más al final **no se ve** — pero el
+> servidor lo cuenta, y rechaza la conexión sin decir por qué.
+
+#### Y por qué ese archivo no va a GitHub
+
+**Porque trae una contraseña de verdad.** La plantilla sí va — así cualquiera
+sabe qué archivo hace falta y qué forma tiene— pero el que tiene el valor
+puesto se queda en su disco. En `.gitignore` quedó esto:
+
+```
+appsettings.Production.json
+```
+
+> **Es el mismo patrón de toda la industria**, y vale la pena nombrarlo: **se
+> versiona la forma, no el secreto.** Un compañero que clone el repositorio ve
+> la plantilla, sabe que necesita su propia contraseña, y la pone. Lo que nunca
+> estuvo en el historial **no se puede filtrar**.
+
+> **Y para el proyecto de aula, el escalón siguiente:** en vez de un archivo,
+> **variables de entorno**. ASP.NET Core las lee con el mismo nombre de la
+> clave, cambiando los dos puntos por dos guiones bajos —
+> `ConnectionStrings__SqlServer`—, que es exactamente lo que hace el
+> `docker-compose.yml` de este proyecto. **No hay archivo que se pueda colar.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

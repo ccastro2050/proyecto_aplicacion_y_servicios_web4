@@ -1,0 +1,12 @@
+{
+  "_comentario": "PLANTILLA. Copie este archivo como appsettings.Production.json -sin el .ejemplo- y reemplace SU_CONTRASENA por la que muestra el panel del hospedaje en Databases > bdfacturas > Local access > Password > Show. El archivo sin .ejemplo esta en .gitignore: NO se versiona, porque trae la contrasena de la base de datos.",
+
+  "_por_que_Production": "ASP.NET Core lee appsettings.json y encima appsettings.<Entorno>.json. En el hospedaje no se fija ASPNETCORE_ENVIRONMENT, y cuando no se fija el entorno es Production: por eso este archivo gana sobre el otro, SOLO publicado. En su maquina sigue mandando appsettings.json, que apunta a Docker.",
+
+  "Motor": "sqlserver",
+
+  "ConnectionStrings": {
+    "_comentario": "Es la cadena de Local access, no la de Remote access. La API vive en el mismo centro de datos que la base, asi que no sale a internet: por eso el servidor NO lleva .public y por eso Encrypt=False.",
+    "SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=SU_CONTRASENA; Encrypt=False; MultipleActiveResultSets=True;"
+  }
+}

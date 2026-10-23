@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block titulo %}{{ cfg.titulo }}{% endblock %}
+
+{#
+   LA MISMA PAGINA QUE EN EL FRONT DE BLAZOR: el formulario arriba, la tabla
+   abajo, y «Editar» rellenando ese mismo formulario.
+
+   La unica diferencia que queda es que aqui CADA CLIC RECARGA LA PAGINA: en
+   Blazor el componente vive en el circuito y no hay recarga. Esa diferencia es
+   real y es lo que el curso compara — no habia razon para que ademas
+   cambiaran el recorrido y los botones.
+#}
+
+{% block contenido %}
+{% set ocultos = cfg.get("ocultar_en_lista", []) %}
+
+<h1 class="h2 mb-3">{{ cfg.titulo }}</h1>
+
+{% if not cfg.get("puente") %}
+<section class="card mb-4">
+  <div class="card-body">
+    <h2 class="h5 card-title mb-3">
+      {% if editando %}Editar {{ registro[cfg.pk] }}{% else %}Agregar{% endif %}
+    </h2>
+
+    <form method="post"
+          action="{% if editando %}{{ url_for('entidades.guardar', clave=clave, pk=registro[cfg.pk]) }}{% else %}{{ url_for('entidades.lista', clave=clave) }}{% endif %}">
+      <div class="row g-3">
+        {% for nombre, etiqueta, fk in cfg.campos %}
+        <div class="col-12 col-md-6 col-lg-3">
+          <label class="form-label" for="c_{{ nombre }}">{{ etiqueta }}</label>
+          {% if fk %}
+          {# LA CLAVE FORANEA SE ELIGE, NO SE ESCRIBE: muestra el nombre y
+             manda el codigo. Escribirla a mano obliga a adivinar que existe. #}
+          <select class="form-select" id="c_{{ nombre }}" name="{{ nombre }}">
+            <option value="">(ninguna)</option>
+            {% for valor, texto in opciones.get(nombre, []) %}
+            <option value="{{ valor }}" {% if registro.get(nombre)|string == valor %}selected{% endif %}>{{ texto }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input class="form-control" id="c_{{ nombre }}" name="{{ nombre }}"
+                 value="{{ registro.get(nombre, '') if registro.get(nombre) is not none else '' }}"
+                 {% if editando and nombre == cfg.pk %}readonly{% endif %}>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      {#
+         LOS DOS BOTONES DE GUARDAR, y sus nombres no son decorativos:
+         «la ficha completa» es el PUT -reemplazo: si falta un campo, 422- y
+         «solo lo que cambie» es el PATCH -parcial: el mismo cuerpo, 200-.
+         LA INTERFAZ NO LE DICE PUT NI PATCH A LA PERSONA.
+      #}
+      <div class="mt-3 d-flex flex-wrap gap-2">
+        {% if editando %}
+        <button class="btn btn-primary" name="accion" value="completa">Guardar la ficha completa</button>
+        <button class="btn btn-outline-primary" name="accion" value="cambios">Guardar solo lo que cambié</button>
+        <a class="btn btn-link" href="{{ url_for('entidades.lista', clave=clave) }}">Cancelar</a>
+        {% else %}
+        <button class="btn btn-primary">Agregar</button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</section>
+{% else %}
+<div class="mb-3">
+  <a class="btn btn-primary" href="{{ url_for('entidades.lista', clave=clave) }}#nueva">Asignar</a>
+</div>
+{% endif %}
+
+{% if datos %}
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead><tr>
+      {% if cfg.get("pk_generada") %}<th>Id</th>{% endif %}
+      {% for n, etiqueta, _ in cfg.campos if n not in ocultos %}<th>{{ etiqueta }}</th>{% endfor %}
+      <th class="text-end">Acciones</th>
+    </tr></thead>
+    <tbody>
+    {% for d in datos %}
+      <tr>
+        {% if cfg.get("pk_generada") %}<td class="font-monospace">{{ d[cfg.pk] }}</td>{% endif %}
+        {% for n, _, _ in cfg.campos if n not in ocultos %}
+        <td>{{ d.get(n, "") if d.get(n) is not none else "—" }}</td>
+        {% endfor %}
+        <td class="text-end">
+        {% if cfg.get("puente") %}
+          <form class="d-inline" method="post"
+                action="{{ url_for('entidades.quitar_puente', clave=clave, a=d[cfg.pk[0]], b=d[cfg.pk[1]]) }}"
+                onsubmit="return confirm('¿Quitar esta asignación?');">
+            <button class="btn btn-sm btn-danger">Quitar</button>
+          </form>
+        {% else %}
+          {% if cfg.editable %}
+          <a class="btn btn-sm btn-outline-primary"
+             href="{{ url_for('entidades.lista', clave=clave, editar=d[cfg.pk]) }}">Editar</a>
+          {% endif %}
+          {# El DELETE del ejemplo borra la fila de verdad, asi que la
+             palabra es ELIMINAR. En el proyecto de aula, donde el borrado si
+             es logico, sera RETIRAR. #}
+          <form class="d-inline" method="post"
+                action="{{ url_for('entidades.eliminar', clave=clave, pk=d[cfg.pk]) }}"
+                onsubmit="return confirm('¿Eliminar este registro?');">
+            <button class="btn btn-sm btn-danger">Eliminar</button>
+          </form>
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+{# Vacio NO es error: es un recuadro que lo dice. #}
+<div class="alert alert-secondary">Todavía no hay {{ cfg.titulo|lower }} registrados.</div>
+{% endif %}
+{% endblock %}

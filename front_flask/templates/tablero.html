@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block titulo %}Tablero{% endblock %}
+
+{#
+   ============================================================
+   EL TABLERO — las diez consultas multitabla de la v4, dibujadas.
+
+   LOS GRAFICOS VAN SIN LIBRERIA Y SIN CDN, y conviene decir por que antes de
+   que parezca pereza:
+
+     1. La regla del proyecto es «sin CDN», y su razon esta escrita: un front
+        que necesita internet para verse bien no arranca en un salon sin red.
+
+     2. UNA BARRA ES GEOMETRIA. Un `div` con un `width` en porcentaje ES un
+        grafico de barras. Una libreria se justifica cuando hacen falta
+        interaccion, ejes, escalas logaritmicas o series temporales — nada de
+        eso hay aqui.
+
+     3. Se ve EXACTAMENTE lo que el navegador va a pintar. Con una libreria uno
+        lee una configuracion y tiene que imaginarse el resultado.
+
+   Si el equipo quiere Chart.js, el sitio es `static/lib/`, servido desde el
+   repositorio — nunca un CDN.
+   ============================================================
+#}
+
+{% macro ancho(valor, tope) -%}
+{{ (100 * (valor or 0) / tope) if tope else 0 }}
+{%- endmacro %}
+
+{% macro tabla(columnas, filas, campos) %}
+  {% if filas %}
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead><tr>{% for c in columnas %}<th scope="col">{{ c }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for f in filas %}
+        <tr>{% for campo, formato in campos %}
+          <td{% if formato != 'texto' %} class="text-end"{% endif %}>
+            {%- if formato == 'dinero' -%}${{ "{:,.0f}".format(f[campo] or 0) }}
+            {%- elif formato == 'numero' -%}{{ "{:,}".format(f[campo] or 0) }}
+            {%- else -%}{{ f[campo] }}{%- endif -%}
+          </td>{% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  {# CERO FILAS NO ES UN ERROR: es la respuesta. En «productos sin vender»
+     significa que todo el catalogo se ha vendido alguna vez, y en «interfaces
+     sin usuarios» que ninguna quedo huerfana. Decirlo con palabras evita que
+     se lea como una falla. #}
+  <p class="text-body-secondary small mb-0 fst-italic">
+      Cero filas — y eso es una respuesta, no un error.
+  </p>
+  {% endif %}
+{% endmacro %}
+
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 pb-2 mb-4 border-bottom">
+    <div>
+        <h1 class="mb-1">Tablero</h1>
+        <p class="text-body-secondary mb-0">
+            Diez consultas que cruzan <strong>cuatro o más tablas</strong> cada una.
+            Ninguna la puede responder el CRUD de una sola.
+        </p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('tablero.tablero') }}">Actualizar</a>
+</div>
+
+{# ---------- 1. Ventas por producto, con barras ---------- #}
+{% set titulo, ok, filas = resultados['ventas-por-producto'] %}
+<div class="card mb-4">
+  <div class="card-header bg-body-tertiary">
+    <strong>1 · {{ titulo }}</strong>
+    <span class="text-body-secondary small ms-2">producto · productosporfactura · factura · cliente</span>
+  </div>
+  <div class="card-body">
+    {% if not ok %}
+      <p class="text-danger small mb-0">Esta consulta no respondió. Las demás sí.</p>
+    {% elif filas %}
+      {% set tope = filas | map(attribute='ingreso') | max %}
+      {% for f in filas[:10] %}
+      <div class="mb-3">
+        <div class="d-flex justify-content-between small">
+          <span>{{ f.nombre }} <code class="text-body-secondary">{{ f.codigo }}</code></span>
+          <span class="fw-semibold">${{ "{:,.0f}".format(f.ingreso or 0) }}</span>
+        </div>
+        {# La barra ES el grafico: un div con su ancho en porcentaje. #}
+        <div class="progress" style="height:.5rem" role="img"
+             aria-label="{{ f.nombre }}: {{ f.ingreso }}">
+          <div class="progress-bar" style="width:{{ ancho(f.ingreso, tope) }}%"></div>
+        </div>
+        <div class="small text-body-secondary">
+          {{ f.unidades }} unidades · {{ f.facturas }} facturas · {{ f.clientes }} clientes
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-body-secondary small mb-0 fst-italic">Cero filas — y eso es una respuesta, no un error.</p>
+    {% endif %}
+  </div>
+</div>
+
+{# ---------- 2 a 10: las demas, en tabla ---------- #}
+{% set definiciones = [
+     ('ventas-por-cliente', 2, 'persona · cliente · factura · productosporfactura',
+      ['Cliente', 'Email', 'Facturas', 'Comprado', 'Unidades'],
+      [('cliente','texto'),('email','texto'),('facturas','numero'),('comprado','dinero'),('unidades','numero')]),
+     ('ventas-por-vendedor', 3, 'persona · vendedor · factura · productosporfactura',
+      ['Vendedor', 'Carné', 'Facturas', 'Vendido'],
+      [('vendedor','texto'),('carnet','numero'),('facturas','numero'),('vendido','dinero')]),
+     ('ventas-por-empresa', 4, 'empresa · cliente · factura · productosporfactura',
+      ['Empresa', 'Código', 'Clientes', 'Facturas', 'Facturado'],
+      [('empresa','texto'),('codigo','texto'),('clientes','numero'),('facturas','numero'),('facturado','dinero')]),
+     ('ticket-por-vendedor', 5, 'persona · vendedor · factura · productosporfactura',
+      ['Vendedor', 'Facturas', 'Total', 'Ticket promedio'],
+      [('vendedor','texto'),('facturas','numero'),('total','dinero'),('ticketPromedio','dinero')]),
+     ('productos-sin-vender', 6, 'producto · productosporfactura · factura · cliente — con LEFT JOIN',
+      ['Código', 'Producto', 'Stock', 'Valor unitario'],
+      [('codigo','texto'),('nombre','texto'),('stock','numero'),('valorunitario','dinero')]),
+     ('anulaciones-por-cliente', 7, 'persona · cliente · factura · productosporfactura',
+      ['Cliente', 'Anuladas', 'Valor anulado'],
+      [('cliente','texto'),('anuladas','numero'),('valorAnulado','dinero')]),
+     ('alcance-de-usuarios', 8, 'usuario · rol_usuario · rol · rutarol · ruta — CINCO tablas',
+      ['Email', 'Roles', 'Interfaces', 'Sus roles'],
+      [('email','texto'),('roles','numero'),('interfaces','numero'),('susRoles','texto')]),
+     ('interfaces-sin-usuarios', 9, 'ruta · rutarol · rol · rol_usuario — con LEFT JOIN',
+      ['Ruta', 'Descripción', 'Roles con acceso', 'Usuarios con acceso'],
+      [('ruta','texto'),('descripcion','texto'),('rolesConAcceso','numero'),('usuariosConAcceso','numero')]),
+     ('credito-contra-consumo', 10, 'persona · empresa · cliente · factura',
+      ['Cliente', 'Empresa', 'Crédito', 'Consumido', 'Disponible'],
+      [('cliente','texto'),('empresa','texto'),('credito','dinero'),('consumido','dinero'),('disponible','dinero')]),
+] %}
+
+<div class="row g-3">
+{% for clave, numero, cruza, columnas, campos in definiciones %}
+  {% set titulo, ok, filas = resultados[clave] %}
+  <div class="col-12 col-xl-6">
+    <div class="card h-100">
+      <div class="card-header bg-body-tertiary">
+        <strong>{{ numero }} · {{ titulo }}</strong>
+        <div class="text-body-secondary small">{{ cruza }}</div>
+      </div>
+      <div class="card-body">
+        {% if not ok %}
+        <p class="text-danger small mb-0">Esta consulta no respondió. Las demás sí.</p>
+        {% else %}
+        {{ tabla(columnas, filas, campos) }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+</div>
+
+<div class="card bg-body-tertiary border-0 mt-4">
+  <div class="card-body">
+    <h2 class="h6 card-title">Por qué estas diez no las puede responder el CRUD</h2>
+    <p class="card-text small mb-0">
+      Cada una cruza cuatro o más tablas. Pedir <code>/api/factura</code> y
+      <code>/api/producto</code> por separado y juntarlos en el navegador daría
+      el mismo número <em>a veces</em>: traería todas las filas a la máquina de
+      quien mira, sumaría mal en cuanto haya paginación, y pediría al servidor
+      muchas veces lo que una consulta responde una sola.
+      <strong>El cruce se hace donde están los datos.</strong>
+    </p>
+  </div>
+</div>
+{% endblock %}

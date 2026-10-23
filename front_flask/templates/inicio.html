@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block titulo %}Inicio{% endblock %}
+
+{#
+   El Inicio — la misma pagina que en los otros dos cursos.
+
+   Cada version tiene el suyo, y conviene decir por que: durante un tiempo
+   este archivo fue EL MISMO en los cuatro proyectos, y decia «Version 1: el
+   CRUD de productos». En el 2, el 3 y el 4 era falso — y es lo primero que lee
+   quien abre el sistema. Un texto equivocado no rompe nada; solo engana, y por
+   eso ni el compilador ni el auditor lo pueden atrapar.
+#}
+
+{% block contenido %}
+<div class="pb-2 mb-4 border-bottom">
+    <h1 class="mb-1">Facturas</h1>
+    <p class="fs-5 text-body-secondary mb-0">Versión 4 — <strong>el aplicativo completo</strong></p>
+</div>
+
+<p class="mb-4">Las cuatro versiones del curso, y además el adelanto de la v5: una segunda implementación de los repositorios contra SQL Server, elegida por configuración.</p>
+
+<div class="alert alert-primary d-flex align-items-start gap-2" role="alert">
+    <div>
+        <strong>Esta versión pide identificarse.</strong>
+        Sin sesión, la interfaz manda a <a href="{{ url_for('login') }}" class="alert-link">iniciar sesión</a>
+        y la API responde <code>401</code>. Y el menú de arriba
+        <strong>solo muestra lo que su rol puede abrir</strong> — pero eso es
+        comodidad, no protección: quien escriba la dirección a mano recibe un
+        <code>403</code> de la API, que es quien de verdad protege.
+    </div>
+</div>
+
+{% set visibles = menu_entidades %}
+{% set sueltas = tarjetas_sueltas %}
+{% set cuantas = visibles|length + sueltas|length %}
+
+<h2 class="h5 mt-4 mb-3">
+    Lo que hay
+    <span class="badge text-bg-secondary align-middle ms-1">{{ cuantas }} interfaces</span>
+</h2>
+
+{% macro tarjeta(url, titulo, descripcion) %}
+<div class="col-12 col-sm-6 col-lg-4">
+    <a class="card h-100 text-decoration-none" href="{{ url }}">
+        <div class="card-body">
+            <h3 class="h6 card-title mb-1">{{ titulo }}</h3>
+            <p class="card-text small text-body-secondary mb-0">{{ descripcion }}</p>
+        </div>
+    </a>
+</div>
+{% endmacro %}
+
+{#
+   AGRUPADAS POR VERSION, y no es decoracion: es lo que deja ver de un vistazo
+   que cada version INCLUYE la anterior. La v2 no reemplaza a la v1 — la trae
+   adentro, y por eso sus seis recursos siguen ahi.
+#}
+{% for v, encabezado in [(1, "De la versión 1 — sin clave foránea"),
+                         (2, "De la versión 2 — con clave foránea"),
+                         (4, "De la versión 4 — las consultas")] %}
+  {% set delaversion = visibles.items()|selectattr("1.desde", "equalto", v)|list %}
+  {% set sueltasv = sueltas|selectattr("2", "equalto", v)|list %}
+  {% if delaversion or sueltasv %}
+  <h3 class="h6 text-body-secondary text-uppercase small mb-3">{{ encabezado }}</h3>
+  <div class="row g-3 mb-4">
+      {% for ruta, titulo, _, descripcion in sueltasv %}
+      {{ tarjeta(ruta, titulo, descripcion) }}
+      {% endfor %}
+      {% for clave, e in delaversion %}
+      {{ tarjeta(url_for('entidades.lista', clave=clave), e.titulo, e.descripcion) }}
+      {% endfor %}
+  </div>
+  {% endif %}
+{% endfor %}
+
+<div class="card bg-body-tertiary border-0 mt-4">
+    <div class="card-body">
+        <h2 class="h6 card-title">La interfaz gráfica y la API son dos procesos distintos</h2>
+        <p class="card-text small mb-0">
+            Y se puede comprobar: apague la API con
+            <code>docker compose stop api-facturas</code> y vuelva a cargar
+            <a href="{{ url_for('entidades.lista', clave='producto') }}">Productos</a>.
+            El menú sigue en pie, con un aviso, y <strong>sin una sola fila</strong>.
+            Si siguiera mostrando los productos, estaría leyendo de donde no debe.
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+{#
+   base.html — el armazon de todas las paginas.
+
+   BOOTSTRAP SE SIRVE DESDE ESTE REPOSITORIO, no desde un CDN. La regla del
+   proyecto es «sin CDN» y su razon esta escrita: un front que necesita
+   internet para verse bien no arranca en un salon sin red. Apague el wifi y
+   esto se ve igual.
+
+   Y LA MARCA VA DESPUES DE BOOTSTRAP, siempre: en CSS, a igual especificidad
+   gana el ultimo que se carga. Asi `marca.css` puede ajustar lo de Bootstrap
+   y no al reves — que es lo que hace que el manual de marca sea una
+   restriccion y no una sugerencia.
+#}
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Facturas{% endblock %} · Comercial Los Andes S.A.</title>
+
+    {# 1o Bootstrap, la base… #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap/bootstrap.min.css') }}">
+    {# …2o la marca, que gana porque va despues #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='marca.css') }}">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2317495B'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23E39B2D'>▲</text></svg>">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-marca">
+  <div class="container">
+    <span class="navbar-brand logosimbolo mb-0">
+        <span class="logotipo">Los Andes</span> <span class="isotipo">▲</span>
+        <small class="descriptor">comercial s.a.</small>
+    </span>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#menuPrincipal" aria-controls="menuPrincipal"
+            aria-expanded="false" aria-label="Abrir el menú">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    {% if hay_sesion %}
+    <div class="collapse navbar-collapse" id="menuPrincipal">
+        <div class="navbar-nav flex-wrap me-auto">
+            <a class="nav-link" href="{{ url_for('inicio') }}">Inicio</a>
+            {# v4 — el tablero va PRIMERO: es lo que se mira al entrar. #}
+            <a class="nav-link" href="{{ url_for('tablero.tablero') }}"><strong>Tablero</strong></a>
+        <a class="nav-link" href="{{ url_for('facturas.lista') }}"><strong>Facturas</strong></a>
+        <a class="nav-link" href="{{ url_for('usuarios_roles.lista') }}">Usuarios y roles</a>
+            {# El menu se arma con los PERMISOS de quien entro. Y ojo: esconder
+               una entrada NO protege nada — quien escriba la direccion a mano
+               llega igual, y lo que lo para es el 403 de la API. #}
+            {% for clave, e in menu_entidades.items() %}
+            <a class="nav-link" href="{{ url_for('entidades.lista', clave=clave) }}">{{ e.titulo }}</a>
+            {% endfor %}
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="navbar-text small">
+                {{ usuario_actual }}
+                {% for r in roles_actuales %}<span class="badge text-bg-light ms-1">{{ r }}</span>{% endfor %}
+            </span>
+            <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">Salir</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="ms-auto">
+        <a class="btn btn-outline-light btn-sm" href="{{ url_for('login') }}">Iniciar sesión</a>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+
+<main class="container py-4">
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensaje in mensajes %}
+        {# Los avisos SIEMPRE en pantalla, nunca en la consola: un error que
+           solo esta en la consola no existe para quien usa el sistema.
+           role="alert" es lo que hace que un lector de pantalla lo ANUNCIE. #}
+        <div class="alert {{ 'alert-success' if categoria == 'exito' else 'alert-danger' }}" role="alert">
+            {{ mensaje }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    {% block contenido %}{% endblock %}
+</main>
+
+<footer class="border-top mt-5 py-4">
+    <div class="container text-body-secondary small">
+        Aplicación y Servicios Web · <strong>versión 4</strong> · front en Flask
+    </div>
+</footer>
+
+{# El JavaScript de Bootstrap: lo necesita el menu plegable del telefono. #}
+<script src="{{ url_for('static', filename='lib/bootstrap/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

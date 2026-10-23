@@ -165,6 +165,34 @@ services:
       # NO depende de la base: el front no tiene nada que hacer con ella.
       - api-facturas
 
+  # --- El SEGUNDO front: la misma aplicacion, en Flask (v4) ---
+  # Por que existe: el curso sostiene que la API y la interfaz son dos
+  # programas distintos que se hablan por HTTP. Dos fronts contra la MISMA
+  # API, escritos en dos lenguajes, es la demostracion de eso. Si la API
+  # tuviera algo de la interfaz adentro, este contenedor no podria existir.
+  #
+  # Y no depende de ninguna base de datos: no sabe que existen.
+  front-flask:
+    build: ./front_flask
+    container_name: facturas-front-flask-aysw-v4
+    restart: unless-stopped
+    ports:
+      - "8118:8118"
+    volumes:
+      # El codigo montado: Flask en modo depuracion recarga al guardar.
+      - ./front_flask:/app
+    environment:
+      PUERTO: "8118"
+      # El NOMBRE del servicio, no localhost: dentro del contenedor del front,
+      # localhost seria el front mismo.
+      API_FACTURAS_URL: "http://api-facturas:8035"
+      # La clave que FIRMA la cookie de sesion. En claro a proposito: es de
+      # desarrollo y este repositorio es material de curso. Lo que importa es
+      # que el codigo la lea de la configuracion y no la lleve escrita adentro.
+      CLAVE_SESION: "ClaveDeDesarrolloDelCursoAplicacionYServiciosWeb_2026_2"
+    depends_on:
+      - api-facturas
+
 volumes:
   mssqldata:      # declaración del volumen nombrado (la "memoria" de la BD)
   pgdata:         # v4: la "memoria" del segundo motor

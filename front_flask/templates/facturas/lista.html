@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block titulo %}Facturas{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h2 mb-0">Facturas</h1>
+    <a class="btn btn-primary" href="{{ url_for('facturas.crear') }}">Nueva factura</a>
+</div>
+
+{% if facturas %}
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead><tr>
+            <th>No.</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th>
+            <th class="text-end">Total</th><th>Estado</th><th class="text-end">Acciones</th>
+        </tr></thead>
+        <tbody>
+        {% for f in facturas %}
+            <tr>
+                <td class="font-monospace">{{ f.numero }}</td>
+                <td>{{ f.fecha[:10] }}</td>
+                <td>{{ f.nombre_cliente }}</td>
+                <td>{{ f.nombre_vendedor }}</td>
+                <td class="text-end font-monospace">{{ "{:,.0f}".format(f.total) }}</td>
+                <td>
+                    {# El estado con la marca: activa Verde Páramo, anulada Rojo Anulada #}
+                    <span class="badge {{ 'bg-success' if f.estado == 'activa' else 'bg-danger' }}">
+                        {{ f.estado }}</span>
+                </td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary"
+                       href="{{ url_for('facturas.detalle', numero=f.numero) }}">Ver</a>
+                    {% if f.estado == 'activa' %}
+                    <form class="d-inline" method="post"
+                          action="{{ url_for('facturas.anular', numero=f.numero) }}"
+                          onsubmit="return confirm('¿Anular la factura {{ f.numero }}? El stock se restaura.');">
+                        <button class="btn btn-sm btn-danger" type="submit">Anular</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-secondary">Todavía no hay facturas.</div>
+{% endif %}
+{% endblock %}

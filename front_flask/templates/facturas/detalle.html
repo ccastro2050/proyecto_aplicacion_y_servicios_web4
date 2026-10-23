@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block titulo %}Factura {{ f.numero }}{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h2 mb-0">Factura {{ f.numero }}
+        <span class="badge {{ 'bg-success' if f.estado == 'activa' else 'bg-danger' }}">{{ f.estado }}</span>
+    </h1>
+    <a class="btn btn-outline-secondary" href="{{ url_for('facturas.lista') }}">Volver</a>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6 col-md-3"><strong>Fecha:</strong><br>{{ f.fecha[:10] }}</div>
+            <div class="col-6 col-md-3"><strong>Cliente:</strong><br>{{ f.nombre_cliente }}</div>
+            <div class="col-6 col-md-3"><strong>Vendedor:</strong><br>{{ f.nombre_vendedor }}</div>
+            <div class="col-6 col-md-3"><strong>Total:</strong><br>
+                <span class="font-monospace">{{ "{:,.0f}".format(f.total) }}</span></div>
+        </div>
+    </div>
+</div>
+
+<h2 class="h4">Renglones (los subtotales los calculó la base de datos)</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead><tr>
+            <th>Producto</th><th>Nombre</th>
+            <th class="text-end">Cantidad</th>
+            <th class="text-end">Valor unitario</th>
+            <th class="text-end">Subtotal</th>
+        </tr></thead>
+        <tbody>
+        {% for r in f.productos %}
+            <tr>
+                <td class="font-monospace">{{ r.codigo_producto }}</td>
+                <td>{{ r.nombre_producto }}</td>
+                <td class="text-end font-monospace">{{ r.cantidad }}</td>
+                <td class="text-end font-monospace">{{ "{:,.0f}".format(r.valorunitario) }}</td>
+                <td class="text-end font-monospace">{{ "{:,.0f}".format(r.subtotal) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+/* marca.css — SOLO la identidad del MANUAL_DE_MARCA.md sobre Bootstrap.
+   Nada de layout ni responsive aquí: eso es 100% Bootstrap. */
+:root {
+    --azul-cordillera: #17495B;
+    --verde-paramo:    #2F7D5C;
+    --ambar-cosecha:   #E39B2D;
+    --rojo-anulada:    #B4402F;
+    --piedra:          #4A4A4A;
+    --niebla:          #F4F2EC;
+    /* La paleta del manual, inyectada a los colores de Bootstrap: */
+    --bs-primary: var(--azul-cordillera);
+    --bs-success: var(--verde-paramo);
+    --bs-danger:  var(--rojo-anulada);
+    --bs-body-bg: var(--niebla);
+}
+.navbar-marca { background-color: var(--azul-cordillera); }
+.logotipo  { font-family: Georgia, serif; font-variant: small-caps; letter-spacing: 2px; }
+.isotipo   { color: var(--ambar-cosecha); }
+.descriptor{ color: #cfd8dc; }
+h1, h2, .card-title { font-family: Georgia, serif; color: var(--azul-cordillera); }
+.btn-primary { --bs-btn-bg: var(--azul-cordillera); --bs-btn-border-color: var(--azul-cordillera);
+               --bs-btn-hover-bg: #1d5a70; --bs-btn-hover-border-color: #1d5a70; }
+.btn-success { --bs-btn-bg: var(--verde-paramo); --bs-btn-border-color: var(--verde-paramo);
+               --bs-btn-hover-bg: #38946d; --bs-btn-hover-border-color: #38946d; }
+.btn-danger  { --bs-btn-bg: var(--rojo-anulada); --bs-btn-border-color: var(--rojo-anulada);
+               --bs-btn-hover-bg: #c94f3c; --bs-btn-hover-border-color: #c94f3c; }
+.table thead th { background-color: var(--azul-cordillera); color: #fff; }
+.form-control:focus { border-color: var(--ambar-cosecha);
+                      box-shadow: 0 0 0 .25rem rgba(227, 155, 45, .25); }

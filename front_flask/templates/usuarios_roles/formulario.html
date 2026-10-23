@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo usuario con roles{% endblock %}
+
+{% block contenido %}
+<h1 class="pb-2 mb-4 border-bottom">Nuevo usuario con sus roles</h1>
+
+<form method="post" class="col-12 col-lg-7">
+  <div class="mb-3">
+    <label class="form-label" for="email">Correo</label>
+    <input class="form-control" type="email" id="email" name="email" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="contrasena">Contraseña</label>
+    <input class="form-control" type="password" id="contrasena" name="contrasena" required>
+    {# La contraseña viaja en el CUERPO del POST, nunca en la URL: lo que va en
+       la dirección queda en el historial del navegador y en los registros del
+       servidor. #}
+    <div class="form-text">La API la guarda con hash; aquí no se calcula nada.</div>
+  </div>
+
+  <fieldset class="mb-3">
+    <legend class="fs-6">Sus roles — <strong>al menos uno</strong></legend>
+    {% for r in roles %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="roles" value="{{ r.id }}" id="n{{ r.id }}">
+      <label class="form-check-label" for="n{{ r.id }}">{{ r.nombre }}</label>
+    </div>
+    {% endfor %}
+    <div class="form-text">
+      Sin ningún rol el usuario no podría hacer nada, y por eso la API lo
+      rechaza con <strong>422</strong> en vez de crearlo inservible.
+    </div>
+  </fieldset>
+
+  <button class="btn btn-primary">Crear</button>
+  <a class="btn btn-link" href="{{ url_for('usuarios_roles.lista') }}">Cancelar</a>
+</form>
+{% endblock %}

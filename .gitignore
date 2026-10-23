@@ -38,3 +38,4 @@ appsettings.Production.postgres.json
 # contenedor los crea root. No se versionan.
 __pycache__/
 *.pyc
+publicado_pg/

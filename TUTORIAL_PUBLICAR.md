@@ -1188,6 +1188,107 @@ gratuita, no.
 > **Y por eso el primer intento después de publicar siempre parece lento.** Si
 > va a mostrarle el sistema a alguien, ábralo una vez antes para despertarlo.
 
+### 5.2 · La dirección del sitio
+
+![El segundo paso: escoger la dirección](docs/tutorial_publicar/img/27_crear_sitio_direccion.png)
+
+#### Las tres opciones de dirección
+
+| Opción | Qué es | ¿Disponible? |
+|---|---|---|
+| **Free subdomain** | Una dirección **instantánea** en `runasp.net` o `tryasp.net`. Sin configurar nada | ✅ **Ésta** |
+| **Your own domain** | Un dominio propio —`midominio.com`— que usted ya tenga. Exige configurar el DNS | `PREMIUM` |
+| **Your own subdomain** | Un subdominio de un dominio suyo —`api.midominio.com`—. También exige DNS | `PREMIUM` |
+
+> **Las dos de pago no son solo un cobro**: piden **configurar el DNS**, que es
+> decirle a internet que ese nombre apunta a este servidor. El subdominio
+> gratuito se salta todo eso porque el dominio ya es del hospedaje.
+
+#### Los dos campos
+
+| Campo | Qué poner |
+|---|---|
+| **Website address** | El nombre. **Mínimo 3 caracteres, solo letras `a–z`, números `0–9` y guion** — sin mayúsculas, sin puntos, sin tildes |
+| **Website free subdomain** | El dominio. Déjelo en **`.runasp.net`** |
+
+**Debajo, el renglón `Your website address:` se completa mientras escribe** y
+muestra cómo va a quedar. Úselo para confirmar antes de seguir.
+
+#### Qué nombre poner, y por qué importa
+
+**Esto no se puede cambiar después sin borrar el sitio**, así que vale pensarlo
+diez segundos.
+
+| | |
+|---|---|
+| **Tiene que ser único en todo el hospedaje** | No solo en su cuenta. Si alguien ya lo tomó, se lo rechaza |
+| **Queda a la vista de todos** | Es la dirección pública que va a escribir cualquiera |
+| **Y queda dentro del front** | El `appsettings.json` de la interfaz apunta a esta dirección. Si cambia, hay que volver a publicar el front |
+
+**Para este ejemplo:** `apifacturas-carloscastro` → la dirección queda
+`apifacturas-carloscastro.runasp.net`.
+
+| Por qué así | |
+|---|---|
+| **`apifacturas`** | Dice **qué es**. Un nombre como `csharpapigenerica` describe la tecnología, no el sistema — y dentro de un mes nadie recuerda cuál era |
+| **`-carloscastro`** | Es lo que garantiza que esté libre |
+
+> **Para el proyecto de aula, un formato fijo:** `apifacturas-<equipo>` para la
+> API y `facturas-<equipo>` para la interfaz. Así, mirando la lista de
+> direcciones se sabe de quién es cada una sin abrir ninguna.
+
+### 5.3 · DNS y Subscription se saltan solos
+
+Al oprimir `Continue`, el asistente pasa del paso 2 al **5**: los pasos **3
+(DNS)** y **4 (Subscription)** quedan con su visto verde sin preguntar nada.
+
+| Paso | Por qué no pregunta |
+|---|---|
+| **DNS** | Con subdominio gratuito **no hay DNS que configurar**: el dominio ya es del hospedaje y apunta solo |
+| **Subscription** | En el plan gratuito no hay paquete que escoger |
+
+### 5.4 · El centro de datos: el mismo de la base
+
+![El quinto paso: Europa, con Estados Unidos bloqueado](docs/tutorial_publicar/img/28_crear_sitio_datacenter.png)
+
+Es la misma pantalla de la base: **Europa seleccionada, Estados Unidos
+bloqueado** por ser plan gratuito.
+
+> **Y esta vez eso es justo lo que queremos.** La base quedó en Europa, el
+> sitio queda en Europa, y **los dos viven en la misma red del centro de
+> datos**. Por eso la API va a poder usar `Local access`, que es la conexión
+> rápida y la que no sale a internet.
+
+**Oprima `Continue`.**
+
+### 5.5 · La aplicación de ejemplo: ninguna
+
+![El sexto paso: My own application, ya seleccionada](docs/tutorial_publicar/img/29_crear_sitio_ejemplo.png)
+
+El hospedaje ofrece instalar una aplicación de demostración —una API .NET, un
+Blazor, un chat con SignalR, un Angular, un Next.js— para que uno vea algo
+funcionando de una vez.
+
+**No queremos ninguna.** La primera tarjeta, **`My own application`**, ya viene
+**seleccionada por defecto**, y en el `Summary` se lee
+`Application: None (empty website)`.
+
+> **Y el propio panel explica por qué no conviene escoger un ejemplo:** *«The
+> example is installed into the **root of your website** and you will need to
+> **delete its files** before you upload your own application. Pick **My own
+> application** if you are deploying your own code right away»*.
+>
+> O sea: el ejemplo se instala **en la misma carpeta** donde va a ir su
+> aplicación. Si lo deja, después hay que borrar sus archivos a mano — y
+> mientras tanto conviven dos aplicaciones en el mismo sitio.
+
+**Oprima `Create Website`.**
+
+> **Para qué sirven los ejemplos, entonces.** Para comprobar que el hospedaje
+> funciona cuando uno todavía no tiene nada que subir. Si un estudiante duda de
+> si el problema es su código o el servidor, instalar el ejemplo de `.NET 10
+> Web API` en un sitio aparte lo resuelve en dos minutos.
+
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

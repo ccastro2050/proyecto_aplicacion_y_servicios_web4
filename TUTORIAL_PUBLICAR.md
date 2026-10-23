@@ -1347,4 +1347,78 @@ tener que probarlo, si lo que usted va a subir va a funcionar aquí.
 
 
 
+### 5.6 · El sitio se crea en dos tiempos
+
+#### Primero: `Creating`
+
+![La lista de sitios con el estado Creating](docs/tutorial_publicar/img/30_sitio_creando.png)
+
+Al oprimir `Create Website` el asistente se cierra y vuelve a la lista. **El
+sitio ya aparece, pero todavía no sirve.**
+
+| Lo que se ve | Qué significa |
+|---|---|
+| **`Creating`**, en naranja | El servidor está **armando el sitio**: creando la carpeta, el *application pool* y las credenciales |
+| *1 website is being prepared · the list refreshes automatically* | **No recargue la página.** La lista se actualiza sola |
+| **`Tasks 3`**, arriba | Las tareas pendientes del servidor. **Van a bajar a `0`** cuando termine |
+| El nombre **sin el ícono del globo** | Todavía no es alcanzable desde internet |
+
+> **Por qué tarda.** Un sitio no es una carpeta: el hospedaje registra el
+> dominio en su servidor web, le asigna un *application pool* propio con sus
+> 256 MB, y genera **el usuario y la clave de WebDeploy**. Eso último es lo que
+> vamos a necesitar en seguida.
+
+#### Después: `Enabled`
+
+![La lista de sitios con el estado Enabled](docs/tutorial_publicar/img/31_sitio_listo.png)
+
+| Lo que cambió | Qué significa |
+|---|---|
+| **`Enabled`**, en verde | **El sitio está vivo.** Ya responde en su dirección |
+| Apareció el **ícono del globo** junto al nombre | Es alcanzable desde internet |
+| **`Tasks 0`** | El servidor terminó |
+| Apareció el filtro **`Enabled 1`** | En la barra de `STATUS`. Antes no estaba porque no había ninguno en ese estado |
+
+#### Lo que quedo creado, renglon por renglon
+
+| Columna | Valor | Qué es |
+|---|---|---|
+| **STATUS** | `Enabled` | Encendido |
+| **NAME** | `apifacturas-carloscastro.runasp.net` | **La dirección pública.** El ícono de la flecha la abre en otra pestaña |
+| La etiqueta | `Free` | El plan |
+| La etiqueta | `EU` | El centro de datos. **El mismo de la base de datos** |
+| La etiqueta | **`site101125`** | **El identificador del sitio.** Anótelo: es el usuario de WebDeploy |
+| **DOMAIN ALIASES** | `—` | No hay dominios propios apuntando aquí. Es de pago |
+| **SUBSCRIPTION** | `—` | No hay paquete contratado |
+| **MEMORY** | `256 MB` | Lo que anunciaba el plan, ahora asignado de verdad |
+| **DISK USAGE** | `--- MB` de `5120 MB` | **Cero usado** de 5 GB. Todavía no hemos subido nada |
+
+> **`site101125` es el dato que importa de esta pantalla.** Ese número lo asigna
+> el hospedaje, no usted, y es **el nombre de usuario con el que se publica**.
+> Fuera de aquí casi no se ve: la dirección pública es
+> `apifacturas-carloscastro.runasp.net`, pero el usuario de publicación es
+> `site101125`. **Son dos cosas distintas y se confunden todo el tiempo.**
+
+> **Y ojo con una cosa que ya habíamos anunciado:** este identificador es
+> **nuevo**. El sitio anterior, el que borramos en el Paso 1, tenía otro. Si
+> alguien guardó un comando de publicación de antes, **ya no sirve** — ni el
+> usuario ni la clave.
+
+#### Compruébelo antes de seguir
+
+**Abra la dirección en el navegador**, con el ícono de la flecha o escribiéndola:
+
+```
+https://apifacturas-carloscastro.runasp.net
+```
+
+| Qué sale | Qué quiere decir |
+|---|---|
+| Una página del hospedaje, o un error **403** / **404** | **Bien.** El sitio existe y responde; sencillamente **está vacío**, que es justo como lo pedimos |
+| *No se puede acceder a este sitio* | **Mal.** Espere un momento: el nombre recién creado puede tardar en propagarse |
+
+> **Que responda vacío es la señal de que todo va bien.** Lo que falta no es el
+> sitio: es **nuestra aplicación dentro de él**.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

@@ -4627,4 +4627,101 @@ momento.
 > hay que aprender es **cuál señal mirar mientras tanto.**
 
 
+### 8.14 · El front contra PostgreSQL — sin publicar nada
+
+**La API de PostgreSQL ya responde, pero el front le sigue hablando a la de SQL
+Server.** Para verlo contra el otro motor hay dos caminos:
+
+| | Editar la configuración **en el servidor** | **Un cuarto sitio** |
+|---|---|---|
+| **Tiempo** | 30 segundos | 5 minutos |
+| **¿Sobrevive a publicar?** | **No** | Sí |
+| **¿Se ven los dos a la vez?** | **No** | Sí |
+| **Para qué sirve** | **Comprobar ahora** | **Mostrar en clase** |
+
+**Aquí hacemos el primero.** El segundo es el mismo procedimiento del Paso 7,
+con otro sitio y otro `UrlApi`.
+
+#### Los cinco pasos
+
+| | |
+|---|---|
+| **1** | `Websites` → **`facturas-carloscastro`** → `Manage` → **`Files`** |
+| **2** | Entre a `wwwroot` y escriba **`appsettings`** en el `Search` |
+| **3** | En **`appsettings.Production.json`**, oprima **`Edit`** |
+| **4** | Cambie la dirección por la de la API de PostgreSQL → **`Save file`** |
+| **5** | `Overview` → **`Restart`** |
+
+![El editor del panel con el UrlApi cambiado](docs/tutorial_publicar/img/64_editar_urlapi.png)
+
+```json
+"UrlApi": "https://apifacturas-pg-carloscastro.runasp.net"
+```
+
+> **El `Restart` no es opcional.** El front lee esa configuración **al
+> arrancar**: sin reiniciar, sigue hablando con SQL Server aunque el archivo ya
+> diga otra cosa.
+
+#### Y un detalle del plan gratuito que confunde
+
+**Después del `Restart` el sitio no queda reiniciado: queda apagado.** Sin
+`AlwaysRunning`, **el proceso arranca con la primera petición**.
+
+| Lo que parece | Lo que es |
+|---|---|
+| «Reinicié y el `AppPool uptime` sigue igual» | **La página del panel está vieja.** Recargue |
+| «Tarda mucho en cargar» | **Es el arranque en frío.** La segunda vez vuela |
+| «La pestaña que tenía abierta muestra datos viejos» | **Blazor Server mantiene un circuito abierto**, y el reinicio lo rompió. **Cierre esa pestaña** o recargue con `Ctrl+F5` |
+
+#### Y así se ve el resultado
+
+![El front publicado leyendo de PostgreSQL](docs/tutorial_publicar/img/65_front_postgres.png)
+
+```
+1   Ana Torres     Carlos Pérez     5,000,000   activa
+2   María Gómez    Juan Díaz        1,250,000   activa
+3   Laura Rojas    Pedro Castillo   2,030,000   activa
+```
+
+**Las mismas seis facturas, los mismos totales, la misma interfaz** — y **los
+nombres con tilde**.
+
+> **Hace un rato, esa misma pantalla en esa misma dirección decía `Carlos
+> PA(c)rez` y `MarA-a GA3mez`.** El defecto que dejamos sin arreglar del lado de
+> SQL Server **sirvió de marcador**: es la prueba, a simple vista, de que el
+> front está leyendo de la otra base de datos.
+>
+> **Un defecto convertido en instrumento de medición.** Vale la pena decirlo en
+> clase: cuando dos sistemas deberían ser idénticos, **cualquier diferencia
+> sirve para distinguirlos** — incluso una que uno no quería tener.
+
+#### Lo que acaba de quedar demostrado
+
+```
+front   (sin tocar el codigo)
+   |  un archivo de texto
+API     (el mismo ApiFacturas.dll, byte por byte)
+   |  un archivo de texto
+base    SQL Server  <->  PostgreSQL
+```
+
+| Lo que ve el usuario | Lo que cambió debajo |
+|---|---|
+| La misma interfaz, las mismas seis facturas, los mismos totales | **Toda la base de datos** |
+
+> **Dos archivos de configuración separan un sistema sobre SQL Server de uno
+> sobre PostgreSQL.** Si el código estuviera mal hecho —con SQL escrito en los
+> controladores, o el motor decidido al compilar— **esto exigiría mantener dos
+> proyectos.**
+
+#### Para devolverlo
+
+**El mismo `Edit`**, la dirección anterior
+—`https://apifacturas-carloscastro.runasp.net`— y **`Restart`** otra vez.
+
+> **Y recuerde lo que ya sabemos:** eso que editó **lo borra la siguiente
+> publicación**. En su disco, `front_blazor/appsettings.Production.json` sigue
+> diciendo SQL Server — así que **publicar el front lo devuelve solo.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

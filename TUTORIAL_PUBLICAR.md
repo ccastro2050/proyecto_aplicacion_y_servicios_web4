@@ -4817,4 +4817,121 @@ Ofrece **GitHub**, GitLab, Google o correo. **Escoja GitHub**, por dos razones:
 > filtrar.**
 
 
+### 9.4 · La búsqueda de hospedaje, y lo que se aprendió por el camino
+
+**Esta parte se escribe tal como ocurrió**, porque lo que pasó buscando dónde
+publicar enseña más que el resultado.
+
+#### Lo que se intentó, en orden
+
+| | Qué pasó |
+|---|---|
+| **1. MonsterASP** | **No corre Python.** `PHP: --- [NONE]` y solo .NET. Descartado antes de intentarlo |
+| **2. Render** | La cuenta del profesor estaba **suspendida por una factura de mayo de 2025**. No deja ni crear un espacio nuevo: *«update the card … before you create another workspace»* |
+| **3. Hugging Face Spaces** | **Ya no sirve: en 2026 los Spaces de Docker pasaron a plan de pago.** *«Gradio and Docker Spaces require a paid plan. Static Spaces stay free for everyone»* |
+| **4. Koyeb y Northflank** | Corren Docker gratis, pero **ahora piden tarjeta** |
+| **5. Back4App** | Sin tarjeta y con Docker, **pero el contenedor gratuito vive 60 minutos por despliegue** — hay que volver a desplegarlo a mano |
+
+> **Y la conclusión, que es la lección:** en octubre de 2026 **casi no queda
+> hospedaje Docker gratuito sin tarjeta.** Lo que en 2023 era normal —Heroku,
+> Fly.io, Railway, Hugging Face— se fue cerrando uno por uno.
+>
+> **Esto no es un contratiempo del tutorial: es información del oficio.** Un
+> proyecto que *depende* de un plan gratuito ajeno **tiene fecha de
+> vencimiento que no controla.** Por eso importa que el proyecto corra en
+> Docker: **mudarlo de plataforma es cambiar de hospedaje, no reescribir la
+> aplicación.**
+
+#### Lo que sí sirve: Render, con una cuenta nueva
+
+**El plan gratuito de Render sigue existiendo y no pide tarjeta.** Lo que estaba
+bloqueado era **esa cuenta**, por una deuda vieja — no el plan.
+
+| | |
+|---|---|
+| **750 horas de instancia al mes** | De sobra para un curso |
+| **Instancia `Free`** | 512 MB, **se duerme a los 15 minutos** |
+| **Pero despierta sola** | Con la primera petición — **a diferencia de Back4App**, que hay que redesplegar a mano |
+| **Sin tarjeta** | Mientras no se escoja una instancia de pago |
+
+> **Y para el estudiante esto es lo normal:** una cuenta recién creada publica
+> gratis sin dar una tarjeta. **El profesor tuvo que crear otra cuenta —con el
+> correo institucional— justamente para hacer lo mismo que van a hacer ellos.**
+>
+> **Eso también vale decirlo en clase:** escribir un tutorial desde una cuenta
+> con historial produce instrucciones que no le funcionan a nadie más. **La
+> única forma de saber qué va a ver el estudiante es empezar como él.**
+
+### 9.5 · Publicar el front Flask en Render
+
+#### La cuenta
+
+```
+https://render.com
+```
+
+**`Get started`** → entrar con **GitHub** o con correo.
+
+> **Si su cuenta de GitHub ya está ligada a una cuenta de Render con deudas,
+> entre con correo** — uno distinto del de esa cuenta.
+
+#### El servicio
+
+**`+ New` → `Web Service`.**
+
+| Campo | Qué poner | Por qué |
+|---|---|---|
+| **Source** | Conectar GitHub y escoger **`proyecto_aplicacion_y_servicios_web4`** | Render **clona y construye él**; usted no sube nada |
+| **Name** | `facturas-flask` | Queda en la dirección pública |
+| **Region** | **Frankfurt** | **La misma de la API y de Neon.** Cada salto que se evita son milisegundos |
+| **Branch** | `main` | |
+| **Root Directory** | **`front_flask`** | **El dato que más se olvida.** Sin él, Render busca el `Dockerfile` en la raíz del repositorio y no lo encuentra |
+| **Language / Runtime** | **`Docker`** | Debe detectarlo solo al ver el `Dockerfile` |
+| **Instance Type** | **`Free`** | **Lo que mantiene todo en cero.** Cualquier otra se cobra por hora |
+
+#### Las variables de entorno
+
+En `Environment` → `Add Environment Variable`:
+
+| Clave | Valor |
+|---|---|
+| **`API_FACTURAS_URL`** | `https://apifacturas-carloscastro.runasp.net` |
+| **`CLAVE_SESION`** | Una cadena larga cualquiera — **firma la cookie de sesión** |
+
+> **`DEPURAR` no hace falta ponerla.** La imagen ya trae `DEPURAR=0`, así que
+> arranca con **gunicorn** sin que nadie configure nada. Es el valor por
+> defecto que le pusimos al `Dockerfile` precisamente para esto.
+
+> **`PORT` tampoco:** Render la define sola, y el `app.py` la lee antes que
+> `PUERTO`. **Por eso el mismo código corre en Docker local y en Render sin un
+> solo cambio.**
+
+#### Qué esperar
+
+| | |
+|---|---|
+| **La primera construcción tarda** | Render baja `python:3.12-slim`, instala Flask, requests y gunicorn, y arma la imagen |
+| **En los registros debe aparecer** | `Booting worker with pid:` — ahí arrancó gunicorn |
+| **La dirección queda** | `https://facturas-flask.onrender.com` o parecida |
+| **La primera visita después de 15 min** | **Tarda** — el arranque en frío, por tercera vez en este tutorial |
+
+#### Y la prueba
+
+**Entre con `admin@correo.com` / `admin123` y abra `Personas`.**
+
+| Si ve | |
+|---|---|
+| La lista con nombres | **Todo funciona**: el front en Render le habló a la API en MonsterASP, y ésta a su base de datos |
+| Un error de conexión | Revise `API_FACTURAS_URL` — **con `https`**, sin barra al final |
+
+> **Y fíjese en lo que acaba de pasar, que es el final del tutorial:** una
+> interfaz en **Python**, hospedada en **Render**, le pide datos a una API en
+> **C#**, hospedada en **MonsterASP**, que los lee de **SQL Server** — o de
+> **PostgreSQL en Neon**, según cuál API se apunte.
+>
+> **Cuatro proveedores, tres lenguajes, dos motores de base de datos — y un
+> solo sistema.** Eso es lo que hace posible que las piezas se hablen por
+> contratos y no por dentro.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

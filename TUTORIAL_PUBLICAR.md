@@ -687,6 +687,164 @@ como etiqueta.
 
 **Oprima `Manage`.** La contraseña no se ve en esta lista: está adentro.
 
-## Pasos 3 a 5 — pendientes
+## Paso 3 — Dentro de la base: credenciales y herramientas
+
+**Databases** → **Manage** en la fila de `bdfacturas`.
+
+![La pantalla de la base, con Overview, Local access y las herramientas](docs/tutorial_publicar/img/16_base_overview.png)
+
+Es la pantalla más densa del panel, y vale la pena recorrerla entera: casi todo
+lo que falta del tutorial sale de aquí.
+
+### 3.1 · El panel Overview, a la izquierda
+
+| Campo | Qué dice | Qué significa |
+|---|---|---|
+| **ID** · **Database** | `db75266` | El nombre real en el servidor. El panel aclara: *Database real name on server* |
+| **Name** | `bdfacturas` | El alias que le pusimos. Se puede cambiar otra vez con **Change** |
+| **Server** | `db75266.databaseasp.net` | Y el aviso: *Always use this server name instead of IP address* — **nunca la IP**, porque cambia |
+| **Collation** | `SQL_Latin1_General_CP1_CI_AS` | La que escogimos. El **Change** solo afecta a lo que nazca después |
+| **Compatibility** | `SqlServer2025` | **El nivel de compatibilidad.** Decide qué sintaxis acepta el motor. Si un script viejo falla por una función que no reconoce, se baja aquí |
+| **Disk limit** | `1024 MB` | Con **Increase** marcado como `PREMIUM`: ampliar cuesta |
+| **Contents** | `0 tables · 1 users · 0 backups` | **Cero tablas**: la base está vacía. Ese `1 users` es la cuenta `db75266` |
+
+### 3.2 · Local access y Remote access: DOS cadenas distintas
+
+**Es la pestaña que más confusión causa**, y conviene entenderla antes de
+copiar nada.
+
+| Pestaña | Para qué sirve | Desde dónde funciona |
+|---|---|---|
+| **Local access** | La conexión que usa **la API publicada** | **Solo desde un sitio alojado aquí mismo.** La conexión no sale del centro de datos |
+| **Remote access** | La conexión desde **su computador** | Desde afuera: SSMS, Azure Data Studio, un script suyo |
+
+> **El panel lo dice sin rodeos:** *«Only usable from applications running on
+> your hosted websites, **not from your local computer or external
+> services**»*.
+>
+> **Por eso una cadena que funciona publicada puede fallar en su máquina, y al
+> revés.** No es que las credenciales estén mal: es que son **dos puertas
+> distintas al mismo cuarto**.
+
+**Lo que muestra Local access:**
+
+| Campo | Valor |
+|---|---|
+| **Server** | `db75266.databaseasp.net` — *internal hostname* |
+| **Port** | `1433`, el puerto estándar de SQL Server |
+| **Login** | `db75266` — **el mismo número otra vez** |
+| **Password** | Oculta, con **Show** para verla y **Change** para cambiarla |
+| **WebMSSQL** | Un cliente de base de datos **dentro del navegador** |
+
+Y abajo, **CONNECTION STRING**, ya armada:
+
+```
+Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=********; Encrypt=False; MultipleActiveResultSets=True;
+```
+
+> **No hay que escribirla a mano.** El botón **Show with password** la completa,
+> y el icono de copiar la lleva al portapapeles. Esa línea es **exactamente** lo
+> que va en el `appsettings.json` de la API — con la contraseña de verdad.
+
+> **Y ahí están las dos piezas que explicamos en el paso 1:** `Encrypt=False`
+> porque el hospedaje no presenta un certificado validable, y
+> `MultipleActiveResultSets=True` para poder tener dos consultas abiertas a la
+> vez en la misma conexión.
+
+### 3.3 · Probar antes de seguir
+
+**CONNECTION TEST → `Test connection`.** Comprueba que la base está viva y que
+esas credenciales entran.
+
+> **Hágalo ahora.** Si falla aquí, no tiene sentido cargar el esquema ni
+> publicar nada: el problema está antes.
+
+![La prueba de conexión en verde](docs/tutorial_publicar/img/17_test_conexion_ok.png)
+
+Cuando pasa, el recuadro se pone verde:
+
+| | |
+|---|---|
+| **OK** | La base está encendida y esas credenciales entran |
+| **Connected in 195 ms** | Lo que tardó el intento |
+
+> **Si falla**, el mensaje dice qué pasó. Los dos casos comunes: el nombre del
+> servidor mal copiado —sobra un espacio al pegar— o la contraseña cambiada
+> desde **Change** y no actualizada donde la tenía anotada.
+
+### 3.4 · Las herramientas, que son las que faltan
+
+En **QUICK ACTIONS**, arriba a la derecha, y repetidas en las fichas de abajo:
+
+| Herramienta | Para qué |
+|---|---|
+| **Import SQL** | **Cargar un archivo `.sql`** — es como va a entrar el esquema |
+| **Run T-SQL** | Pegar y ejecutar un script, sin archivo |
+| **WebMSSQL** | Un cliente completo en el navegador: ver tablas, consultar, editar |
+| **Backups** | Bajar y subir copias. **La única copia del plan gratuito es la que usted baje** |
+| **Add user** | Crear otra cuenta de acceso a la base |
+
+> **Esto es lo que evita instalar SQL Server Management Studio.** El esquema, la
+> siembra y las consultas de comprobación se pueden hacer desde aquí — lo que en
+> un salón de clase ahorra la media hora que se va en instalaciones que fallan.
+
+**QUICK STATISTICS** confirma dónde estamos: **Tables 0**. La base existe y está
+vacía. Lo que sigue es llenarla.
+
+### 3.5 · Remote access, que viene APAGADO
+
+![La pestaña Remote access, deshabilitada](docs/tutorial_publicar/img/18_remote_access.png)
+
+Al abrir la segunda pestaña, lo primero que salta: **`Disabled`**. El servidor y
+la cadena de conexión aparecen tachados — **no existen hasta que se encienda**.
+
+> **Esto explica la mitad de los «no me conecta desde mi máquina».** No es la
+> contraseña ni el nombre del servidor: es que **el acceso remoto está apagado
+> de fábrica**, y nadie lo mira porque la pestaña de al lado sí muestra una
+> cadena que parece completa.
+
+| | Local access | Remote access |
+|---|---|---|
+| **Para qué** | La API **publicada** | SSMS, Visual Studio, Azure Data Studio, CI/CD |
+| **Desde dónde** | Solo desde un sitio alojado aquí | **Desde cualquier parte de internet** |
+| **Estado inicial** | Encendido | **Apagado** |
+| **Servidor** | `db75266.databaseasp.net` | **Otro nombre**, que solo aparece al encenderlo |
+| **Login y contraseña** | `db75266` | **Los mismos** |
+
+> **Lo único que cambia entre las dos es el nombre del servidor.** Usuario,
+> contraseña, puerto y base son idénticos — y por eso el error es tan fácil de
+> cometer: la cadena de `Local access` se ve bien, se pega en SSMS, y no
+> conecta.
+
+#### ¿Hay que encenderlo?
+
+**Para este tutorial, no.** El esquema se carga desde el propio panel con
+**Import SQL**, **Run T-SQL** o **WebMSSQL**, y eso no necesita acceso remoto.
+
+| Déjelo apagado si… | Enciéndalo si… |
+|---|---|
+| Va a trabajar desde el panel | Quiere usar **SSMS** o **Azure Data Studio** desde su computador |
+| Es un proyecto de clase | Necesita que una herramienta externa entre a la base |
+
+> **Y una razón para dejarlo apagado que vale enseñar:** encenderlo expone la
+> base de datos **a todo internet**. Mientras está apagada, el único que entra
+> es el sitio publicado, que vive en la misma red. Es la diferencia entre una
+> puerta interior y una puerta a la calle.
+
+#### Si lo enciende, el aviso que hay que leer
+
+> *«Can't connect from your computer although Remote access is enabled?
+> **Repeated failed logins get an IP blocked automatically** — check your IP in
+> Automated Security Protection»*.
+
+**Es la trampa más desagradable de esta pantalla.** Alguien se equivoca de
+contraseña cuatro o cinco veces, el hospedaje **bloquea su dirección IP**, y a
+partir de ahí **ni siquiera la contraseña correcta funciona**. El síntoma es
+idéntico al de una credencial mala, y la causa es otra.
+
+> **Si le pasa:** deje de intentar, vaya a **Automated Security Protection** y
+> quite el bloqueo de su IP. Seguir probando solo lo confirma.
+
+## Pasos 4 y 5 — pendientes
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

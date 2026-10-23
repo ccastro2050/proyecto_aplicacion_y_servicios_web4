@@ -1578,4 +1578,99 @@ las que vamos a usar en seguida:
 | `Resource` | Cuánta memoria de los 256 MB se está usando |
 
 
+### 5.8 · `Overview`: el tablero del sitio
+
+![La vista general del sitio](docs/tutorial_publicar/img/35_sitio_overview.png)
+
+Es la pantalla más cargada del panel. **Se lee en tres columnas**, y casi todo
+es información — muy poco hay que tocar.
+
+#### Columna izquierda: qué es este sitio
+
+| Renglón | Valor | Qué dice |
+|---|---|---|
+| **ID** | `site101125` | El identificador, otra vez. **Es el usuario de publicación** |
+| **Status** | `Enabled` | Encendido |
+| **Server** | `site101125.siteasp.net` · `EU` · `W14` | **El servidor físico** donde vive. `W14` es la máquina. *«Always use this server name instead of IP address»* |
+| **.NET** | `.NET 10.x/9.x/8.x/7.x/6.x/5.x/Core` **`[x86]`** | **Todas las versiones están disponibles**, nuestra v10 incluida. Y corre en **32 bits** — ver abajo |
+| **PHP** | `--- [NONE]` | Apagado. **Aquí solo corre .NET**, y está bien así |
+| **Memory limit** | `256 MB RAM` | Lo del plan gratuito |
+| **File count** | `0 files` de `100000 files` | **Hay un tope de archivos**, no solo de megas |
+| **DISK QUOTA** | `0 MB` · `0% used` de `5 GB` | Vacío, como se esperaba |
+
+> **Lo de `[x86]` vale anotarlo.** El sitio corre en **32 bits**. Para una API
+> normal no cambia nada — .NET la compila a código intermedio y el servidor la
+> ejecuta igual. **Importa solo si alguien publica con `win-x64`** o usa una
+> biblioteca nativa de 64 bits: ahí falla, y el mensaje no dice por qué.
+> Nosotros vamos a publicar **sin fijar plataforma**, que es lo que evita el
+> problema.
+
+> **Y el tope de 100.000 archivos tampoco es decorativo.** Una API publicada
+> tiene unas pocas decenas de archivos; un `node_modules` tiene decenas de
+> miles. Si alguna vez sube un front de Angular o React, **suba lo compilado**,
+> no la carpeta de trabajo.
+
+#### Columna del medio: las credenciales
+
+**Dos pestañas, y son dos formas distintas de subir lo mismo:**
+
+| Pestaña | Para qué |
+|---|---|
+| **`FTP / SFTP access`** | Copiar archivos a mano, con un programa como FileZilla |
+| **`Visual Studio access`** | **WebDeploy.** Es la que vamos a usar — publica desde la línea de comandos o desde Visual Studio |
+
+De la pestaña de FTP, que es la que está abierta, lo que importa:
+
+| Dato | Valor |
+|---|---|
+| **Server** | `site101125.siteasp.net` |
+| **Port** | `21` FTP · `22` SFTP/SCP |
+| **Login** | `site101125` |
+| **Password** | Oculta, con **`Show`** para verla y **`Change`** para cambiarla |
+| **Website root** | **`\wwwroot`** — **la carpeta donde va la aplicación** |
+| **WebFTP** | Un administrador de archivos por navegador, **sin instalar nada** |
+| **`Test connection`** | Comprueba que el servidor responde y que la clave sirve, **sin salir del panel** |
+
+> **`\wwwroot` es el destino.** Cuando el comando de publicar diga a dónde va
+> el código, va a ser ahí. Y es la misma carpeta que el ejemplo habría ocupado
+> si lo hubiéramos instalado.
+
+#### Columna derecha: cómo está el sitio ahora
+
+| Bloque | Qué muestra |
+|---|---|
+| **La miniatura** | La página que responde hoy: *«Your website is ready…»*. **Es la página de sitio vacío** que anunciamos — la prueba de que el sitio funciona y lo que falta es nuestro código |
+| **DNS status** | **`Domain pointing correctly`**, en verde: `apifacturas-carloscastro.runasp.net → 5.9.179.193`. El nombre ya apunta al servidor |
+| **QUICK ACTIONS** | **`Start`** · **`Stop`** · **`Restart`** |
+| **QUICK STATISTICS** | `Site uptime 7m`, `AppPool uptime 7m`, peticiones `GET` / `POST` en `0`, `404 errors 0`, `Transferred 0 MB` |
+
+> **El `DNS status` es el que estaba en naranja hace un rato.** Mientras el
+> sitio se creaba, el nombre todavía no apuntaba a ninguna parte y el panel lo
+> marcaba como pendiente. **Ya se resolvió solo**, y por eso ahora está verde.
+> No había nada que hacer: solo esperar.
+
+> **`Restart` va a hacer falta.** Si publica una versión nueva y el sitio sigue
+> respondiendo como antes, es que el proceso viejo sigue vivo. `Restart` lo
+> reinicia sin borrar nada.
+
+> **Y `QUICK STATISTICS` es la respuesta a «¿llegó mi petición?».** Si un
+> estudiante dice que la API no responde, aquí se ve si el servidor recibió
+> algo:
+>
+> | Lo que se ve | Qué quiere decir |
+> |---|---|
+> | `GET requests` sigue en `0` | **La petición nunca llegó.** El problema está en la dirección o en el cliente |
+> | Suben las peticiones y suben los `404 errors` | **Llegó, pero a una ruta que no existe** |
+> | `AppPool uptime` se reinicia solo | **Es el arranque en frío**, no un error |
+> | `AppPool crashed` mayor que `0` | **La aplicación se está cayendo.** A `Logs` |
+
+#### Abajo: los atajos
+
+La fila de íconos —`Files`, `Domains`, `HTTPS`, `Deploy`, `Git`, `Logs`…— es
+**el mismo menú de la izquierda, en grande**. No hay nada nuevo ahí.
+
+**Siga a la pestaña `Visual Studio access`**, que es donde están los datos de
+WebDeploy.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

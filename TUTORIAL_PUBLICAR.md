@@ -2138,4 +2138,87 @@ appsettings.Production.json
 > `docker-compose.yml` de este proyecto. **No hay archivo que se pueda colar.**
 
 
+### 6.2 · Compilar para producción: `dotnet publish`
+
+#### Qué vamos a hacer, y por qué no basta con `dotnet run`
+
+Lo que usted corre todos los días —`dotnet run`, o el `docker compose up`—
+**compila y arranca en el mismo gesto**, y deja los resultados regados en
+`bin/` y `obj/` junto con cosas que solo sirven para depurar.
+
+**El hospedaje no compila nada.** Lo que hay que subirle es **la aplicación ya
+armada**: los `.dll`, la configuración, los archivos estáticos y el `web.config`
+que le dice a IIS cómo arrancarla. Eso es lo que produce `dotnet publish`.
+
+#### El comando
+
+**Desde la carpeta del proyecto de la API:**
+
+```powershell
+cd C:\Users\fcl\OneDrive\Desktop\proyectos_usbmed\2026_2\proyecto_aplicacion_y_servicios_web4\api_facturas
+dotnet publish -c Release -o publicado
+```
+
+**Pieza por pieza:**
+
+| Parte | Qué hace | Qué pasa si no la pone |
+|---|---|---|
+| **`dotnet publish`** | Compila **y arma el paquete listo para desplegar**: resuelve los paquetes NuGet, copia los archivos de configuración y **genera el `web.config`** | — |
+| **`-c Release`** | Compila en modo **publicación**: optimizado, sin la información de depuración | Compila en `Debug`: **más lento y más pesado**, y expone detalles internos en los errores |
+| **`-o publicado`** | Deja el resultado en una carpeta llamada **`publicado`** | Lo deja enterrado en `bin\Release\net10.0\publish\`, que es largo de escribir en el comando siguiente |
+
+> **`-c` es de *configuration* y `-o` de *output*.** Las dos tienen forma larga
+> —`--configuration`, `--output`— y hacen exactamente lo mismo.
+
+#### Qué debe salir
+
+Al final, una línea así:
+
+```
+api_facturas -> C:\...\api_facturas\publicado\
+```
+
+| Lo que se ve | Qué significa |
+|---|---|
+| **Terminado con la ruta de `publicado`** | **Bien.** Ahí quedó todo |
+| `error CS...` | **No compiló.** Arregle el código primero — esto no tiene nada que ver con el hospedaje |
+| `warning` | Avisos. **No impiden publicar** |
+
+#### Qué quedó adentro
+
+Vale la pena abrir la carpeta una vez, porque explica qué es «una aplicación
+publicada»:
+
+| Archivo | Qué es |
+|---|---|
+| **`ApiFacturas.dll`** | **Su código compilado.** Lo que de verdad corre |
+| `ApiFacturas.exe` | El lanzador, para correrla sin IIS |
+| **`web.config`** | **El que hace que IIS la sepa arrancar.** Lo genera `publish`, no está en el repositorio |
+| `appsettings.json` | La configuración base — la de Docker |
+| **`appsettings.Production.json`** | **La del hospedaje**, con la cadena de la base de datos |
+| `*.deps.json` · `*.runtimeconfig.json` | Qué paquetes y qué versión de .NET necesita |
+| Un montón de `.dll` más | Las bibliotecas de las que depende |
+
+> **Sí: el `appsettings.Production.json` con la contraseña viaja adentro.** Es
+> lo que queremos — allá la necesita— y es exactamente por eso que **la
+> carpeta `publicado/` también quedó en el `.gitignore`**. Lo que no puede
+> estar en GitHub no puede colarse por la puerta de atrás.
+
+> **Y fíjese en lo que NO quedó:** no hay archivos `.cs`. **El código fuente no
+> se sube.** Lo que corre en el hospedaje es el compilado — que es la
+> diferencia entre publicar una aplicación .NET y publicar un PHP, donde lo que
+> se sube **es** el código.
+
+#### Si lo vuelve a correr
+
+**No hay problema: `publish` sobreescribe.** Pero si antes había archivos que
+ya no existen en el proyecto, **se quedan ahí** — `publish` no limpia. Para
+una carpeta limpia de verdad, bórrela antes:
+
+```powershell
+Remove-Item -Recurse -Force publicado
+dotnet publish -c Release -o publicado
+```
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

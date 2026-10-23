@@ -21,3 +21,8 @@ docs/spec_kit/versiones/v5_otros_motores/
 # datos del hospedaje. Se versiona la plantilla -appsettings.Production.json.ejemplo-,
 # nunca el archivo con el valor puesto.
 appsettings.Production.json
+
+# La carpeta que produce  dotnet publish -o publicado : es resultado de
+# compilar, se regenera con un comando, y ademas se lleva adentro el
+# appsettings.Production.json con la contrasena.
+publicado/

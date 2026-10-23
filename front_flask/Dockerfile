@@ -23,6 +23,15 @@ COPY . .
 ENV PUERTO=8118
 EXPOSE 8118
 
+# El defecto es PUBLICADO, no desarrollo. Asi, un hospedaje que solo haga
+# `docker build` + `docker run` -Hugging Face, Render, Back4App- arranca con
+# gunicorn sin que nadie configure nada. El modo de desarrollo se pide a
+# proposito: el docker-compose de este repositorio pone DEPURAR=1.
+#
+# Ponerlo al reves -depurar por defecto- es como queda abierto el depurador
+# de Werkzeug en internet. Y nadie se entera hasta que alguien lo encuentra.
+ENV DEPURAR=0
+
 # ============================================================
 # UN SOLO ARRANQUE PARA LOS DOS MUNDOS
 #

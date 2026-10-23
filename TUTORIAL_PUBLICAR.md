@@ -2793,6 +2793,93 @@ La barra del navegador dice **`Not secure`**, porque entramos por **`http://`**.
 > `admin123` en el cuerpo de una petición. En una red compartida —la
 > universidad, un café— eso se puede leer.
 
+### 6.7 · El certificado: de `http` a `https`
+
+**`https://apifacturas-carloscastro.runasp.net/swagger` no abre.** Comprobado
+también desde la terminal:
+
+```
+schannel: failed to receive handshake, SSL/TLS connection failed
+```
+
+**Y no es la red:** `http://` responde perfecto por el mismo camino. **El sitio
+no tiene certificado**, sencillamente.
+
+#### La pantalla lo dice sin rodeos
+
+![La seccion HTTPS con el dominio sin certificado](docs/tutorial_publicar/img/46_https_apagado.png)
+
+**`HTTPS` · SSL certificates**, en el menú del sitio.
+
+| Lo que se ve | Qué significa |
+|---|---|
+| **`Secured 0 of 1 domain`** | Un dominio, ninguno asegurado |
+| **`HTTP only`** · *«No certificate — visitors get an insecure connection»* | El estado de la única fila |
+| **`HTTPS redirect` · `Disabled`** | Nadie es enviado a la versión segura |
+
+#### Lo importante: es gratis y automático
+
+> *«Each domain/binding connected to your website can have its own HTTPS
+> certificate. For a **Free certificate** we use **Let's Encrypt** —
+> certificates are **issued and renewed automatically**»*
+
+| | |
+|---|---|
+| **No cuesta** | También en el plan gratuito |
+| **No se renueva a mano** | Let's Encrypt dura 90 días y **el hospedaje lo renueva solo**. Sin esto, cada tres meses el sitio amanecería roto |
+| **Es por dominio** | Cada dominio conectado al sitio lleva el suyo |
+
+#### El orden, y el propio panel lo obliga
+
+**Oprima `Enable HTTPS`** en la fila del dominio — no el botón verde de arriba,
+que hace lo mismo pero para escoger cuál.
+
+**Y solo después, encienda `HTTPS Redirect`.** El panel no deja hacerlo al
+revés, y lo explica:
+
+> *«Enable HTTPS on at least one domain first — **there is nothing to redirect
+> to yet**»*
+
+> **Ese candado está puesto a propósito, y evita un desastre clásico:** forzar
+> la redirección **antes** de tener certificado deja el sitio **completamente
+> muerto** — toda petición `http` se manda a `https`, y `https` no existe. No
+> hay página de error que lo explique: simplemente no carga.
+
+#### Qué hace la redirección, y por qué encenderla
+
+> *«When enabled, every HTTP request is automatically redirected to its secure
+> HTTPS version. **Modern devices work only over `https://`** and search
+> engines also prefer `https://` URLs»*
+
+**Sin la redirección, las dos direcciones funcionan** — y la insegura sigue
+abierta para el que la escriba. Con ella, **no hay forma de entrar por la
+puerta mala.**
+
+#### Por qué esto no es opcional en este proyecto
+
+| | |
+|---|---|
+| **La contraseña viaja legible** | Acabamos de mandar `admin123` en el cuerpo de una petición |
+| **El token también** | Quien lo lea entra como administrador **durante una hora** |
+| **Y el front lo va a exigir** | Si la interfaz queda en `https` y llama a una API en `http`, **el navegador bloquea la llamada** — *mixed content*— y el error no dice que sea por eso |
+
+> **Ese último es el que vuelve esto urgente.** Resolverlo ahora cuesta cinco
+> minutos; descubrirlo depurando el front cuesta una tarde buscando en el lado
+> equivocado.
+
+#### Después de encenderlo
+
+| Compruebe | Dónde |
+|---|---|
+| `Secured **1** of 1 domain` | En esta misma pantalla |
+| Que **`https://apifacturas-carloscastro.runasp.net/swagger`** abra | En el navegador |
+| Que la barra **ya no diga `Not secure`** | Arriba |
+| Que `http://` **lo mande solo** a `https://` | Con la redirección encendida |
+
+**Y de ahí en adelante, `https` en todas partes:** en lo que se le pase al
+estudiante, en Postman y —sobre todo— **en el `UrlApi` del front**, que es lo
+que sigue.
+
 #### Lo que falta: la interfaz
 
 **La API ya sirve. Lo que no hay todavía es la pantalla**, y es el Paso 7.

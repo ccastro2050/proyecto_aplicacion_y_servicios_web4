@@ -1948,14 +1948,31 @@ puesta el valor por defecto es `Production`**.
 > **`appsettings.Production.json`** **se ignora en su computador y manda en el
 > hospedaje**, sin tocar nada más y sin un solo `if` en el código.
 
-#### El archivo
+#### El archivo: créelo usted
 
-**Ya quedó creado** en el proyecto, en dos versiones:
+**En `api_facturas`, al lado de `appsettings.json`, cree un archivo nuevo
+llamado:**
+
+```
+appsettings.Production.json
+```
+
+**Con VS Code:** clic derecho sobre la carpeta `api_facturas` → *New File* →
+ese nombre, **exactamente así** — con la `P` mayúscula y los dos puntos del
+`.json`. Si lo escribe `appsettings.production.json`, en Windows funciona y
+**en el servidor también**, pero deja de funcionar el día que el proyecto corra
+en Linux. **Escríbalo bien desde el principio.**
+
+**En este repositorio hay dos archivos, y conviene entender para qué sirve cada
+uno:**
 
 | Archivo | Qué es | ¿Va a GitHub? |
 |---|---|---|
-| `api_facturas/appsettings.Production.json`**`.ejemplo`** | **La plantilla**, con `SU_CONTRASENA` | **Sí** |
-| `api_facturas/appsettings.Production.json` | **El de verdad**, con la contraseña puesta | **No** — está en `.gitignore` |
+| `api_facturas/appsettings.Production.json`**`.ejemplo`** | **La plantilla.** Viene en el repositorio, con `SU_CONTRASENA` donde va la clave | **Sí** |
+| `api_facturas/appsettings.Production.json` | **El que usted crea**, con su contraseña | **No** |
+
+> **El atajo:** copie el `.ejemplo`, péguelo al lado y quítele el `.ejemplo` del
+> nombre. Así no tiene que escribir nada — solo reemplazar la contraseña.
 
 #### Cómo queda el archivo, completo
 
@@ -2116,15 +2133,30 @@ que manda es la del panel.**
 > | **Borrar el `;` del final** | Separa los parámetros de la cadena |
 > | **Ponerle comillas a la contraseña** | Va dentro de la cadena, no entre comillas propias |
 
-#### Y por qué ese archivo no va a GitHub
+#### Y póngalo en el `.gitignore`, antes de hacer el primer commit
 
 **Porque trae una contraseña de verdad.** La plantilla sí va — así cualquiera
 sabe qué archivo hace falta y qué forma tiene— pero el que tiene el valor
-puesto se queda en su disco. En `.gitignore` quedó esto:
+puesto **se queda en su disco**.
+
+**Abra el `.gitignore` de la raíz del proyecto y agregue al final:**
 
 ```
+# La configuracion de PRODUCCION trae la contrasena real de la base de
+# datos del hospedaje. Se versiona la plantilla, nunca el archivo con el
+# valor puesto.
 appsettings.Production.json
 ```
+
+**Compruébelo**, que es un comando y no una creencia:
+
+```powershell
+git status
+```
+
+**El archivo NO debe aparecer en la lista.** Si aparece, el `.gitignore` está
+mal escrito o el archivo ya se había agregado antes — y entonces hay que
+sacarlo con `git rm --cached api_facturas/appsettings.Production.json`.
 
 > **Es el mismo patrón de toda la industria**, y vale la pena nombrarlo: **se
 > versiona la forma, no el secreto.** Un compañero que clone el repositorio ve
@@ -2966,6 +2998,99 @@ que cambiarlo:
 
 **La API ya sirve, y ahora cifrada. Lo que no hay todavía es la pantalla**, y
 es el Paso 7.
+
+
+## Paso 7 — Publicar la interfaz
+
+**La API ya sirve, pero nadie va a usarla escribiendo JSON en Swagger.** Falta
+la pantalla.
+
+**Es el mismo procedimiento del Paso 6, con tres diferencias:**
+
+| | Qué cambia |
+|---|---|
+| **Otro sitio** | Un segundo sitio en el hospedaje, con **su propia dirección y sus propias credenciales** |
+| **Otra configuración** | El front no habla con la base de datos: **habla con la API**. Lo único que necesita saber es su dirección |
+| **Otra carpeta** | `front_blazor` en vez de `api_facturas` |
+
+### 7.1 · Decirle al front dónde está la API
+
+#### El problema, que es el mismo de antes con otra cara
+
+Hoy el front busca la API en **tres sitios distintos**, según dónde esté
+corriendo:
+
+| Dónde corre | A qué dirección le habla | Quién se la dice |
+|---|---|---|
+| En su máquina, sin Docker | `http://localhost:8035` | `front_blazor/appsettings.json` |
+| Dentro de Docker | `http://api-facturas:8035` | La variable `UrlApi` del `docker-compose.yml` |
+| **Publicado** | **la dirección pública de su API** | **El archivo que va a crear ahora** |
+
+> **Sin ese archivo, el front publicado buscaría la API en `localhost:8035`** —
+> o sea, **dentro del servidor del hospedaje**, donde no hay ninguna API. No
+> encontraría nada: todas las pantallas saldrían vacías o con error, y el
+> mensaje no diría que el problema es la dirección.
+
+#### Créelo
+
+**En `front_blazor`, al lado de `appsettings.json`, cree:**
+
+```
+appsettings.Production.json
+```
+
+**Con este contenido** — cambiando la dirección por la de **su** API:
+
+```json
+{
+  "_comentario": "La configuracion del front PUBLICADO. A diferencia de la de la API, esta SI se versiona: no tiene un solo secreto. Lo unico que dice es a que direccion le habla, y esa direccion es publica.",
+
+  "_por_que_https": "Con la redireccion forzada encendida, la API responde 307 a toda peticion http. Apuntar directo a https evita ese salto en cada llamada -y evita que el navegador bloquee la mezcla de http con https cuando el front si esta cifrado-.",
+
+  "UrlApi": "https://apifacturas-carloscastro.runasp.net"
+}
+```
+
+**Tres cosas que se equivocan y cuestan una tarde:**
+
+| | |
+|---|---|
+| **`https`, no `http`** | La API redirige, así que `http` *funcionaría*… pagando **dos viajes por llamada**. Y si el front queda cifrado y la API no, **el navegador bloquea la llamada** |
+| **Sin la barra al final** | `...runasp.net`, **no** `...runasp.net/` — el front le pega las rutas detrás, y dos barras seguidas dan un 404 |
+| **Sin `/api` al final** | Va **la dirección del sitio**, no la de un recurso. El `/api/...` lo pone el código |
+
+#### Éste sí va a GitHub
+
+| | El de la API | **El del front** |
+|---|---|---|
+| Qué trae | La cadena de conexión, **con contraseña** | **Solo una dirección pública** |
+| ¿Se versiona? | **No** | **Sí** |
+
+> **Y como el `.gitignore` ya tiene la línea `appsettings.Production.json`, esa
+> regla también tapa al del front.** Hay que destaparlo — agregue debajo:
+>
+> ```
+> # EXCEPCION: la del front no tiene secretos -solo la direccion publica
+> # de la API-, asi que esa si se versiona.
+> !front_blazor/appsettings.Production.json
+> ```
+>
+> **El `!` significa «esto NO se ignora»**, y tiene que ir **después** de la
+> regla que lo ignoraba: en `.gitignore` gana **la última** que coincide.
+
+**Compruébelo:**
+
+```powershell
+git status
+```
+
+| Debe aparecer | No debe aparecer |
+|---|---|
+| `front_blazor/appsettings.Production.json` | `api_facturas/appsettings.Production.json` |
+
+> **Y ahí está la regla de verdad, en una frase:** **lo que no se versiona no
+> son los archivos de producción — son los secretos.** Confundir las dos cosas
+> lleva a esconder configuración que a todo el equipo le serviría ver.
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

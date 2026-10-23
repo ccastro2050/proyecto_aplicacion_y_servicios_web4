@@ -4100,4 +4100,75 @@ docker run --rm -e PGCLIENTENCODING=UTF8 postgres:16-alpine psql "postgresql://n
 **En la consola de Neon, `Tables` debe mostrar ahora las doce.**
 
 
+### 8.6 · Las doce tablas, vistas en la consola
+
+![La vista de tablas en Neon](docs/tutorial_publicar/img/60_neon_tablas.png)
+
+`Postgres database` → **`Tables`**.
+
+**La misma lista de SQL Server:** `cliente`, `empresa`, `factura`, `persona`,
+`producto`, `productosporfactura`, `rol`, `rol_usuario`, `ruta`, `rutarol`,
+`usuario`, `vendedor`.
+
+**Y los datos adentro.** La tabla `cliente` muestra cuatro filas, con sus
+columnas tipadas: `id serial`, `credito numeric`, `fkcodpersona varchar(10)`.
+
+> **Un detalle que confirma que las semillas entraron idénticas:** los ids de
+> `cliente` son **`1, 2, 3, 5`** — **falta el `4`**, igual que en SQL Server.
+> **No es un error: es el mismo salto del script original.**
+>
+> **Y es justo lo que tenía que pasar.** Si los ids fueran distintos entre los
+> dos motores, las dos APIs darían respuestas distintas a la misma petición
+> —`GET /api/cliente/5` existiría en una y no en la otra— y la demostración se
+> caería. Por eso el script trae `setval`: **alinea los contadores para que el
+> próximo id también coincida.**
+
+**Las tres últimas columnas —`empresa`, `persona`, `facturas`— no son datos:**
+son los enlaces que Neon dibuja siguiendo las claves foráneas. Un clic lleva a
+la fila relacionada.
+
+### 8.7 · El archivo de configuración de la variante
+
+**Cree `api_facturas/appsettings.Production.postgres.json`**, al lado de los
+otros dos. En el repositorio está la plantilla
+`appsettings.Production.postgres.json.ejemplo`: cópiela, quítele el `.ejemplo`
+y reemplace la contraseña.
+
+```json
+{
+  "Motor": "postgres",
+
+  "ConnectionStrings": {
+    "Postgres": "Host=ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=SU_CLAVE;SSL Mode=Require"
+  }
+}
+```
+
+#### Ahora hay tres archivos de producción, y conviene no confundirlos
+
+| Archivo | Apunta a | ¿Se versiona? |
+|---|---|---|
+| `api_facturas/appsettings.Production.json` | **SQL Server** en MonsterASP | **No** |
+| `api_facturas/appsettings.Production.postgres.json` | **PostgreSQL** en Neon | **No** |
+| `front_blazor/appsettings.Production.json` | **La API**, por su dirección pública | **Sí** — no tiene secretos |
+
+**Al `.gitignore`:**
+
+```
+appsettings.Production.postgres.json
+```
+
+#### Lo que NO hay que hacer
+
+> **No cambie el `appsettings.Production.json` que ya funciona.** La tentación
+> es editarlo, publicar, y ver si PostgreSQL responde. **Pero eso tumba la API
+> de SQL Server** — y la gracia del paso es tener las dos vivas al mismo
+> tiempo.
+
+> **Y no ponga las dos cadenas en el mismo archivo** «por si acaso». Funcionaría
+> —la API solo lee la que corresponda al `Motor`— **pero entonces el secreto de
+> Neon viaja al sitio de SQL Server y al revés.** Cada sitio debe llevar
+> **únicamente la credencial que necesita**: si uno se compromete, el otro no.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

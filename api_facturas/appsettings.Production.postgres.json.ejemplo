@@ -1,0 +1,14 @@
+{
+  "_comentario": "PLANTILLA de la variante PostgreSQL. Copie este archivo como appsettings.Production.postgres.json -sin el .ejemplo- y reemplace SU_CLAVE por la contrasena que muestra Neon en Connect. El archivo sin .ejemplo esta en .gitignore: NO se versiona, porque trae la contrasena de la base de datos.",
+
+  "_para_que_sirve": "Es la MISMA API publicada en otro sitio, hablandole a PostgreSQL en vez de SQL Server. No se compila nada distinto: al publicar, este archivo reemplaza al appsettings.Production.json dentro de la carpeta publicada. Mismo ApiFacturas.dll, mismo contrato, otro motor.",
+
+  "_las_dos_claves": "Motor y ConnectionStrings:Postgres tienen que coincidir. Si deja Motor en sqlserver, la API lee la cadena de SQL Server -que aqui no existe- y falla con un error de conexion que no menciona PostgreSQL por ninguna parte.",
+
+  "Motor": "postgres",
+
+  "ConnectionStrings": {
+    "_comentario": "Es la cadena de Neon, traducida al formato de Npgsql: pares Clave=Valor separados por punto y coma. El formato postgresql://... que muestra Neon es el de psql, y Npgsql NO lo entiende. El servidor lleva -pooler porque el Connection pooling esta encendido: la API abre y cierra conexion en cada peticion, y sin el pooler se agotan.",
+    "Postgres": "Host=ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=SU_CLAVE;SSL Mode=Require"
+  }
+}

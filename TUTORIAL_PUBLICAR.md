@@ -1126,6 +1126,68 @@ la use.
 > entera —las doce tablas— sin borrar la base. Es útil para volver a empezar un
 > ejercicio, y es fácil de oprimir por error.
 
-## Paso 5 — pendiente
+## Paso 5 — Crear el sitio de la API
+
+**Websites** → **Add website**.
+
+### 5.1 · El plan
+
+![El asistente de sitio: seis pasos, PREMIUM contra FREE](docs/tutorial_publicar/img/26_crear_sitio_plan.png)
+
+#### Qué hay en la pantalla
+
+| Dónde | Qué es |
+|---|---|
+| Arriba | **Seis pasos**, no cuatro como la base: **Plan · Domain · DNS · Subscription · Location · Example** |
+| **Summary** | El resumen que se va llenando, con una línea por paso |
+| Las dos tarjetas | **PREMIUM** y **FREE**, cada una con su botón |
+
+**Oprima `Select FREE website`.**
+
+#### Las cuatro casillas del plan gratuito
+
+| Casilla | Dice | Qué significa |
+|---|---|---|
+| **DISK SPACE** | `5 GB per website · fixed` | Para los archivos publicados. **Sobra**: una API compilada pesa unas decenas de megabytes |
+| **RAM** | `256 MB dedicated · fixed` | **La memoria del proceso.** Es poco pero alcanza para una API de clase. Y es **por sitio**: la API y el front tendrán 256 MB cada uno |
+| **PERFORMANCE** | `LOW · shared servers` | El servidor es compartido con otros clientes |
+| **DATACENTERS** | `EU only` | **Europa**, igual que la base. Que coincidan no es casualidad: el gratuito no ofrece otra cosa, y así quedan emparejados |
+
+#### Lo incluido, y las cinco limitaciones
+
+**INCLUDED:** *Run ONLY on our FREE subdomains `runasp.net` / `tryasp.net`*
+
+> **O sea: la dirección la pone el hospedaje.** Usted escoge el nombre, pero el
+> dominio es de ellos. Un dominio propio es del plan de pago.
+
+**LIMITATIONS**, y dos de las cinco importan de verdad:
+
+| Limitación | Qué implica |
+|---|---|
+| **No sending e-mails** | **Ojo con esto si su aplicación manda correo.** Habrá que comprobar si bloquea también el envío por un servidor externo como Gmail — se prueba, no se supone |
+| *Limited features/capabilities* | Faltan funciones del panel. **La que más se nota es `AlwaysRunning`**, que es de pago — ver abajo |
+| *Limited transfers/traffic* | Hay un tope de datos transferidos al mes |
+| *Limited quantity per customer* | Cinco sitios como máximo |
+| *No guarantees* | Si se cae, no hay a quién reclamarle |
+
+#### `AlwaysRunning` no está, y eso se va a notar
+
+En la tarjeta de pago aparece **`AlwaysRunning`** entre lo incluido. En la
+gratuita, no.
+
+> **Qué significa que falte:** cuando el sitio lleva un rato sin recibir
+> peticiones, **el servidor apaga el proceso** para liberar memoria. La
+> siguiente petición lo despierta — y esa primera petición **tarda varios
+> segundos** mientras el proceso arranca y vuelve a conectarse a la base.
+>
+> **Es el «arranque en frío», y confunde muchísimo:** alguien abre la
+> aplicación publicada, tarda ocho segundos, y concluye que el código está mal.
+> Vuelve a probar y responde al instante. **No es el código: es que estaba
+> dormida.**
+
+> **Y por eso el primer intento después de publicar siempre parece lento.** Si
+> va a mostrarle el sistema a alguien, ábralo una vez antes para despertarlo.
+
+
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

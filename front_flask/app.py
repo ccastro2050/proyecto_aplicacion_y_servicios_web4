@@ -127,5 +127,25 @@ def inicio():
     return render_template("inicio.html", entidades=ENTIDADES)
 
 
+# ============================================================
+# EL ARRANQUE, y por que lee TRES variables del entorno
+#
+# En Docker lo arranca el compose; en un hospedaje de nube lo arranca la
+# plataforma, y cada una tiene sus costumbres. Leer del entorno es lo que
+# permite que el MISMO codigo corra en los dos sitios sin tocar una linea.
+#
+#   PORT    la ponen casi todas las plataformas de nube -Render, Railway,
+#           Koyeb- y esperan que el programa escuche AHI. Si uno escucha en
+#           otro puerto, la plataforma reporta el sitio como caido sin decir
+#           por que.
+#   PUERTO  la del compose de este proyecto: 8118.
+#   DEPURAR "1" en desarrollo -recarga al guardar y muestra el error
+#           completo en la pagina-, "0" publicado.
+#
+# El orden importa: PORT gana, porque cuando existe es porque la plataforma
+# lo exige.
+# ============================================================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PUERTO", "8118")), debug=True)
+    puerto = int(os.environ.get("PORT") or os.environ.get("PUERTO") or 8118)
+    depurar = os.environ.get("DEPURAR", "1") == "1"
+    app.run(host="0.0.0.0", port=puerto, debug=depurar)

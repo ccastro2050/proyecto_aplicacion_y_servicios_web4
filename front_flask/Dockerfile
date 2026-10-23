@@ -22,4 +22,18 @@ COPY . .
 
 ENV PUERTO=8118
 EXPOSE 8118
-CMD ["python", "app.py"]
+
+# ============================================================
+# UN SOLO ARRANQUE PARA LOS DOS MUNDOS
+#
+# En desarrollo queremos el servidor de Flask: recarga al guardar y muestra
+# el error completo en la pagina. Publicado NO lo queremos: atiende una
+# peticion a la vez, y su depurador en internet es una puerta abierta.
+#
+# La variable DEPURAR decide. Vale "1" por defecto -asi el compose no tiene
+# que ponerla- y se fija en "0" en el hospedaje.
+#
+# El ${PORT:-${PUERTO:-8118}} es la misma cadena de respaldo del app.py:
+# manda el puerto que imponga la plataforma, y si no hay, el del proyecto.
+# ============================================================
+CMD ["sh", "-c", "if [ \"$DEPURAR\" = \"0\" ]; then exec gunicorn --bind 0.0.0.0:${PORT:-${PUERTO:-8118}} --workers 2 app:app; else exec python app.py; fi"]

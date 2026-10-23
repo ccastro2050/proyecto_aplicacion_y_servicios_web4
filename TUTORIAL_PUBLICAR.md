@@ -4724,4 +4724,97 @@ base    SQL Server  <->  PostgreSQL
 > diciendo SQL Server — así que **publicar el front lo devuelve solo.**
 
 
+## Paso 9 — La segunda interfaz: Flask, y otro hospedaje
+
+**El proyecto tiene dos interfaces contra la misma API:**
+
+| | Lenguaje | Puerto local |
+|---|---|---|
+| `front_blazor` | **C#** · Blazor Server | `8099` |
+| **`front_flask`** | **Python** · Flask + Jinja2 | **`8118`** |
+
+> **Por qué existen las dos, y no es por gusto:** si la API tuviera algo de la
+> interfaz adentro —HTML, sesiones, reglas de pantalla— **la segunda no podría
+> existir**. Que dos programas en dos lenguajes consuman lo mismo sin tocar una
+> línea de la API **es la demostración de que las capas están bien puestas.**
+
+### 9.1 · El problema: MonsterASP no corre Python
+
+**Y lo dice su propio panel.** En la vista general de cualquier sitio:
+
+```
+.NET   .NET 10.x/9.x/8.x/7.x/6.x/5.x/Core [x86]
+PHP    --- [NONE]
+```
+
+| | |
+|---|---|
+| **MonsterASP es IIS para .NET** | Tiene Node.js para el ejemplo de Next.js, pero **Python no aparece por ninguna parte** |
+| **Entonces el front Flask no cabe ahí** | No es cuestión de configurarlo: **el intérprete no está** |
+
+> **Y eso es una lección del curso, no un contratiempo.** «Publicar en la nube»
+> no es un solo sitio: **cada tecnología necesita un servidor que la sepa
+> ejecutar.** Hasta aquí todo cabía en un hospedaje porque todo era .NET. El
+> primer programa en otro lenguaje **obliga a salir a buscar.**
+
+### 9.2 · Dónde sí: las opciones, y por qué Render
+
+**Esto cambió mucho en 2026**, así que las opciones se revisaron antes de
+escoger — no de memoria:
+
+| Plataforma | Estado en octubre de 2026 | ¿Sirve? |
+|---|---|---|
+| **Render** | **750 horas/mes**, corre un `Dockerfile`, publica desde GitHub. Se duerme a los 15 min. El tráfico bajó a 5 GB en abril | **Sí — la escogida** |
+| **Koyeb** | Un servicio gratis y **sin dormirse**… pero **pide tarjeta desde febrero de 2026**, con retención de 29 USD | Riesgoso para un curso |
+| **Fly.io** | **Ya no tiene plan gratuito**: prueba de 7 días y tarjeta | No |
+| **Railway** | ~1 USD de crédito al mes | No |
+| **PythonAnywhere** | Gratis, **pero bloquea las salidas HTTP** a sitios fuera de su lista blanca | **No** — no podría llamar a nuestra API |
+
+> **El de PythonAnywhere es el error que más caro sale**, y por eso vale
+> nombrarlo: el sitio *arranca*, la página *abre*, el login *falla* — porque la
+> plataforma no deja salir hacia `runasp.net`. **Un hospedaje puede correr su
+> lenguaje y aun así no servirle.**
+
+### 9.3 · Qué es Render
+
+![La pagina de Render](docs/tutorial_publicar/img/66_render_inicio.png)
+
+**Render es un hospedaje que publica desde su repositorio de GitHub.** Eso es
+lo que lo distingue de MonsterASP, y se ve en su propia portada: lo primero que
+muestra es `$ git push`.
+
+| | MonsterASP | **Render** |
+|---|---|---|
+| **Cómo llega el código** | Usted compila y **sube con `msdeploy`** | **Render clona su repositorio y compila él** |
+| **Qué corre** | Lo que IIS sepa: .NET, Node | **Lo que diga su `Dockerfile`** — cualquier lenguaje |
+| **Cada versión nueva** | Repetir `publish` + `msdeploy` | **Un `git push`** |
+| **El plan gratuito** | 5 sitios, 256 MB, duerme | 750 h/mes, 512 MB, **duerme a los 15 min** |
+
+> **Lo de «corre lo que diga su `Dockerfile`» es la clave**, y explica por qué
+> aquí sí cabe Python: **Render no tiene que soportar Flask — tiene que
+> soportar Docker.** El `Dockerfile` del proyecto dice `FROM python:3.12-slim`,
+> y eso basta.
+
+> **Y hay una simetría que vale señalar en clase:** el mismo `front_flask/`
+> que levanta `docker compose` en su máquina **es el que corre en Render, sin
+> cambios**. Eso es lo que prometía Docker desde la primera versión del curso
+> — y es la primera vez que se cobra la promesa.
+
+#### Entrar
+
+**`Get started`**, arriba a la derecha — o `Sign in` si ya tiene cuenta.
+
+Ofrece **GitHub**, GitLab, Google o correo. **Escoja GitHub**, por dos razones:
+
+| | |
+|---|---|
+| **Ya tiene cuenta** | Una contraseña menos — igual que con Neon |
+| **Y es lo que Render necesita** | Va a publicar **desde su repositorio**. Entrando con GitHub la conexión queda hecha; entrando con correo, hay que autorizar GitHub después |
+
+> **Al autorizar, Render pide permiso sobre sus repositorios — y se lo puede
+> dar solo a los que escoja.** Para la clase conviene: seleccione únicamente
+> `proyecto_aplicacion_y_servicios_web4`. **Lo que no se autoriza no se puede
+> filtrar.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

@@ -2909,6 +2909,29 @@ http://apifacturas-carloscastro.runasp.net/
 > convertiría en `GET` y **perdería el cuerpo con las credenciales** — un error
 > precioso de diagnosticar.
 
+#### Comprobado en el navegador
+
+**El Swagger abrió por `https` y la barra ya no dice `Not secure`.** Y dentro
+de la página, **todo cambió solo**:
+
+| Antes | Ahora |
+|---|---|
+| `Request URL: http://apifacturas-carloscastro.runasp.net/api/sesion` | **`https://`**`apifacturas-carloscastro.runasp.net/api/sesion` |
+| El recuadro `Curl` decía `http` | Dice **`https`** |
+
+> **Nadie reconfiguró Swagger.** Esas direcciones las arma **con la dirección
+> por la que usted entró**: si entra por `https`, prueba por `https`. Por eso
+> basta con cambiar la letra en la barra.
+
+**Y las dos pruebas del paso anterior se repitieron por el canal cifrado:**
+
+| Petición | Resultado |
+|---|---|
+| `POST /api/sesion` con `admin123` | **`200`** · *«Sesion iniciada»* con su token |
+| `GET /api/usuario?limite=1000` | **`200`** · `total: 8` |
+
+**Mismo sistema, mismos datos, ahora cifrado.**
+
 #### Una consecuencia inmediata: ya no hay `http`
 
 **Todo lo que estaba apuntando a `http://` ahora paga un salto de más**, y hay

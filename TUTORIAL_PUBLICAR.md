@@ -3019,10 +3019,24 @@ que cambiarlo:
 | Las peticiones de Postman o de la terminal | `https://` |
 | **El `UrlApi` del front** | **`https://`** — lo configuramos en el Paso 7 |
 
-> **Y aquí la sorpresa, que es buena:** la redirección **no es un sustituto de
-> configurar bien el front**. Un `HttpClient` sigue el `307` sin problema, pero
-> paga **dos viajes por cada llamada**. Con `UrlApi` apuntando directo a
-> `https`, va derecho.
+> **Y aquí una trampa que descubrimos midiendo, no leyendo:** la redirección
+> **no sustituye configurar bien el front** — y no por lentitud, sino porque
+> **rompe las llamadas autenticadas**.
+>
+> ```
+> GET http://...  con la cabecera  Authorization: Bearer <token>
+>   -> 307 hacia https://...
+>   -> el cliente repite la peticion SIN la cabecera
+>   -> 401 No autorizado
+> ```
+>
+> **El cliente descarta la cabecera `Authorization` al seguir un redirect**, y
+> lo hace a propósito: el redirect podría llevar a otro servidor, y mandarle el
+> token a un desconocido sería peor. **Comprobado contra esta misma API**: la
+> petición sin token pasa, la petición con token vuelve `401`.
+>
+> **Moraleja:** `http` **no funciona a medias — no funciona.** El `UrlApi` va
+> directo a `https`.
 
 #### Las cuatro pestañas del diálogo, por si aparecen dudas
 
@@ -3139,7 +3153,7 @@ appsettings.Production.json
 
 | | |
 |---|---|
-| **`https`, no `http`** | La API redirige, así que `http` *funcionaría*… pagando **dos viajes por llamada**. Y si el front queda cifrado y la API no, **el navegador bloquea la llamada** |
+| **`https`, no `http`** | Con `http` **las llamadas autenticadas fallan con `401`**: el redirect `307` hace que el cliente descarte la cabecera `Authorization`. No es lentitud — es que no funciona |
 | **Sin la barra al final** | `...runasp.net`, **no** `...runasp.net/` — el front le pega las rutas detrás, y dos barras seguidas dan un 404 |
 | **Sin `/api` al final** | Va **la dirección del sitio**, no la de un recurso. El `/api/...` lo pone el código |
 

@@ -117,22 +117,49 @@ docker compose up -d --build
 
 **Eso es todo.** La primera vez tarda unos minutos (descarga imágenes,
 el inicializador crea la base de datos, y la primera compilación
-toma ~1 minuto más). Al terminar quedan corriendo **tres contenedores**: la
-base de datos, la API y la **interfaz gráfica**.
+toma ~1 minuto más). Al terminar quedan corriendo **cinco contenedores**: las
+**dos bases de datos** —SQL Server y PostgreSQL—, la API y **las dos
+interfaces gráficas**, una en Blazor y otra en Flask.
 
 ### Lo primero que hay que abrir
 
 | Qué | Dónde |
 |---|---|
-| **La interfaz gráfica** — por aquí se empieza | **http://localhost:8099** |
+| **La interfaz gráfica en Blazor** — por aquí se empieza | **http://localhost:8099** |
+| **La interfaz gráfica en Flask** — la misma, en Python | **http://localhost:8118** |
 | **Swagger** — la API, para verla y probarla | http://localhost:8035/swagger |
 | La API — diagnóstico | http://localhost:8035/ |
 | SQL Server (para SQLTools/SSMS, opcional) | `localhost,11466` · `sa`/`Paradigmas123!` |
 
-> **La interfaz gráfica y la API son dos puertos distintos**, y conviene no
-> confundirlos: el **8099** es lo que se abre en el navegador; el **8035**
-> es lo que esa interfaz consume. Abrir `8099/swagger` da 404 — Swagger vive
-> en la API.
+**Para entrar a cualquiera de las dos interfaces:** `admin@correo.com` /
+`admin123`.
+
+> **Las interfaces y la API son puertos distintos**, y conviene no
+> confundirlos: el **8099** y el **8118** son lo que se abre en el navegador;
+> el **8035** es lo que esas interfaces consumen. Abrir `8099/swagger` da
+> 404 — Swagger vive en la API.
+
+#### Dos interfaces, una sola API
+
+**Ábralas en dos pestañas y compárelas.** Son la misma aplicación — el mismo
+menú, las mismas facturas, los mismos totales— escritas en **dos lenguajes
+distintos**, hablando con **la misma API** por HTTP.
+
+| | En Blazor (`8099`) | En Flask (`8118`) |
+|---|---|---|
+| Lenguaje | **C#** | **Python** |
+| Qué corre en el navegador | El circuito de Blazor Server | HTML y Bootstrap, nada más |
+| Dónde guarda la sesión | En el servidor, con el circuito | En la **cookie firmada** de Flask |
+| A quién le pide los datos | **`api-facturas:8035`** | **`api-facturas:8035`** |
+
+> **Por qué esto importa y no es un capricho:** si la API tuviera algo de la
+> interfaz adentro —HTML, sesiones, reglas de pantalla— **el segundo front no
+> podría existir**. Que dos programas en dos lenguajes consuman lo mismo sin
+> tocar una línea de la API **es la demostración de que las capas están bien
+> puestas.**
+>
+> **Y ninguno de los dos sabe que existe una base de datos.** Apague la API y
+> las dos interfaces siguen en pie, con su aviso y sin una sola fila.
 
 ### El menú de la interfaz gráfica
 
@@ -271,6 +298,23 @@ proyecto_aplicacion_y_servicios_web4/
 │   ├── Excepciones/             # NoEncontradoExcepcion → 404 · ConflictoExcepcion → 409 (v2)
 │   └── pruebas/                 # Proyecto de consola: producto Y persona con
 │                                #   repositorios FALSOS (criterio 6, corre sin BD)
+├── front_blazor/                 # INTERFAZ 1 — Blazor Server, C# (puerto 8099)
+│   ├── Program.cs                # El menú, los permisos y la dirección de la API
+│   ├── Components/               # Las páginas .razor
+│   └── appsettings.Production.json   # A qué API le habla PUBLICADA (sí se versiona:
+│                                #   no tiene secretos, solo una dirección pública)
+│
+├── front_flask/                  # INTERFAZ 2 — Flask + Jinja2, Python (puerto 8118)
+│   ├── app.py                    # El ensamblador: sesión, login y arranque
+│   ├── cliente_api.py            # LO UNICO que habla con la API, por HTTP
+│   ├── entidades.py              # El registro de las 8 entidades: una tabla de datos
+│   ├── rutas_*.py                # Entidades, facturas, tablero y usuarios-con-roles
+│   ├── templates/                # El HTML (Jinja2)
+│   └── Dockerfile                # python:3.12-slim; gunicorn si DEPURAR=0
+│                                #   LA MISMA aplicación que front_blazor, en otro
+│                                #   lenguaje y contra LA MISMA API: la prueba de
+│                                #   que la API no tiene nada de la interfaz adentro
+│
 ├── docs/
 │   ├── spec_kit/                # LAS ESPECIFICACIONES: constitución permanente +
 │   │                            #   una carpeta por versión con sus 9 .md

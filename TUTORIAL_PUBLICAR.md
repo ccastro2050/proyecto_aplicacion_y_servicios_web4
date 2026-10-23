@@ -1758,4 +1758,76 @@ contraseña— y se habilitan dos botones:
 > encendido mientras dure el trabajo.
 
 
+### 5.10 · Encendido: los tres datos para publicar
+
+![La pestaña de WebDeploy encendida, con el servidor y la contraseña](docs/tutorial_publicar/img/37_webdeploy_encendido.png)
+
+Al oprimir `Enabled`, el `---- Disabled ----` se convirtió en un nombre de
+servidor, apareció la contraseña y **se encendieron los dos botones** que
+estaban grises.
+
+#### La ficha completa
+
+| Dato | Valor | De dónde sale |
+|---|---|---|
+| **Server** | `site101125.siteasp.net` | Lo acaba de crear el hospedaje |
+| **Port** | `8172` | Fijo, el de WebDeploy |
+| **Site** | `site101125` | **Cuál** aplicación se actualiza |
+| **Login** | `site101125` | **Quién** la actualiza |
+| **Password** | `c+3LK6h#-iM4` | **Recién generada.** Se ve con `Show` y se cambia con `Change` |
+
+> **Anótelos los cinco.** El comando de publicar los pide todos, y si uno sale
+> mal el mensaje de error **no dice cuál**.
+
+> **Y fíjese en el nombre del servidor:** `site101125.siteasp.net`, con
+> **`siteasp.net`**. No es `runasp.net`, que es donde la gente visita el sitio,
+> ni `databaseasp.net`, que es la base de datos. **Tres dominios parecidos para
+> tres cosas distintas**, y el panel usa los tres en la misma pantalla:
+>
+> | Dominio | Para qué |
+> |---|---|
+> | `apifacturas-carloscastro.`**`runasp.net`** | **Visitar** el sitio |
+> | `site101125.`**`siteasp.net`** | **Publicar** en el sitio |
+> | `db75266.`**`databaseasp.net`** | **La base de datos** |
+
+#### Compruébelo aquí mismo
+
+**Oprima `Test connection`** en el recuadro `WEBDEPLOY CHECK`: *«Checks that the
+WebDeploy server is reachable and that these credentials can sign in»*.
+
+> **Hacer esta prueba ahora ahorra media hora después.** Si el comando de
+> publicar falla, lo primero que uno sospecha es la clave. Con esta prueba hecha
+> **ya sabe que la clave sirve**, y puede buscar el error donde sí está: en el
+> comando.
+
+#### `Download publish profile`
+
+Baja un archivo **`.PublishSettings`** — un XML con el servidor, el sitio, el
+usuario y la contraseña adentro.
+
+| Si usa | Haga |
+|---|---|
+| **Visual Studio** | Bájelo. `Publish` → `Import Profile`, y queda configurado sin escribir nada |
+| **La línea de comandos** | **No lo necesita.** Vamos a pasar los datos en el comando |
+
+> **Y ese archivo es un secreto completo.** Trae la contraseña en texto plano.
+> **No va al repositorio.** Si lo baja, déjelo fuera de la carpeta del proyecto
+> — o agréguelo al `.gitignore` antes de que se le cuele.
+
+#### Sobre las contraseñas de aquí en adelante
+
+En este tutorial **las capturas muestran los valores reales** — sin eso no se
+entendería de dónde sale cada dato. Pero **en el texto van como
+`SU_CONTRASENA`**, por dos razones:
+
+| | |
+|---|---|
+| **La suya va a ser otra** | Cada sitio genera la propia. Copiar la de la captura no le va a servir |
+| **Para poder copiar y pegar** | Los comandos quedan listos para usar, cambiando solo lo que es suyo |
+
+> **Y al terminar la clase, estas dos se cambian:** la de WebDeploy, con el
+> `Change` de esta pantalla, y la de la base de datos, con el suyo. **Quedaron
+> en capturas de un repositorio público.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

@@ -1421,4 +1421,101 @@ https://apifacturas-carloscastro.runasp.net
 > sitio: es **nuestra aplicación dentro de él**.
 
 
+### 5.7 · `Rename`: el botón que no hace lo que su nombre dice
+
+![El diálogo Rename website](docs/tutorial_publicar/img/32_renombrar_sitio.png)
+
+En el renglón del sitio, al lado de `Manage`, está **`Rename`**. Vale la pena
+abrirlo **aunque no vayamos a renombrar nada**, porque lo que **no** deja hacer
+es justo lo que hay que entender antes de publicar.
+
+#### Los cuatro campos
+
+| Campo | Estado | Qué es |
+|---|---|---|
+| **Site ID** · `site101125` | **Gris, bloqueado.** *«Site ID cannot be modified»* | **El identificador no se cambia nunca.** Lo asignó el hospedaje y es el usuario de WebDeploy |
+| **Main domain** | **Gris**, con la etiqueta `current` y el `Save` pálido | El dominio principal. **Solo se puede escoger entre los dominios ya conectados al sitio** — y hay uno solo |
+| **Description** | **Activo**, con su `Save` azul | **Lo único que sí se puede cambiar.** Una nota suya, de hasta 200 caracteres |
+| **PREVIEW IN LISTS** | Solo lectura | Cómo va a verse el sitio en la lista: el dominio arriba y **`site101125`** debajo |
+
+#### Lo que dice el panel, y por qué importa
+
+> *«**No other domain is connected to this website yet.** Add a domain first,
+> then you can set it as the main domain»*
+>
+> *«Changes the **main domain** of this website — the primary name shown
+> throughout our Control panel (site lists, breadcrumbs and top header). **Pick
+> from any domain currently connected to this site**»*
+
+**O sea: `Rename` no inventa una dirección nueva — escoge entre las que ya
+tiene.** Y nuestro sitio tiene una sola, el subdominio gratuito. Por eso el
+campo está gris: no hay entre qué escoger.
+
+> **Esto confirma lo que dijimos al bautizar el sitio:** la dirección
+> `apifacturas-carloscastro.runasp.net` **no se cambia**. Para tener otra hay
+> que **conectar otro dominio** — que es de pago — o **borrar el sitio y crear
+> otro**. Por eso valía la pena pensar el nombre diez segundos.
+
+#### Cuidado: `Rename` aquí y `Rename` en la base de datos no son lo mismo
+
+**Es la misma palabra para dos cosas distintas**, y están a dos clics una de
+otra en el mismo panel:
+
+| | En **Databases** | En **Websites** |
+|---|---|---|
+| Qué cambia | El **alias**: el nombre amable con que usted ve la base | El **dominio principal**, entre los ya conectados |
+| ¿Sirvió? | **Sí** — le pusimos `bdfacturas` a `db75266` | **No** — no hay otro dominio |
+| Lo de abajo | `db75266` sigue siendo el nombre real | `site101125` sigue siendo el identificador |
+
+> **Y en los dos casos pasa lo mismo por debajo:** lo que usted cambia es **la
+> etiqueta**, no el nombre con el que el servidor conoce la cosa. El nombre
+> real —`db75266`, `site101125`— **no se toca nunca**, y es el que va en las
+> conexiones y en los comandos.
+
+#### Sí use la `Description`
+
+Es un texto libre que **solo se ve en este panel** — no sale a internet. El
+propio campo sugiere `production, client XY, staging`.
+
+**Para el proyecto de aula sirve de verdad:** con cinco sitios permitidos, la
+lista se llena rápido de nombres parecidos. **Escriba tres cosas: qué es, de
+quién es y de qué curso es.**
+
+| | Qué escribir |
+|---|---|
+| **En este tutorial** | `API facturas v4 - demostracion de clase - AySW 2026-2` |
+| **Un equipo, en su API** | `API facturas v4 - equipo 3 - AySW 2026-2` |
+| **Un equipo, en su front** | `Front facturas v4 - equipo 3 - AySW 2026-2` |
+
+> **Por qué esas tres cosas.** Dentro de un mes, la lista va a tener la API y el
+> front de varios equipos, con direcciones parecidas. `API` o `Front` dice
+> **cuál de los dos es**, el equipo dice **de quién**, y el semestre dice **si
+> todavía sirve o se puede borrar**. Sin eso toca abrir cada uno para saberlo.
+
+**Oprima el `Save` azul** del renglón de `Description`, y después `Close`.
+
+> **Ojo con los dos `Save`.** Hay uno por campo, no uno para todo el diálogo. El
+> de arriba guarda el dominio —y está pálido porque no hay nada que guardar—;
+> el de abajo guarda la descripción.
+
+#### De paso: el menú del sitio
+
+Al entrar a un sitio, el menú de la izquierda **cambia**: ya no son los
+servicios de la cuenta, son **las secciones de este sitio**. Dos de ellas son
+las que vamos a usar en seguida:
+
+| Sección | Para qué |
+|---|---|
+| **`Deploy`** · *FTP / Visual Studio* | **Aquí están las credenciales de publicación.** Es la siguiente parada |
+| **`Logs`** · *Error and access logs* | **Cuando la API publicada falle, la respuesta está aquí.** No en su máquina |
+| `Overview` | La vista general del sitio |
+| `Files` | El administrador de archivos: ver qué quedó subido |
+| `Domains` · *Aliases / Bindings* | Conectar otro dominio — lo que `Rename` pedía |
+| `HTTPS` · *SSL certificate* | El certificado. Con el subdominio gratuito viene puesto |
+| `Git deploy` | Publicar desde GitHub, en vez de WebDeploy |
+| `AppInstaller` | El catálogo de aplicaciones del que hablaba el paso anterior |
+| `Process` · *Process list* | Ver si el proceso está vivo — útil con los arranques en frío |
+| `Resource` | Cuánta memoria de los 256 MB se está usando |
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

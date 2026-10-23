@@ -3221,4 +3221,98 @@ que en el Paso 6.7.
 > va a seguir diciendo `Not secure` a sus estudiantes.
 
 
+### 7.4 · Lo que subió, leído
+
+```
+Numero total de cambios: 39 (38 agregados, 1 eliminados, 0 actualizados,
+                             0 parametros cambiados, 1682908 bytes copiados)
+```
+
+| | |
+|---|---|
+| **1.682.908 bytes** | **El mismo número exacto** que tenía la carpeta `publicado` |
+| **1 eliminado** | `iisstart.htm` otra vez — el «Your website is ready…» de este sitio |
+| **38 agregados** | Nueve archivos en la raíz y el resto dentro de `wwwroot` |
+
+#### LOS DOS `appsettings`: cuál manda, y por qué viajan los dos
+
+**En la salida se ven subiendo uno detrás del otro:**
+
+```
+Info: Adding file (site101138\appsettings.json).
+Info: Adding file (site101138\appsettings.Production.json).
+```
+
+**Y eso es exactamente lo que queremos.** No sobra ninguno:
+
+| Archivo | Qué dice | Cuándo lo usa |
+|---|---|---|
+| **`appsettings.json`** | `UrlApi: http://localhost:8035` | **Siempre se lee.** Es la base |
+| **`appsettings.Production.json`** | `UrlApi: https://apifacturas-carloscastro.runasp.net` | **Encima del anterior**, porque allá el entorno es `Production` |
+
+**La regla, en una frase:** ASP.NET Core **lee los dos, en ese orden**, y
+**la clave repetida gana en el último**. No es que uno reemplace al otro: es
+que se **superponen**.
+
+```
+appsettings.json              UrlApi = http://localhost:8035
+appsettings.Production.json   UrlApi = https://apifacturas-carloscastro.runasp.net   <- gana
+                              ------------------------------------------------------
+resultado en el hospedaje     UrlApi = https://apifacturas-carloscastro.runasp.net
+resultado en su maquina       UrlApi = http://localhost:8035
+```
+
+> **Por qué importa que se superpongan y no que se reemplacen:** el
+> `appsettings.json` del front trae además `Logging` y `AllowedHosts`, que el
+> de producción **no repite**. Esas siguen valiendo. **Solo cambia lo que el
+> segundo archivo menciona** — por eso el de producción puede tener una sola
+> línea útil.
+
+> **Y por eso el de desarrollo se sube sin problema.** Alguien podría pensar
+> que apuntar a `localhost` en el servidor es peligroso. No lo es: **esa línea
+> nunca gana allá**. Y si borrara el archivo base, se llevaría por delante el
+> `Logging` y el `AllowedHosts`.
+
+#### `.br` y `.gz`: cada archivo estático subió tres veces
+
+Fíjese en el patrón:
+
+```
+wwwroot\app.css
+wwwroot\app.css.br
+wwwroot\app.css.gz
+```
+
+**Y lo mismo con `marca.css`, `formularios.js`, `bootstrap.min.css`,
+`bootstrap.bundle.min.js`, `blazor.server.js` y `blazor.web.js`.**
+
+| Extensión | Qué es |
+|---|---|
+| sin extensión extra | El archivo **tal cual** |
+| **`.gz`** | Comprimido con **gzip** — lo entiende cualquier navegador |
+| **`.br`** | Comprimido con **Brotli** — más pequeño, lo entienden los navegadores modernos |
+
+> **No los creó nadie a mano: los genera `dotnet publish`.** Y el servidor
+> escoge: el navegador dice en cada petición qué compresiones acepta, y IIS le
+> manda **la mejor que ambos entiendan**. Si no entiende ninguna, recibe el
+> archivo normal.
+>
+> **Es por lo que la página carga rápido aunque el servidor esté en Europa:**
+> lo que cruza el Atlántico es la versión comprimida.
+
+#### Y los dos `blazor` que delatan la tecnología
+
+```
+wwwroot\_framework\blazor.server.js
+wwwroot\_framework\blazor.web.js
+```
+
+**Ahí está el circuito de Blazor Server**, en forma de archivo. Ese JavaScript
+es lo único que corre en el navegador: **abre la conexión permanente con el
+servidor, manda los clics y recibe los pedacitos de HTML que cambian.**
+
+> **Toda la lógica de las pantallas sigue en C#, en el servidor.** Por eso el
+> front pesa 1,6 MB: **no hay una aplicación JavaScript aquí**, solo el cable.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

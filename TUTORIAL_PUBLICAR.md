@@ -1492,11 +1492,51 @@ quién es y de qué curso es.**
 > **cuál de los dos es**, el equipo dice **de quién**, y el semestre dice **si
 > todavía sirve o se puede borrar**. Sin eso toca abrir cada uno para saberlo.
 
+![El diálogo con la descripción escrita y Show more abierto](docs/tutorial_publicar/img/33_renombrar_detalle.png)
+
+**Mientras escribe, dos cosas se mueven solas:** el contador —`53/200`— y el
+recuadro **`PREVIEW IN LISTS`**, que ahora muestra la descripción debajo del
+dominio, junto al identificador.
+
+> **Y la vista previa delata algo:** la descripción aparece **cortada**. Se lee
+> `API facturas v4 - demostracion de clase - AySW 20` — el `26-2` se perdió. En
+> la lista de sitios el espacio es el que es, y se corta por donde toque.
+>
+> **De ahí una regla práctica:** caben unos **45 caracteres** a la vista. Ponga
+> **lo que lo distingue al principio**. Los 200 no son para escribir un párrafo:
+> son para que quepa lo que usted quiera, sabiendo que en la lista solo se ve el
+> comienzo.
+
 **Oprima el `Save` azul** del renglón de `Description`, y después `Close`.
 
 > **Ojo con los dos `Save`.** Hay uno por campo, no uno para todo el diálogo. El
 > de arriba guarda el dominio —y está pálido porque no hay nada que guardar—;
 > el de abajo guarda la descripción.
+
+#### `Show more`: la letra menuda, que esta vez sí importa
+
+Debajo de `About website renaming` hay un **`Show more`**. Ábralo: son cuatro
+renglones y **uno de ellos tranquiliza de verdad**.
+
+| Lo que dice el panel | Qué significa |
+|---|---|
+| *«Only domains already pointed to this website are selectable — **the Site ID itself never changes**»* | Confirma lo de arriba: `site101125` **es para siempre** |
+| *«Purely a Control panel / primary-domain change — **does not affect FTP/WebDeploy, DNS records, SSL certificates or any technical configuration**»* | **Éste es el importante** — ver abajo |
+| *«Need a domain that is not listed? **Add it first in the website Domains section**, then it becomes selectable here»* | El camino para tener otra dirección: primero conectar el dominio en `Domains` |
+| *«The Description field is for your own notes or tags — **also shown in the Control panel only**»* | La descripción **no sale a internet** |
+
+> **Por qué el segundo renglón importa tanto.** Renombrar **no toca las
+> credenciales de WebDeploy**, ni el certificado, ni nada técnico. Es solo la
+> etiqueta del panel.
+>
+> **Y eso marca la diferencia con borrar.** Borrar el sitio **sí** cambia el
+> identificador y la clave — por eso el sitio nuevo quedó con `site101125` y no
+> con el número del anterior. Renombrar es cosmético; borrar es empezar de
+> cero.
+>
+> **En la práctica:** si un equipo quiere «cambiarle el nombre» a su sitio,
+> puede hacerlo sin miedo — pero sepa que lo único que cambia es cómo lo ve
+> él mismo en el panel. **La dirección pública sigue siendo la misma.**
 
 #### De paso: el menú del sitio
 

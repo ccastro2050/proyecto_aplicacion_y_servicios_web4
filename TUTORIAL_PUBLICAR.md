@@ -4430,4 +4430,118 @@ copy appsettings.Production.postgres.json publicado_pg\appsettings.Production.js
 > problema eran tres renglones en medio de ochenta y nueve.**
 
 
+### 8.11 · Probarla — y la prueba que vale por todo el paso
+
+**Tres comprobaciones, de menos a más exigente.**
+
+#### 1. ¿Arranca, y con qué motor?
+
+```
+http://apifacturas-pg-carloscastro.runasp.net
+```
+
+```json
+{
+  "mensaje": "API Facturas funcionando",
+  "version": "v4",
+  "motor": "postgres",
+  "contratos": "docs/spec_kit/versiones/v4_aplicativo/6_contracts.md"
+}
+```
+
+| Si dice | |
+|---|---|
+| **`"motor": "postgres"`** | **El archivo de configuración llegó y manda** |
+| `"motor": "sqlserver"` | El `copy` no se hizo — o se hizo **antes** de publicar, y `publish` lo pisó |
+
+> **Esa línea es la única señal visible de todo el paso.** Lo demás de la
+> respuesta es idéntico a la otra API.
+
+> **La primera carga tarda**, y esta vez se despiertan **dos cosas dormidas**:
+> el sitio en MonsterASP y la base en Neon. Son dos siestas encadenadas.
+
+#### 2. ¿Contesta la base de datos? — el 401 a propósito
+
+Igual que en el Paso 6.4: **intentar entrar con una clave que uno sabe que está
+mal.**
+
+```
+POST /api/sesion   { "email": "admin@correo.com", "contrasena": "estaNoEs" }
+```
+
+```json
+{"estado":401,"mensaje":"El correo o la contrasena no son correctos."}
+```
+
+> **Para poder decir eso, la API tuvo que ir hasta Frankfurt, buscar el correo y
+> comparar la contraseña.** Un `500` habría significado que no conecta.
+
+#### 3. La prueba del paso: **las dos APIs, lado a lado**
+
+**Abra las dos en dos pestañas**, entre con `admin@correo.com` / `admin123` en
+cada una, y pida lo mismo.
+
+| | SQL Server · `site101125` | **PostgreSQL / Neon · `site101144`** |
+|---|---|---|
+| Sesión con `admin123` | token | **token** |
+| `GET /api/cliente` → `total` | **4** | **4** |
+| Los ids | **1, 2, 3, 5** | **1, 2, 3, 5** |
+| El primer cliente | `{"id":1,"credito":520000.00,"fkcodpersona":"P001","fkcodempresa":"E001"}` | **idéntico** |
+| El Swagger | `ApiFacturas 1.0 · OAS 3.0`, catorce controladores | **idéntico** |
+
+> **Y eso es exactamente lo que se quería demostrar: no se nota la
+> diferencia.** Mismo contrato, mismas rutas, mismo documento OpenAPI, mismas
+> respuestas. **Las dos corren el mismo `ApiFacturas.dll`, byte por byte**, y lo
+> único distinto entre ellas es **un archivo de texto de ocho renglones**.
+>
+> **Si la aplicación estuviera mal hecha, esto sería imposible.** Con SQL
+> escrito dentro de los controladores, o con el motor decidido al compilar,
+> habría que mantener dos versiones del proyecto. **El hecho de que una copia de
+> archivo baste es la demostración de que las capas sirven para algo.**
+
+#### Una diferencia que sí se ve, y no es un error
+
+**Pida `GET /api/persona` en las dos:**
+
+| | |
+|---|---|
+| **PostgreSQL** | `Carlos Pérez`, `María Gómez` |
+| **SQL Server** | `Carlos PA(c)rez`, `MarA-a GA3mez` |
+
+**Es el defecto del Paso 7.6**, pendiente de reimportar. Y de paso, **la prueba
+de que las dos bases se cargaron por caminos distintos**: una por el panel con
+`sqlcmd` adivinando la codificación, la otra por `psql` con
+`PGCLIENTENCODING=UTF8` declarado.
+
+> **El mismo archivo de origen, dos resultados.** No fue el motor: fue avisar la
+> codificación, o no avisarla.
+
+### 8.12 · Lo que queda, y lo que esto deja enseñado
+
+**Publicado:**
+
+| | |
+|---|---|
+| **API SQL Server** | `https://apifacturas-carloscastro.runasp.net` |
+| **API PostgreSQL** | `http://apifacturas-pg-carloscastro.runasp.net` |
+| **Front** | `https://facturas-carloscastro.runasp.net` |
+| **Las bases** | `db75266` en MonsterASP · `neondb` en Neon / Frankfurt |
+
+**Pendiente, todo de panel y nada de código:**
+
+| | |
+|---|---|
+| **1** | Reimportar `bdfacturas_publicar.sql` — arregla las tildes de SQL Server |
+| **2** | `HTTPS` en el sitio de PostgreSQL: `Enable HTTPS`, y después el redirect |
+| **3** | Al terminar la clase, **cambiar las contraseñas** que quedaron en las capturas |
+
+#### Y las tres cosas que este paso deja probadas
+
+| | |
+|---|---|
+| **El motor es configuración, no código** | Una copia de archivo cambia de SQL Server a PostgreSQL |
+| **El contrato aguanta** | Las dos APIs responden lo mismo, campo por campo |
+| **Los errores aparecen donde uno no mira** | Las tildes, el `401` por el redirect, la carpeta anidada — **ninguno dio un mensaje que dijera lo que pasaba** |
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

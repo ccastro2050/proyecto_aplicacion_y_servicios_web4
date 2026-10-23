@@ -3944,22 +3944,104 @@ cd ...\proyecto_aplicacion_y_servicios_web4
 docker run --rm -e PGCLIENTENCODING=UTF8 -v "${PWD}\db:/db:ro" postgres:16-alpine psql "postgresql://neondb_owner:SU_CLAVE@ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech/neondb?sslmode=require" -v ON_ERROR_STOP=1 -f /db/bdfacturas_postgres.sql
 ```
 
-#### Pieza por pieza
+#### La idea de fondo: **no instalamos PostgreSQL — lo prestamos**
 
-| Parte | Qué hace |
+`psql` es el cliente de línea de comandos de PostgreSQL, y **viene dentro de la
+imagen `postgres`**. El proyecto ya la usa para la base local, así que **ya está
+descargada en su máquina**.
+
+**Entonces en vez de instalar PostgreSQL entero para usar una herramienta,
+levantamos un contenedor de un solo uso, le pasamos el archivo, y lo botamos.**
+
+> **Y eso es lo que lo hace servible en clase:** ningún estudiante tiene que
+> instalar nada que no tenga ya. El único requisito es Docker, que el curso usa
+> desde la primera versión.
+
+#### El comando, partido en dos mitades
+
+```
+docker run --rm -e ... -v ...   postgres:16-alpine   psql "..." -v ... -f ...
+|_________ la mitad de Docker _________|             |____ la mitad de psql ____|
+```
+
+**Todo lo que va ANTES del nombre de la imagen es para Docker.** Todo lo que va
+DESPUÉS es **el programa que corre adentro** y sus propios argumentos. Leerlo
+así desarma la confusión.
+
+#### La mitad de Docker
+
+| Parte | Qué hace | Qué pasa si falta |
+|---|---|---|
+| **`docker run`** | Levanta un contenedor nuevo a partir de una imagen | — |
+| **`--rm`** | **Lo borra apenas termina** | Queda un contenedor muerto ocupando disco. A la décima vez, diez |
+| **`-e PGCLIENTENCODING=UTF8`** | Define una **variable de entorno** dentro del contenedor. `psql` la lee para saber **en qué codificación viene el archivo** | `psql` adivina por la configuración regional del contenedor, y **las tildes pueden partirse** — exactamente lo que pasó con `sqlcmd` |
+| **`-v "${PWD}\db:/db:ro"`** | **Monta una carpeta suya dentro del contenedor** | El contenedor no ve el archivo. `psql` responde que no existe |
+| **`postgres:16-alpine`** | **La imagen.** Aquí termina la mitad de Docker | — |
+
+**El `-v` de Docker se lee en tres partes, separadas por dos puntos:**
+
+```
+-v  "${PWD}\db  :  /db  :  ro"
+     |              |      |
+     |              |      solo lectura
+     |              como se ve ADENTRO
+     la carpeta de SU maquina
+```
+
+| | |
 |---|---|
-| **`docker run --rm`** | Levanta un contenedor y **lo borra al terminar**. No deja nada instalado |
-| **`-e PGCLIENTENCODING=UTF8`** | **Le avisa a `psql` que el archivo está en UTF-8** — ver abajo |
-| **`-v "${PWD}\db:/db:ro"`** | Monta la carpeta `db` dentro del contenedor, **de solo lectura**. El archivo entra **como bytes** |
-| **`postgres:16-alpine`** | La imagen que el `docker-compose.yml` ya usa |
-| **`psql "postgresql://..."`** | El cliente, con la cadena **en el formato de Neon** — aquí sí sirve ese formato, no es .NET |
-| **`-v ON_ERROR_STOP=1`** | **Para en el primer error.** Sin esto sigue de largo y uno termina con media base cargada creyendo que todo salió bien |
-| **`-f /db/bdfacturas_postgres.sql`** | El archivo, visto **desde dentro** del contenedor |
+| **`${PWD}`** | PowerShell lo reemplaza por **la carpeta donde usted está parado**. Por eso el `cd` de antes importa |
+| **`/db`** | El nombre que esa carpeta tiene **dentro** del contenedor. Por eso el archivo se llama `/db/bdfacturas_postgres.sql` y no `C:\...\db\...` |
+| **`:ro`** | *read only*. **El contenedor puede leer sus archivos, no escribirlos.** Cuesta cuatro letras y evita un accidente |
 
-> **Por qué montar la carpeta y no mandar el archivo por la tubería.**
-> PowerShell **reescribe el texto** al pasárselo a un programa externo, y con
-> las tildes haría **el mismo destrozo** que hizo `sqlcmd` en MonsterASP.
-> Montando la carpeta, el archivo viaja intacto.
+> **Las comillas no son decoración:** la ruta puede tener espacios —
+> `OneDrive\Desktop\proyectos usbmed`— y sin comillas PowerShell la parte en
+> pedazos.
+
+#### La mitad de `psql`
+
+| Parte | Qué hace | Qué pasa si falta |
+|---|---|---|
+| **`psql "postgresql://..."`** | El programa y **a dónde conectarse** | Intenta conectarse a una base local que no existe |
+| **`-v ON_ERROR_STOP=1`** | **Para en el primer error** | **Sigue de largo.** Uno termina con media base cargada **creyendo que todo salió bien** |
+| **`-f /db/bdfacturas_postgres.sql`** | El archivo a ejecutar, **con la ruta de adentro** | Se queda esperando que usted escriba SQL a mano |
+
+#### ¡OJO! El `-v` significa **dos cosas distintas** en el mismo comando
+
+**No es un error del tutorial — es así, y confunde a cualquiera:**
+
+| Dónde aparece | De quién es | Qué significa |
+|---|---|---|
+| `-v "${PWD}\db:/db:ro"` | **De Docker** | *volume* — **montar una carpeta** |
+| `-v ON_ERROR_STOP=1` | **De `psql`** | *variable* — **fijar una opción** |
+
+> **Lo que los distingue es la posición**, no la letra: el primero está **antes**
+> del nombre de la imagen; el segundo, **después**. Cambiarlos de lugar no da un
+> error claro — da uno confuso.
+
+#### Dos detalles que parecen contradicciones
+
+| | |
+|---|---|
+| **La imagen es `postgres:16` y Neon corre PostgreSQL 18** | **No importa:** lo único que usamos de la imagen es **el cliente**, y un `psql` 16 habla con un servidor 18 sin problema. Si quisiera el cliente exacto, cambie el `16` por `18` |
+| **La cadena va en formato `postgresql://`** | **Aquí sí es el formato bueno:** es la que entiende `psql`. **La de .NET —`Host=...;Database=...`— es la del paso anterior**, y solo sirve para la API |
+
+> **Esa es la confusión que viene:** la misma base, la misma contraseña, **dos
+> formatos de cadena**, y cada herramienta acepta solo el suyo. Copiar la de .NET
+> aquí produce un error de sintaxis que no explica nada.
+
+#### Y por qué montar la carpeta en vez de mandar el archivo por la tubería
+
+Sería más corto escribir `Get-Content archivo.sql | docker run -i ...`. **Y
+sería un error.**
+
+> **PowerShell reescribe el texto** al pasárselo a un programa externo: lo
+> convierte a la codificación de la consola, que en Windows no es UTF-8. **Las
+> tildes se partirían igual que con `sqlcmd`** — y esta vez por culpa de la
+> tubería, no del archivo.
+>
+> **Montando la carpeta, el archivo nunca pasa por la consola:** `psql` lo abre
+> él mismo, desde el disco, byte por byte.
 
 #### La salida, cuando sale bien
 

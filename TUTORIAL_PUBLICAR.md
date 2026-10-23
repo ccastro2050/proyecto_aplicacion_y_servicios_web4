@@ -2549,10 +2549,67 @@ conexión saldría en alemán.
 > **en español** — lo cual confunde, porque uno cree que el mensaje lo escribió
 > alguien del proyecto.
 
+#### ¿Y los archivos? En la página siguiente
+
+**La primera página solo tiene carpetas, y confunde:** el listado muestra **15
+renglones** y pone **las carpetas primero**. Las catorce más la fila `..`
+llenan la página justa. **Los 36 archivos están en las páginas 2, 3 y 4** — la
+paginación está abajo a la derecha.
+
+| Para verlos todos de una vez | |
+|---|---|
+| **Suba `Records`** | El desplegable de arriba dice `15`. Con `50` caben todos |
+| **O use el `Search`** | Filtra por nombre, ruta u origen |
+
+![La segunda pagina: los archivos](docs/tutorial_publicar/img/42_archivos_pagina2.png)
+
+#### Lo que enseña esta lista
+
+**1. Su código es una porción minúscula de lo que se publica.**
+
+| Archivo | Tamaño |
+|---|---|
+| **`ApiFacturas.dll`** — **todo su código** | **439 KB** |
+| El total subido | **18 MB** |
+
+> **Su trabajo es el 2 % del paquete.** El resto son las bibliotecas de las que
+> depende: el conector de SQL Server, Dapper, el manejo de tokens, Swagger.
+> **Eso es lo que significa «depender de un paquete»** — se ve en la balanza.
+
+**2. La columna `UPDATED` no dice cuándo se subió.**
+
+| Archivo | `CREATED` | `UPDATED` |
+|---|---|---|
+| `appsettings.Production.json` | hace 10 min | **hace 23 min** |
+| `appsettings.json` | hace 10 min | **hace 18 días** |
+| `Azure.Core.dll` | hace 10 min | **26.02.2024** |
+
+> **`CREATED` es cuándo llegó; `UPDATED` es la fecha que el archivo traía.**
+> WebDeploy **conserva la fecha de modificación original** — por eso el
+> `Azure.Core.dll` dice 2024: es cuando Microsoft lo compiló.
+>
+> **Y eso no es un detalle estético: es el mecanismo del `sync`.** Así decide
+> qué subir la próxima vez — **compara fechas y tamaños**. Un archivo cuya
+> fecha no cambió ni se vuelve a mandar. De ahí sale el *«only changed files
+> are transferred»*.
+>
+> **El `appsettings.json` con 18 días lo confirma**: nadie lo tocó desde
+> entonces, y el servidor lo sabe.
+
+**3. El botón `Edit` solo aparece en unos renglones.**
+
+| Tipo | Botones |
+|---|---|
+| `.json`, `.config` y demás texto | **`Download`** y **`Edit`** |
+| `.dll`, `.exe`, `.pdb` | **Solo `Download`** |
+
+> **No es un permiso: es sentido común.** Un `.dll` es binario — abrirlo en un
+> editor de texto no sirve de nada.
+
 #### Ver el `appsettings.Production.json` que llegó
 
-Los 36 archivos están repartidos en **cuatro páginas**. Para no pasarlas una a
-una, **escriba `appsettings` en el `Search`**.
+**Está en esa misma página 2**, y tiene botón `Edit`. Si prefiere ir directo,
+**escriba `appsettings` en el `Search`**.
 
 **Ábralo con el menú `...` del renglón**, con la opción de ver o editar.
 

@@ -4862,7 +4862,50 @@ bloqueado era **esa cuenta**, por una deuda vieja — no el plan.
 > con historial produce instrucciones que no le funcionan a nadie más. **La
 > única forma de saber qué va a ver el estudiante es empezar como él.**
 
-### 9.5 · Publicar el front Flask en Render
+### 9.5 · Un alto: ¿en MonsterASP usamos Docker?
+
+**No. En ningún momento.** Y conviene detenerse aquí, porque es la confusión
+que aparece apenas entran dos hospedajes distintos al mismo proyecto.
+
+| Dónde | ¿Docker? | Qué pasa de verdad |
+|---|---|---|
+| **Su máquina** | **Sí** | `docker compose up` levanta cinco contenedores: las dos bases, la API y los dos fronts |
+| **MonsterASP** | **No** | Usted compiló con `dotnet publish` y **subió los archivos** con `msdeploy`. **IIS los ejecuta directamente** |
+| **Render** | **Sí** | La plataforma **lee el `Dockerfile`, construye la imagen** y corre el contenedor |
+
+#### La prueba está en la lista de archivos que subió
+
+**Vuelva al Paso 6.5**, a los 50 archivos de `wwwroot`: hay `.dll`, `web.config`
+y los `appsettings`. **No hay ningún `Dockerfile`.**
+
+> **MonsterASP no sabe que ese archivo existe.** El `Dockerfile` de
+> `api_facturas` sirve únicamente para levantar la API **en su máquina**.
+
+#### Por qué cada uno hace lo suyo
+
+| | |
+|---|---|
+| **MonsterASP es un hospedaje de .NET** | **Ya tiene .NET 10 instalado.** No necesita que usted le diga cómo correr su aplicación: le basta el `web.config` que genera `publish` |
+| **Render no sabe qué es su aplicación** | Puede ser Python, Go o Rust. **El `Dockerfile` es la receta**: «parta de `python:3.12-slim`, instale esto, arranque así» |
+
+> **Y de ahí sale, en una frase, por qué el front Flask no cabía en
+> MonsterASP:** ese hospedaje corre **lo que él tiene instalado**; Render corre
+> **lo que usted le describa**.
+>
+> **Dos filosofías distintas**, y el curso termina con un ejemplo vivo de cada
+> una.
+
+#### La tabla completa, para la clase
+
+| | La API (C#) | El front Blazor (C#) | **El front Flask (Python)** |
+|---|---|---|---|
+| **En su máquina** | Contenedor | Contenedor | **Contenedor** |
+| **Publicado en** | MonsterASP | MonsterASP | **Render** |
+| **Cómo llega** | `publish` + `msdeploy` | `publish` + `msdeploy` | **`git push`** |
+| **Quién lo ejecuta** | IIS | IIS | **Docker** |
+| **¿Viaja el `Dockerfile`?** | **No** | **No** | **Sí — es lo único que viaja** |
+
+### 9.6 · Publicar el front Flask en Render
 
 #### La cuenta
 

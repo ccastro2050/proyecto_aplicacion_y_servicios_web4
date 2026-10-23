@@ -39,3 +39,8 @@ appsettings.Production.postgres.json
 __pycache__/
 *.pyc
 publicado_pg/
+
+# Las salidas de  dotnet publish  viven FUERA de las carpetas de proyecto:
+# dentro, el contenedor las vigila y recompila en ciclo, y ademas el SDK
+# las mete en el siguiente paquete. Ver TUTORIAL_PUBLICAR.md 8.10.
+publicados/

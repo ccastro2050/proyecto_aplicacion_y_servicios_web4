@@ -2631,4 +2631,96 @@ la base de datos adentro.
 > sabiendo que se pierde en la próxima subida.
 
 
+### 6.6 · Probar el sistema completo desde el Swagger publicado
+
+![El Swagger de la API publicada](docs/tutorial_publicar/img/43_swagger_publicado.png)
+
+```
+http://apifacturas-carloscastro.runasp.net/swagger
+```
+
+**Es el mismo Swagger de siempre**, con los catorce controladores y los cinco
+verbos de cada uno — pero ahora **la dirección es pública**: cualquiera con ese
+enlace lo abre, sin instalar nada y sin Docker.
+
+> **Fíjese en el enlace del documento OpenAPI**, debajo del título:
+> `http://apifacturas-carloscastro.runasp.net/swagger/v1/swagger.json`. **Ese
+> enlace es el contrato de la API**, y se le puede pasar a alguien para que
+> genere un cliente sin ver el código.
+
+#### Las credenciales de prueba
+
+Son las mismas de siempre — **las que siembra `bdfacturas.sql`**, y por eso
+funcionan igual publicadas:
+
+| Usuario | Contraseña | Quién es |
+|---|---|---|
+| **`admin@correo.com`** | **`admin123`** | **Administrador** — ve y hace todo |
+| `vendedor1@correo.com` | `admin123` | Vendedor |
+| `jefe@correo.com` | `admin123` | Jefe |
+| `cliente1@correo.com` | `admin123` | Cliente |
+
+> **Y esto sí es un secreto de mentiras:** son datos sembrados de un ejercicio
+> de clase, iguales en los cinco repositorios del curso. **No se parecen en
+> nada a una contraseña de verdad** — que es, justamente, lo que las hace
+> servibles para enseñar.
+>
+> **Pero ojo con una consecuencia real:** la API está **publicada en internet**
+> y estas claves son públicas. Cualquiera que vea este tutorial puede entrar.
+> **Mientras sea una demostración, está bien.** Si alguna vez pone datos que
+> importen, lo primero es cambiarlas.
+
+#### Los cuatro pasos en Swagger
+
+| | Qué hacer |
+|---|---|
+| **1** | Despliegue **`POST /api/sesion`** → **`Try it out`** |
+| **2** | En el cuerpo: `{ "email": "admin@correo.com", "contrasena": "admin123" }` → **`Execute`** |
+| **3** | De la respuesta, **copie el valor de `token`** — sin las comillas |
+| **4** | Arriba, **`Authorize`** → pegue el token → `Authorize` → `Close` |
+
+> **En el `Authorize` va el token pelado**, sin escribir `Bearer` adelante: **esa
+> palabra la pone Swagger**. Es el error más común, y se manifiesta como un 401
+> después de haberse autenticado bien.
+
+**De ahí en adelante, el candado de cada ruta queda cerrado** y cualquier
+`Try it out` lleva el token.
+
+#### Comprobado contra la API publicada
+
+**No es teoría: esto se corrió contra `apifacturas-carloscastro.runasp.net`.**
+
+| Petición | Respuesta |
+|---|---|
+| `POST /api/sesion` con `admin123` | **`token`, `email`, `roles`, `expira`** — la sesión se abrió |
+| `GET /api/cliente` con el token | **4 clientes** |
+| `GET /api/producto` con el token | La lista de productos |
+| `GET /api/consultas/ventas-por-producto` | La consulta multitabla de la v4 |
+
+Y el primer cliente llegó así:
+
+```json
+{"id":1,"credito":520000.00,"fkcodpersona":"P001","fkcodempresa":"E001"}
+```
+
+> **Ese `P001` es Ana Torres**, la primera persona que sembramos con el
+> `bdfacturas_publicar.sql` en el Paso 4. **El círculo se cerró:** el archivo
+> `.sql` que importó en el panel, la base de datos `db75266`, la cadena de
+> conexión del `appsettings.Production.json`, el `ApiFacturas.dll` que subió
+> con `msdeploy` — **y un dato que sale por internet**.
+
+#### Y el sobre de la respuesta, de paso
+
+```json
+{ "datos": [...], "total": 4, "limite": 50, "tabla": "cliente" }
+```
+
+**La lista no viene suelta: viene envuelta.** Es el contrato del curso — el
+front no tiene que adivinar cuántos hay ni de dónde salieron.
+
+#### Lo que falta: la interfaz
+
+**La API ya sirve. Lo que no hay todavía es la pantalla**, y es el Paso 7.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

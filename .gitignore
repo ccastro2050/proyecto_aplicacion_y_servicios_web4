@@ -33,3 +33,8 @@ publicado/
 
 # La variante PostgreSQL: trae la contrasena de Neon.
 appsettings.Production.postgres.json
+
+# Compilados de Python: los genera el interprete al importar, y en el
+# contenedor los crea root. No se versionan.
+__pycache__/
+*.pyc

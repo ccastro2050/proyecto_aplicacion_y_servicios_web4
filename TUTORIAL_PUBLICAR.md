@@ -845,6 +845,122 @@ idéntico al de una credencial mala, y la causa es otra.
 > **Si le pasa:** deje de intentar, vaya a **Automated Security Protection** y
 > quite el bloqueo de su IP. Seguir probando solo lo confirma.
 
-## Pasos 4 y 5 — pendientes
+## Paso 4 — Cargar el esquema y los datos
+
+### 4.1 · Antes de subir nada: adaptar el script
+
+**El script del proyecto NO se puede subir tal cual.** Su línea 7 dice:
+
+```sql
+USE bdfacturas_sqlserver_local;
+```
+
+| Por qué falla | |
+|---|---|
+| **Esa base no existe en el hospedaje** | Allá se llama `db75266` |
+| **Y aunque existiera, no tendría permiso** | El usuario `db75266` solo manda sobre **su** base |
+
+**Lo que pasa si se sube así:** el `USE` se rechaza y lo que viene después o
+falla o se ejecuta donde no es. Y el error habla de la base, no del script.
+
+**La solución es quitar esa línea y su `GO`.** Nada más — los objetos se crean
+en la base a la que uno ya está conectado, que es justo lo que se quiere.
+
+En este repositorio ya está hecho:
+
+| Archivo | Para qué |
+|---|---|
+| `db/bdfacturas.sql` | El original, **para su máquina**. Lleva el `USE` |
+| `db/bdfacturas_publicar.sql` | **El de publicar.** El mismo, sin el `USE` |
+
+> **Son dos archivos a propósito, y el de publicar lo dice en su cabecera.** Un
+> solo archivo que sirva para los dos sitios no existe: en local hace falta el
+> `USE` y en el hospedaje estorba.
+
+### 4.2 · La pantalla de importar
+
+**QUICK ACTIONS → `Import SQL`**, o la ficha **Import** de abajo.
+
+![La pantalla de importar, vacía](docs/tutorial_publicar/img/19_import_vacio.png)
+
+La pantalla explica su propio proceso en tres pasos:
+
+| # | Qué dice | Qué significa |
+|---|---|---|
+| **1** | *Upload the .sql script* | Subir el archivo, **desde su computador** (hasta 2 GB) o desde un sitio alojado aquí |
+| **2** | *Start the import* | **El script corre con `sqlcmd` en el servidor**, en segundo plano |
+| **3** | *Watch the progress* | La lista de **Imports** muestra filas importadas, duración y errores **en vivo** |
+
+> **Ese «corre con `sqlcmd`» resuelve una duda importante.** `sqlcmd` es el
+> cliente oficial de línea de comandos de SQL Server, y **entiende `GO`** — que
+> no es T-SQL, sino una instrucción del cliente para separar lotes. El script de
+> este proyecto tiene **27**, y con otro importador podrían haber reventado.
+
+> **Y «en segundo plano» quiere decir que puede cerrar la página.** La
+> importación sigue, y al volver la lista muestra en qué va. Con un script de
+> noventa mil caracteres eso importa.
+
+**Oprima `Upload SQL file`** y escoja `db/bdfacturas_publicar.sql`.
+
+> **El tamaño no es problema:** el límite es **2 GB** y el archivo pesa **92
+> KB**.
+
+### 4.3 · Escoger el archivo
+
+![El selector de archivos, con los tres .sql de la carpeta db](docs/tutorial_publicar/img/20_escoger_archivo.png)
+
+En `db/` hay **tres** archivos, y solo uno sirve aquí:
+
+| Archivo | |
+|---|---|
+| `bdfacturas.sql` | **No.** Es el de su máquina: lleva el `USE` que falla |
+| `bdfacturas_postgres.sql` | **No.** Es del otro motor |
+| **`bdfacturas_publicar.sql`** | **Sí.** 91 KB |
+
+### 4.4 · El diálogo de confirmación, y sus tres avisos
+
+![El diálogo de Import SQL file](docs/tutorial_publicar/img/21_dialogo_import.png)
+
+**El archivo se renombró al subir**:
+`db75266_bdfacturas_publicar_20261023035734.sql`. El hospedaje le antepone la
+base y le pega la fecha y la hora — así, si sube el mismo script tres veces, los
+tres quedan distinguibles.
+
+Y trae tres avisos, cada uno con su consecuencia:
+
+| Aviso | Qué significa |
+|---|---|
+| *Statements are executed with the **owner privileges**… and **cannot be undone**. If the script drops or overwrites data, **create a backup first**.* | **Este script empieza borrando.** Sus primeras líneas hacen `DROP` de disparadores, procedimientos y tablas. Sobre una base vacía da igual; **sobre una con datos, se los lleva** |
+| *Errors in individual statements **do not stop the import** — they are collected in the log so you can fix and re-run only the failed parts.* | **El más importante de los tres**, y está abajo |
+| *Scripts that switch to or reference **system databases** (master, model, msdb, tempdb) are **rejected**.* | Confirma por qué hubo que quitar el `USE`: el importador vigila a qué base apunta el script |
+
+> **«Success» NO significa «todo salió bien».** Significa que el proceso
+> terminó. Como los errores de una instrucción **no detienen** la importación,
+> un script puede acabar en verde con la mitad de los procedimientos sin crear.
+>
+> **Por eso hay que mirar el registro, no el color.**
+
+### 4.5 · El resultado
+
+![La importación terminada: Success, 116 filas](docs/tutorial_publicar/img/22_import_exitoso.png)
+
+| Dónde | Qué dice |
+|---|---|
+| **STATUS** | `Success` |
+| **ROWS** | `116 rows` |
+| **DURATION** | `0 seconds` |
+| **Tables**, en el menú izquierdo | **12** — y antes decía **0** |
+
+**Ese `12` es la comprobación de verdad**, no el `Success`: las doce tablas del
+modelo están creadas.
+
+> **Y las 116 filas son los datos sembrados**, los del `DATOS_DE_PRUEBA.md` del
+> proyecto: productos, personas, empresas, roles, rutas, usuarios, clientes,
+> vendedores y las facturas de ejemplo.
+
+**Oprima `Detail`** en la fila de la importación: ahí está el registro
+instrucción por instrucción, que es donde se ve si alguna falló en silencio.
+
+## Paso 5 — pendiente
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

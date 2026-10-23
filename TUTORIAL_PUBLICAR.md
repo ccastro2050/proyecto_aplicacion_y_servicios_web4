@@ -1955,24 +1955,53 @@ puesta el valor por defecto es `Production`**.
 | `api_facturas/appsettings.Production.json`**`.ejemplo`** | **La plantilla**, con `SU_CONTRASENA` | **Sí** |
 | `api_facturas/appsettings.Production.json` | **El de verdad**, con la contraseña puesta | **No** — está en `.gitignore` |
 
-Su contenido:
+#### Cómo queda el archivo, completo
+
+**Éste es el contenido entero**, tal como está en el proyecto — con los
+comentarios y todo:
 
 ```json
 {
+  "_comentario": "ESTE ARCHIVO NO SE VERSIONA -esta en .gitignore- porque trae la contrasena real de la base de datos del hospedaje. La plantilla que si se versiona es appsettings.Production.json.ejemplo, al lado. Si clona el repositorio en otra maquina, copie la plantilla y vuelva a poner la contrasena.",
+
+  "_por_que_Production": "ASP.NET Core lee appsettings.json y encima appsettings.<Entorno>.json. En el hospedaje no se fija ASPNETCORE_ENVIRONMENT, y cuando no se fija el entorno es Production: por eso este archivo gana sobre el otro, SOLO publicado. En su maquina sigue mandando appsettings.json, que apunta a Docker.",
+
   "Motor": "sqlserver",
 
   "ConnectionStrings": {
+    "_comentario": "Es la cadena de Local access, no la de Remote access. La API vive en el mismo centro de datos que la base de datos, asi que no sale a internet: por eso el servidor NO lleva .public y por eso Encrypt=False.",
     "SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=SU_CONTRASENA; Encrypt=False; MultipleActiveResultSets=True;"
   }
 }
 ```
 
-**Dos renglones, y los dos importan:**
+#### Renglón por renglón
 
-| Renglon | Por qué está |
-|---|---|
-| **`"Motor": "sqlserver"`** | La v4 habla con **dos motores** — SQL Server y PostgreSQL— y esta clave escoge. En el hospedaje solo tenemos SQL Server |
-| **La cadena** | Es la de **`Local access`**, copiada del panel. **No la de `Remote access`** |
+| Clave | ¿La usa la API? | Para qué está |
+|---|---|---|
+| **`_comentario`** | **No** | Explica **qué es este archivo** y por qué no se versiona |
+| **`_por_que_Production`** | **No** | Explica **por qué se llama así**, que es lo que nadie recuerda después |
+| **`Motor`** | **Sí** | La v4 habla con **dos motores** —SQL Server y PostgreSQL— y esta clave escoge. En el hospedaje solo tenemos SQL Server |
+| **`ConnectionStrings._comentario`** | **No** | Recuerda **cuál de las dos cadenas** es ésta |
+| **`ConnectionStrings.SqlServer`** | **Sí** | La cadena de **`Local access`**, copiada del panel. **No la de `Remote access`** |
+
+> **¿Por qué hay claves que empiezan por guión bajo?** **Porque JSON no tiene
+> comentarios.** No existe el `//` ni el `/* */`: si los escribe, el archivo
+> deja de ser JSON válido.
+>
+> **La salida es una clave de mentiras.** `_comentario` es una clave como
+> cualquier otra, pero **ninguna parte del código la busca** — la API pide
+> `Motor` y `ConnectionStrings:SqlServer`, y lo que sobre lo ignora. El guión
+> bajo al principio es la señal, para quien lea, de que **eso es para leer, no
+> para funcionar**.
+>
+> **Y es la convención de todo este proyecto**, no un invento de esta página:
+> abra `api_facturas/appsettings.json` y va a ver los mismos `_comentario`.
+
+> **Que un archivo de configuración se explique a sí mismo no es adorno.** Este
+> archivo **no está en GitHub**: no tiene historial, no tiene mensaje de commit
+> y nadie va a poder preguntarle a `git log` por qué existe. **Lo único que va
+> a quedar es lo que diga adentro.**
 
 > **Por qué la local y no la remota, otra vez.** La API va a correr **en el
 > mismo centro de datos** que la base de datos. No necesita salir a internet

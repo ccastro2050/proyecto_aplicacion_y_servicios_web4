@@ -27,6 +27,29 @@ En el tutorial todo lo sensible va como **marcador**:
 | `<CLAVE_JWT>` | La clave con que se firman los tokens |
 | `<CLAVE_CORREO>` | La clave de aplicación del correo |
 
+### En este tutorial se ven, en el proyecto de aula NO
+
+**Aquí las credenciales aparecen en las capturas a propósito**: sin verlas no
+se entiende de dónde sale cada dato, y el tutorial dejaría de enseñar. Es
+material de clase, y las de este ejemplo se cambian al terminar.
+
+> **En el proyecto de aula eso no se vale, y la rúbrica lo califica.** Ahí los
+> secretos van en **variables de entorno**: la cadena de conexión, la clave con
+> que se firman los tokens y la clave del correo **no se escriben en ningún
+> archivo del repositorio**.
+
+| | En este tutorial | En el proyecto de aula |
+|---|---|---|
+| La cadena de conexión | Se ve, para poder explicarla | **Variable de entorno** |
+| La clave de los tokens | Se ve | **Variable de entorno** |
+| La clave del correo | Se ve | **Variable de entorno** |
+| El `appsettings.json` | Se muestra lleno | **Va al repositorio sin secretos** |
+
+> **Y la regla que hace que esto no sea solo una advertencia:** una contraseña
+> escrita en el repositorio **queda en el historial de git para siempre**.
+> Borrarla en un commit posterior no la saca del historial — solo la esconde de
+> la vista. La única salida real es **cambiar la contraseña**.
+
 **Los valores reales van en un archivo local que NO se commitea.** Cree
 `credenciales.local.txt` en la raíz y agréguelo al `.gitignore`:
 
@@ -844,6 +867,58 @@ idéntico al de una credencial mala, y la causa es otra.
 
 > **Si le pasa:** deje de intentar, vaya a **Automated Security Protection** y
 > quite el bloqueo de su IP. Seguir probando solo lo confirma.
+
+### 3.6 · Encendido: qué aparece y qué significa
+
+Al oprimir **`Enabled`**, los campos tachados se llenan.
+
+![El panel de Remote access encendido](docs/tutorial_publicar/img/25_remote_encendido.png)
+
+| Campo | Qué es |
+|---|---|
+| **Enabled / Disabled** | El interruptor. **Verde a la izquierda = encendido**, y la base queda alcanzable desde internet |
+| **Server** · `db75266.public.databaseasp.net` | **El nombre público.** Es el de siempre con **`.public`** metido en medio — y ésa es toda la diferencia con el interno |
+| *Never use the IP address, it can change* | El aviso del panel: **siempre el nombre, nunca la IP.** La dirección numérica del servidor puede cambiar sin avisar y dejar su configuración muerta |
+| **Port** · `1433` | El puerto estándar de SQL Server. El mismo en las dos pestañas |
+| **Login** · `db75266` | **El mismo usuario.** No hay una cuenta aparte para el acceso remoto |
+| **Password** | **La misma contraseña**, con **`Show`** para verla y **`Change`** para cambiarla |
+
+> **Lo único que cambia entre las dos pestañas es el nombre del servidor.**
+> Usuario, contraseña, puerto y base son idénticos — por eso el error es tan
+> fácil: se copia la cadena de `Local access`, se pega en SSMS, y no conecta.
+> Y uno revisa la contraseña veinte veces antes de mirar el servidor.
+
+#### Y una segunda diferencia, que no está a la vista
+
+Compare las dos cadenas de conexión:
+
+```
+Local access:
+Server=db75266.databaseasp.net; ... Encrypt=False; MultipleActiveResultSets=True;
+
+Remote access:
+Server=db75266.public.databaseasp.net; ... Encrypt=True; TrustServerCertificate=True; MultipleActiveResultSets=True;
+```
+
+| | Local | Remota |
+|---|---|---|
+| `Encrypt` | **False** | **True** |
+| `TrustServerCertificate` | — | **True** |
+
+> **No es un capricho: es coherente.** La conexión local **no sale del centro
+> de datos**, así que cifrarla no agrega nada. La remota **viaja por internet
+> abierto**, así que se cifra — pero `TrustServerCertificate=True` significa
+> que **se acepta el certificado sin validar quién lo emitió**.
+>
+> Para un proyecto de clase está bien. En un sistema de verdad, eso deja la
+> puerta abierta a que alguien se interponga en la conexión: se cifra, sí, pero
+> contra quien sea que conteste.
+
+#### Apáguelo cuando no lo necesite
+
+**Mientras está encendido, la base es alcanzable desde cualquier parte del
+mundo.** Si solo lo encendió para cargar algo con SSMS, vuelva a `Disabled` al
+terminar. La API publicada **no lo necesita**: ella usa `Local access`.
 
 ## Paso 4 — Cargar el esquema y los datos
 

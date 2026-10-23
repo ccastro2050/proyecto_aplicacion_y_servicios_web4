@@ -2275,4 +2275,188 @@ dotnet publish -c Release -o publicado
 ```
 
 
+### 6.3 · Subirla: `msdeploy`
+
+#### El comando
+
+**Desde la misma carpeta `api_facturas`:**
+
+```powershell
+& "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
+  -verb:sync `
+  -source:contentPath="C:\Users\fcl\OneDrive\Desktop\proyectos_usbmed\2026_2\proyecto_aplicacion_y_servicios_web4\api_facturas\publicado" `
+  -dest:contentPath="site101125",computerName="https://site101125.siteasp.net:8172/msdeploy.axd?site=site101125",userName="site101125",password="c+3LK6h#-iM4",authType="Basic" `
+  -enableRule:AppOffline `
+  -allowUntrusted
+```
+
+> **El acento grave `` ` `` al final de cada renglón es el continuador de
+> PowerShell**: dice «el comando sigue abajo». Si prefiere, bórrelos y escriba
+> todo en una sola línea — es exactamente lo mismo.
+
+#### Pieza por pieza
+
+| Parte | Qué dice |
+|---|---|
+| **`& "C:\Program Files\...\msdeploy.exe"`** | El programa. **El `&` hace falta** porque la ruta tiene espacios: sin él, PowerShell cree que es un texto |
+| **`-verb:sync`** | **Sincronizar**, no copiar. Compara las dos carpetas y manda **solo la diferencia** |
+| **`-source:contentPath=`** | **Qué mando**: la carpeta `publicado`, **con la ruta completa** |
+| **`-dest:contentPath="site101125"`** | **A cuál sitio.** Es el `Site` del panel |
+| **`computerName="https://site101125.siteasp.net:8172/msdeploy.axd?site=site101125"`** | **A qué servidor.** Fíjese que el identificador va **dos veces**: en el `contentPath` y en el `?site=` |
+| **`userName`** · **`password`** | El `Login` y el `Password` de `Visual Studio access` |
+| **`authType="Basic"`** | Usuario y contraseña, **no** la cuenta de Windows de su máquina |
+| **`-enableRule:AppOffline`** | **Pausa el sitio mientras sube** y lo levanta al terminar |
+| **`-allowUntrusted`** | Acepta el certificado del puerto 8172 sin validar quién lo emitió |
+
+> **`-enableRule:AppOffline` no es opcional en la práctica.** Si el sitio está
+> corriendo, el `ApiFacturas.dll` **está en uso** y el servidor no deja
+> reemplazarlo. Con esta regla, WebDeploy pone un `app_offline.htm`, el proceso
+> suelta los archivos, sube todo y lo quita. **Sin ella, el error típico es
+> «file in use» a mitad de camino**, con el sitio a medio actualizar.
+
+#### Lo que sale, y cómo leerlo
+
+**Son muchos renglones. Hay tres que importan:**
+
+```
+Info: Usando el id. '8f6c13c3-...' para las conexiones al servidor remoto.
+Info: Adding file (site101125\ApiFacturas.dll).
+Info: Deleting file (site101125\iisstart.htm).
+...
+Numero total de cambios: 81 (80 agregados, 1 eliminados, 0 actualizados, 0 parametros cambiados, 18647083 bytes copiados)
+```
+
+| Renglón | Qué significa |
+|---|---|
+| `Usando el id. ...` | Se conectó y el servidor le dio una sesión. **Si las credenciales estuvieran mal, el comando moriría aquí** |
+| `Adding file (...)` | Cada archivo que sube. La primera vez son todos |
+| **`Deleting file (site101125\iisstart.htm)`** | **El único borrado** — ver abajo |
+| **`Numero total de cambios: 81`** | **El resumen, y la línea que hay que leer** |
+
+**El resumen, desglosado:**
+
+| | |
+|---|---|
+| **80 agregados** | Los 50 archivos más las carpetas: los idiomas de `Microsoft.Data.SqlClient` y los `runtimes` por plataforma |
+| **1 eliminado** | `iisstart.htm` |
+| **0 actualizados** | No había nada que actualizar: estaba vacío |
+| **18.647.083 bytes** | Los 18 MB |
+
+#### Ese `iisstart.htm` borrado es la demostración de qué es «sincronizar»
+
+**`iisstart.htm` era la página de «Your website is ready…»** — la que vimos
+en la miniatura del panel, la que el hospedaje pone en todo sitio nuevo.
+
+**Nadie le dijo a `msdeploy` que la borrara.** La borró porque
+**`-verb:sync` deja el destino igual al origen**, y en `publicado` no hay
+ningún `iisstart.htm`.
+
+> **Eso es lo que separa `sync` de «subir por FTP»**, y conviene entenderlo en
+> las dos direcciones:
+>
+> | | |
+> |---|---|
+> | **A favor** | **Lo que queda arriba es exactamente lo que usted publicó.** No sobrevive un archivo viejo de una versión anterior causando un error imposible de explicar |
+> | **En contra** | **Lo que esté en el servidor y no en su carpeta, se borra.** Si alguien subió algo a mano —una imagen, un archivo de configuración— **desaparece en la siguiente publicación** |
+>
+> **Para una API no es problema**: todo lo que necesita viene de `publicado`.
+> Pero vale saberlo antes de que pase.
+
+#### Y la segunda vez va a ser mucho más corta
+
+Esta fue la primera: **subió todo**. La próxima, **solo lo que cambie** — si
+tocó un controlador, un archivo; si cambió la configuración, otro. Es lo que
+prometía el panel: *«only changed files are transferred, so subsequent deploys
+are quick»*.
+
+**El ciclo completo de ahí en adelante son dos comandos:**
+
+```powershell
+dotnet publish -c Release -o publicado
+& "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="...\publicado" -dest:contentPath="site101125",computerName="https://site101125.siteasp.net:8172/msdeploy.axd?site=site101125",userName="site101125",password="c+3LK6h#-iM4",authType="Basic" -enableRule:AppOffline -allowUntrusted
+```
+
+
+### 6.4 · Comprobar que quedó viva — en tres golpes
+
+**No basta con que el comando no diera error.** Hay tres cosas distintas que
+pueden estar mal, y **cada prueba descarta una**:
+
+| Prueba | Qué demuestra |
+|---|---|
+| **1. La raíz** | Que el sitio **arranca** |
+| **2. Swagger** | Que los **controladores** se cargaron |
+| **3. Un inicio de sesión fallido** | Que **la base de datos contesta** |
+
+#### 1. La raíz: ¿arranca?
+
+```
+http://apifacturas-carloscastro.runasp.net/
+```
+
+```json
+{"mensaje":"API Facturas funcionando","version":"v4","motor":"sqlserver",
+ "contratos":"docs/spec_kit/versiones/v4_aplicativo/6_contracts.md"}
+```
+
+| Lo que dice | Por qué importa |
+|---|---|
+| `API Facturas funcionando` | **El proceso arrancó.** Ya no está el `iisstart.htm` |
+| `"version":"v4"` | Es la versión que creíamos |
+| **`"motor":"sqlserver"`** | **El `appsettings.Production.json` sí se está leyendo.** En su máquina esto también dice `sqlserver`, pero aquí lo dice **porque ganó el archivo de producción** |
+
+> **Si esta primera petición tarda varios segundos, es el arranque en frío**
+> del plan gratuito. La segunda vuela.
+
+#### 2. Swagger: ¿se cargaron los controladores?
+
+```
+http://apifacturas-carloscastro.runasp.net/swagger
+```
+
+**Debe abrir la página interactiva de siempre**, con los catorce controladores
+y el botón `Authorize`.
+
+> **Que esto funcione publicado no era obvio.** En muchos proyectos Swagger
+> está envuelto en un `if (app.Environment.IsDevelopment())`, y entonces
+> **desaparece justo donde más se necesita**. En esta API no lo está — por eso
+> se puede probar el sistema publicado sin instalar nada.
+
+#### 3. La prueba que de verdad importa: ¿contesta la base de datos?
+
+**Las dos anteriores pasarían igual con la cadena de conexión equivocada.** La
+API arranca sin tocar la base de datos — solo la toca en la primera petición
+que necesite datos.
+
+**El truco: intentar entrar con una contraseña que uno sabe que está mal.**
+
+```powershell
+Invoke-RestMethod -Uri "http://apifacturas-carloscastro.runasp.net/api/sesion" `
+  -Method POST -ContentType "application/json" `
+  -Body '{"email":"admin@correo.com","contrasena":"estaNoEs"}'
+```
+
+La respuesta esperada:
+
+```json
+{"estado":401,"mensaje":"El correo o la contrasena no son correctos."}
+```
+
+| La respuesta | Qué quiere decir |
+|---|---|
+| **`401` con ese mensaje** | **Todo bien.** Para poder decir que la contraseña no sirve, la API **tuvo que ir a la base de datos**, buscar el correo y comparar. **La conexión funciona** |
+| **`500`** | **La conexión NO funciona.** Revise el `appsettings.Production.json`: servidor, usuario, contraseña |
+| **`404`** | La ruta está mal escrita, no es un problema de datos |
+
+> **Ese 401 es la mejor noticia de todo el tutorial**, y es contraintuitivo:
+> **un error es la prueba de que todo funciona.** Un rechazo correcto exige que
+> la cadena entera esté bien — red, credenciales del servidor, base de datos,
+> tabla, consulta y comparación de la clave. **Lo único que falla es lo que
+> queríamos que fallara.**
+
+> **Y por eso es la prueba que se le pide a un estudiante**: no necesita saber
+> ninguna contraseña de verdad para demostrar que su sistema quedó bien
+> publicado.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

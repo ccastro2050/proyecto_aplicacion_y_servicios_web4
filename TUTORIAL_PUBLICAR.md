@@ -1008,6 +1008,49 @@ bloque de inserciones. Si faltara una tabla por sembrar, aquí habría once.
 los dieciséis procedimientos y los datos de ejemplo. Lo que falta es la API que
 la use.
 
+### 4.7 · Ver las tablas: la comprobación que cierra el paso
+
+**Tables**, en el menú de la izquierda.
+
+![La lista de las doce tablas con sus filas](docs/tutorial_publicar/img/24_tablas_cargadas.png)
+
+**Las doce tablas, con las filas que trae cada una:**
+
+| Tabla | Filas | | Tabla | Filas |
+|---|---|---|---|---|
+| `cliente` | 4 | | `rol` | 5 |
+| `empresa` | 3 | | `rol_usuario` | 21 |
+| `factura` | 6 | | `ruta` | 15 |
+| `persona` | 6 | | `rutarol` | 25 |
+| `producto` | 8 | | `usuario` | 8 |
+| `productosporfactura` | 12 | | `vendedor` | 3 |
+
+> **Esas doce cifras suman 116**, que es exactamente lo que dijo el registro de
+> la importación. **Las dos cuentas cuadran**, y por eso ésta es la
+> comprobación que cierra el paso: no es que el proceso haya terminado — es que
+> los datos están donde deben.
+
+> **Y de paso se reconoce el modelo:** `rutarol` con 25 filas y `rol_usuario`
+> con 21 son las dos tablas puente del control de acceso; `productosporfactura`
+> con 12 son los renglones de las 6 facturas.
+
+#### Los archivos físicos, abajo
+
+| Tipo | Archivo | Usa | Límite |
+|---|---|---|---|
+| **Data** | `db75266.mdf` | 8 MB | **1024 MB** |
+| **Log** | `db75266_log.ldf` | 8 MB | **5120 MB** |
+
+> **El registro de transacciones tiene su propio límite, y es cinco veces el de
+> los datos.** Conviene saberlo: el `1 GB` del plan gratuito es para los datos;
+> el `.ldf` tiene 5 GB aparte. Un proceso que inserte y borre mucho **infla el
+> registro sin que crezcan los datos**, y para eso están los botones
+> **`Shrink data`** y **`Shrink logs`**, que devuelven el espacio liberado.
+
+> **Cuidado con el botón rojo de arriba, `Delete all content`.** Vacía la base
+> entera —las doce tablas— sin borrar la base. Es útil para volver a empezar un
+> ejercicio, y es fácil de oprimir por error.
+
 ## Paso 5 — pendiente
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

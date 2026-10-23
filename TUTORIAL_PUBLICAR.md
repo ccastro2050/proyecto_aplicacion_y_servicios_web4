@@ -3472,4 +3472,82 @@ después de compilar, y hay que volver a hacer `dotnet publish` y `msdeploy`.
 > API: es un número viejo. `Recalculate` lo pone al día.
 
 
+### 7.6 · El sistema completo, y un defecto que solo aparece publicado
+
+![El front publicado con la sesion iniciada y las facturas](docs/tutorial_publicar/img/50_front_facturas.png)
+
+**Entró con `admin@correo.com`, y ahí está todo funcionando:** el menú con las
+trece interfaces, `admin@correo.com [Administrador]`, y las seis facturas con
+su cliente, su vendedor y su total.
+
+**Esa pantalla recorrió la cadena entera:**
+
+```
+navegador -> front (site101138) -> API (site101125) -> base de datos (db75266)
+```
+
+#### Pero mire la columna del vendedor
+
+```
+Carlos PA(c)rez        MarA-a GA3mez        Juan DA-az
+```
+
+**Las tildes están rotas.** Y no es el front: **son los datos, mal guardados en
+la base de datos.**
+
+#### De dónde salió
+
+| | |
+|---|---|
+| El archivo `bdfacturas_publicar.sql` estaba en **UTF-8** | Es lo correcto |
+| Pero **sin BOM** | La marca de tres bytes que anuncia «esto es UTF-8» |
+| El hospedaje importa con **`sqlcmd`** | Y `sqlcmd`, **sin BOM, lee el archivo como Windows-1252** |
+
+**Entonces cada letra acentuada se partió en dos.** En UTF-8, la `é` ocupa dos
+bytes (`C3 A9`); leídos como Windows-1252, esos dos bytes son **dos
+caracteres**: `Ã` y `©`. Así quedaron guardados.
+
+> **Y esto es lo que lo hace peligroso: el import dijo `Success` y `Errors 0`.**
+> Para SQL Server no hubo ningún error — recibió texto perfectamente válido,
+> solo que el texto equivocado. **La comprobación de «cero errores» no alcanza
+> para esto.**
+>
+> **Ni se nota en su máquina.** En Docker la base se carga por otro camino, que
+> sí respeta el UTF-8. **Es un defecto que solo existe publicado** — de los que
+> aparecen el día de la sustentación.
+
+#### El arreglo: tres bytes
+
+**Al archivo `db/bdfacturas_publicar.sql` se le agregó el BOM de UTF-8** — los
+bytes `EF BB BF` al principio, invisibles en el editor. Con eso, `sqlcmd`
+reconoce la codificación y los acentos entran bien.
+
+| | |
+|---|---|
+| **En VS Code** | Abajo a la derecha dice la codificación. Debe decir **`UTF-8 with BOM`** |
+| **Si dice `UTF-8` a secas** | Haga clic ahí → `Save with Encoding` → `UTF-8 with BOM` |
+
+#### Y hay que volver a importar
+
+**El archivo arreglado no arregla los datos ya cargados.** Hay que repetir el
+Paso 4 con el archivo nuevo:
+
+**`Databases` → `bdfacturas` → `Import SQL`** → el mismo archivo → importar.
+
+> **Y se puede hacer sin miedo**, porque el script **empieza borrando todo**:
+> los disparadores, los procedimientos y las doce tablas, en orden. Está hecho
+> para correrse encima de sí mismo.
+>
+> **Lo que sí se pierde son los datos que haya agregado a mano** desde la
+> interfaz. En una demostración no importa; el día que importe, primero un
+> respaldo.
+
+**Después de reimportar, recargue el front.** Donde decía `Carlos PA(c)rez` debe
+decir **`Carlos Pérez`**.
+
+> **Por qué no hay que volver a publicar nada:** el defecto estaba **en los
+> datos**, no en el código. La API y el front siguen siendo los mismos
+> archivos.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

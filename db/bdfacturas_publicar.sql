@@ -1,8 +1,22 @@
--- ============================================================
+﻿-- ============================================================
 -- Script para PUBLICAR en un hospedaje
 --
--- Es el mismo bdfacturas.sql, con UNA diferencia:
---   se quito la linea  USE bdfacturas_sqlserver_local;  y su GO.
+-- Es el mismo bdfacturas.sql, con DOS diferencias:
+--
+--   1) se quito la linea  USE bdfacturas_sqlserver_local;  y su GO.
+--   2) este archivo empieza con el BOM de UTF-8 (los tres bytes
+--      EF BB BF, invisibles en el editor).
+--
+-- POR QUE EL BOM: el hospedaje importa con sqlcmd, y sqlcmd SIN el BOM
+-- lee el archivo como Windows-1252. Entonces cada letra acentuada -que
+-- en UTF-8 ocupa dos bytes- se guarda como dos caracteres: Perez entra
+-- como PA(c)rez, Maria como MarA-a. Y NO da error: el import dice
+-- Success y Errors 0, porque para SQL Server es texto valido. El
+-- destrozo solo se ve despues, en las pantallas.
+--
+-- Con el BOM, sqlcmd reconoce UTF-8 y los acentos entran bien.
+-- Si abre este archivo y lo vuelve a guardar, asegurese de que el
+-- editor conserve el BOM -en VS Code: UTF-8 with BOM-.
 --
 -- POR QUE: en el hospedaje la base ya existe y tiene otro nombre
 -- -por ejemplo db75266-, y el usuario solo tiene permiso sobre ESA.

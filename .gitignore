@@ -26,3 +26,7 @@ appsettings.Production.json
 # compilar, se regenera con un comando, y ademas se lleva adentro el
 # appsettings.Production.json con la contrasena.
 publicado/
+
+# EXCEPCION: la del front no tiene secretos -solo la direccion publica de
+# la API-, asi que esa si se versiona.
+!front_blazor/appsettings.Production.json

@@ -2880,9 +2880,69 @@ puerta mala.**
 estudiante, en Postman y —sobre todo— **en el `UrlApi` del front**, que es lo
 que sigue.
 
+#### Hecho: así quedó
+
+![La seccion HTTPS con el certificado emitido y la redireccion encendida](docs/tutorial_publicar/img/47_https_encendido.png)
+
+```
+Done - HTTPS redirect was enabled
+Secured 1 of 1 domain      HTTPS redirect on
+apifacturas-carloscastro.runasp.net -> HTTPS
+Let's Encrypt - renews automatically - expires in 60 days (22.12.2026)
+```
+
+**Y la redirección se comprobó desde la terminal**, que es lo único que no
+miente:
+
+```
+http://apifacturas-carloscastro.runasp.net/
+-> 307, redirige a: https://apifacturas-carloscastro.runasp.net/
+```
+
+| Antes | Ahora |
+|---|---|
+| `http` respondía `200` **directo** | `http` responde **`307`** y manda a `https` |
+
+> **El `307` es un «muévase, pero sin cambiar nada».** A diferencia del `301`
+> o el `302`, **conserva el método y el cuerpo**: un `POST` sigue siendo un
+> `POST` después del salto. Si fuera un `302`, un inicio de sesión se
+> convertiría en `GET` y **perdería el cuerpo con las credenciales** — un error
+> precioso de diagnosticar.
+
+#### Una consecuencia inmediata: ya no hay `http`
+
+**Todo lo que estaba apuntando a `http://` ahora paga un salto de más**, y hay
+que cambiarlo:
+
+| Dónde | A qué |
+|---|---|
+| El enlace que se le pasa al estudiante | `https://apifacturas-carloscastro.runasp.net/swagger` |
+| Las peticiones de Postman o de la terminal | `https://` |
+| **El `UrlApi` del front** | **`https://`** — lo configuramos en el Paso 7 |
+
+> **Y aquí la sorpresa, que es buena:** la redirección **no es un sustituto de
+> configurar bien el front**. Un `HttpClient` sigue el `307` sin problema, pero
+> paga **dos viajes por cada llamada**. Con `UrlApi` apuntando directo a
+> `https`, va derecho.
+
+#### Las cuatro pestañas del diálogo, por si aparecen dudas
+
+| Pestaña | Para qué |
+|---|---|
+| **`Let's Encrypt`** | **La nuestra.** Gratis, automática, renovada sola |
+| `Certificate` | Ver el que ya está puesto |
+| `Custom PEM/KEY` · `Custom PFX` | Subir uno comprado. Dos formatos del mismo archivo |
+| `Disable` | Quitarlo |
+
+> **Una inconsistencia del panel que conviene no perseguir:** el diálogo dice
+> que el certificado *«renews itself automatically every 90 days»* y la fila
+> dice `expires in 60 days`. **La palabra que importa es `automatically`** —
+> nadie tiene que acordarse en diciembre.
+
 #### Lo que falta: la interfaz
 
-**La API ya sirve. Lo que no hay todavía es la pantalla**, y es el Paso 7.
+**La API ya sirve, y ahora cifrada. Lo que no hay todavía es la pantalla**, y
+es el Paso 7.
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

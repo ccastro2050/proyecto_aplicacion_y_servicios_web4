@@ -287,7 +287,7 @@ Marque la casilla y oprima **Delete database**.
 
 ### 1.4 · Comprobar que quedó limpia
 
-![La lista de bases vacía: 0 databases found](docs/tutorial_publicar/img/07_cuenta_limpia.png)
+<!-- CAPTURA pendiente · 07_cuenta_limpia.png : la lista de bases vacia -->
 
 En la columna de la izquierda tienen que estar los dos en **0**:
 
@@ -316,6 +316,211 @@ conviene tenerlas a la vista:
 | **El identificador del sitio no es la dirección** | `site70966` es con lo que se publica; `csharpapigenerica-carloscastro.runasp.net` es lo que ve el usuario |
 | **La base trae sus propias herramientas** | **Import**, **Run T-SQL**, **WebMSSQL** y **Backups**, en el menú de la base. El esquema se carga desde ahí, sin instalar nada |
 
-## Pasos 2 a 5 — pendientes
+## Paso 2 — Crear la base de datos
+
+> **Primero la base, después los sitios.** Cuando se publique la API va a
+> necesitar la cadena de conexión, y la cadena no existe hasta que la base
+> exista.
+
+### 2.1 · Escoger el plan
+
+**Databases** → **Add database**.
+
+![El primer paso del asistente: PREMIUM contra FREE](docs/tutorial_publicar/img/08_crear_base_plan.png)
+
+#### Qué hay en esta pantalla
+
+| Dónde | Qué es |
+|---|---|
+| **Arriba, los números 1 a 4** | El asistente tiene **cuatro pasos**: **Plan** (el que está abierto), **Database** —tipo y nombre—, **Subscription** —el paquete— y **Location** —el centro de datos—. El número en azul es dónde está |
+| **A la derecha, Summary** | Un resumen que **se va llenando** con lo que escoja en cada paso. Ahora está en guiones porque todavía no ha escogido nada. Sirve para revisar antes de confirmar |
+| **Las dos tarjetas** | Las dos opciones de plan: **PREMIUM** y **FREE**. Cada una con su botón abajo |
+| **DESIGNED FOR**, en cada tarjeta | Para qué dice el hospedaje que sirve cada plan. El gratuito dice *Hobby projects, Development, Testing, Proof of concept* — un trabajo de clase cabe ahí |
+| **RECOMMENDED**, sobre PREMIUM | Es la recomendación **del vendedor**, no la del curso. Y abajo dice *Premium plan required*: si lo escoge, le pide pagar |
+
+#### Las cuatro casillas de cada tarjeta, una por una
+
+| Casilla | Qué dice el plan gratuito | Qué significa |
+|---|---|---|
+| **DISK SPACE** | `1 GB per database · fixed, not expandable` | Cuánto pesan **sus datos**: las tablas, los índices y el registro de transacciones. **`fixed`** quiere decir que **no se puede ampliar** — si se llena, hay que borrar datos o pasar al plan de pago. Un GB es muchísimo aquí: la base de este ejemplo pesaba **8 MB** |
+| **ENGINES** | `MSSQL + MySQL` · *SQL Server 2025 · MySQL 8.0* | Los **motores** disponibles. **MSSQL es SQL Server**, el de Microsoft, y es el que usa este proyecto; **MySQL** es otro, y no sirve aquí sin reescribir el acceso a datos. **La versión importa**: SQL Server 2025 entiende todo lo que se escriba para versiones anteriores |
+| **PERFORMANCE** | `LOW · shared servers` | **Compartido**: su base vive en una máquina junto con las de otros clientes, y la potencia se reparte. Si otro proyecto está trabajando duro, el suyo responde más lento. Para un trabajo de clase no se nota; para un sistema con usuarios, sí |
+| **DATACENTERS** | `EU only · no USA option` | **Dónde está físicamente el servidor.** En el plan gratuito solo hay Europa, así que desde Colombia cada consulta cruza el Atlántico. El de pago deja escoger Estados Unidos, que está más cerca |
+
+#### Y las dos listas de abajo
+
+| Lista | Qué trae |
+|---|---|
+| **INCLUDED** | *SQL Server 2025 and MySQL 8.0* — **los mismos motores del plan de pago**, solo que en servidores compartidos. Y *Simple backup and restore*: se puede bajar y subir una copia **a mano**, desde el menú de la base |
+| **LIMITATIONS** | *No automatic daily backups* — **nadie hace la copia por usted** · *Limited features* — faltan funciones del panel · *Limited transfers/traffic* — hay un tope de datos transferidos al mes · *Limited quantity per customer* — cinco bases como máximo · *No guarantees* — si se cae, no hay a quién reclamarle |
+
+> **De todas esas, la que de verdad importa en un curso es la primera de
+> LIMITATIONS.** Las demás son molestias; esa es la que hace perder el trabajo.
+> **Baje una copia desde Backups antes de cada entrega**, y guárdela fuera del
+> hospedaje.
+
+#### Qué escoger, y qué implica
+
+**Oprima `Select FREE database`.**
+
+| | FREE | PREMIUM |
+|---|---|---|
+| **Espacio** | **1 GB** por base, **fijo** | 2 GB, ampliable |
+| **Motores** | SQL Server 2025 · MySQL 8.0 — **los mismos** | los mismos |
+| **Rendimiento** | **LOW**, en servidores compartidos | alto, con SSD |
+| **Centro de datos** | **solo Europa** | Europa o Estados Unidos |
+| **Copias automáticas** | **no hay** | diarias, guardadas 14 días |
+| **Acceso desde sus herramientas** | por la interfaz web del panel | también con SQL Management Studio y otras |
+
+> **Los motores son los mismos en los dos planes.** Lo que cambia es el
+> rendimiento y las garantías, no lo que SQL Server sabe hacer: un
+> procedimiento almacenado o un disparador funcionan igual en el gratuito. Un
+> gigabyte es muchísimo para un proyecto de clase — la base de este ejemplo pesa
+> 8 MB.
+
+> **Dos límites del gratuito que sí se notan, y conviene saberlos antes:**
+>
+> **No hay copias automáticas.** La única copia es la que uno baje a mano desde
+> **Backups**. Si borra la base por error, no hay a qué volver — acabamos de
+> verlo en el paso 1.
+>
+> **El servidor está en Europa.** Desde Colombia cada consulta cruza el
+> Atlántico, así que lo publicado responde **más lento que en su máquina**. No
+> es un defecto del código: es la latencia, que aparece en cuanto el sistema
+> sale del `localhost`. Es de las cosas que un proyecto de aula solo enseña
+> cuando se publica de verdad.
+
+> **Y el aviso del panel es honesto:** *«Not recommended for any production
+> use. No guarantees, support or automatic daily backups»*. Para un trabajo de
+> clase está bien; para un sistema con usuarios de verdad, no.
+
+### 2.2 · Escoger el motor
+
+![El segundo paso: SQL Server, MySQL o PostgreSQL](docs/tutorial_publicar/img/09_crear_base_motor.png)
+
+#### Qué cambió en la pantalla
+
+| Dónde | Qué pasó |
+|---|---|
+| **Paso 1** | Ya no es un número: es un **visto verde**. Está hecho |
+| **Summary** | La primera línea se llenó: **Hosting plan → Free plan**. Así se va confirmando lo escogido |
+| **Back** | Apareció un botón para volver atrás sin perder lo andado |
+
+#### Las tres tarjetas, y cuál va
+
+| Motor | Para qué dice que sirve | Las etiquetas de abajo |
+|---|---|---|
+| **SQL Server 2025** *(MSSQL)* | ASP.NET y .NET, Entity Framework | **T-SQL** es el dialecto de SQL de Microsoft · **SSMS** es SQL Server Management Studio, el cliente de escritorio · **Compatibility 2008–2025** quiere decir que un script escrito para versiones viejas funciona igual |
+| **MySQL 8.0** | PHP: WordPress, Laravel | **InnoDB** es su motor de almacenamiento · **Workbench** y **HeidiSQL** son clientes. Nótese el subtítulo: *MariaDB 10.10 compatible* — lo que corre por debajo es **MariaDB**, no MySQL de Oracle |
+| **PostgreSQL 18** · **BETA** | ASP.NET Core, Node.js, Next.js | **psql** es su cliente de consola · **pgAdmin**, el gráfico. **BETA** significa que el hospedaje todavía lo está probando |
+
+**Escoja `SQL Server 2025`.**
+
+> **Por qué ése y no los otros dos**, que es la pregunta que un estudiante debe
+> poder responder: los repositorios de este proyecto **escriben T-SQL a mano** y
+> se conectan con el cliente de SQL Server. Cambiar de motor no es escoger otra
+> tarjeta aquí: es reescribir la capa de acceso a datos.
+
+> **Y fíjese en la tarjeta de PostgreSQL**, porque dice algo del curso: también
+> sirve para ASP.NET Core. Es exactamente el segundo motor del proyecto, el de
+> la v5 — así que el día que exista esa versión, **también se puede publicar
+> aquí**. Que esté en **BETA** quiere decir que todavía no hay que confiarle un
+> trabajo con fecha de entrega.
+
+#### Al escoger SQL Server aparecen dos ajustes más
+
+![SQL Server escogido, con los ajustes de colación e idioma](docs/tutorial_publicar/img/10_crear_base_ajustes.png)
+
+| Dónde | Qué pasó |
+|---|---|
+| La tarjeta de SQL Server | Quedó **enmarcada en verde con un visto** |
+| **Summary** | Se llenó la segunda línea: **Database type → SQL Server (MSSQL)** |
+| Abajo | Apareció **MSSQL database settings**, que no estaba |
+| A la derecha | Apareció el botón **Continue** |
+
+**Deje los dos ajustes como están** y oprima **Continue**. Pero vale la pena
+entender qué son, porque uno de los dos no se puede corregir después del todo.
+
+#### QUÉ SE SELECCIONA, y por qué
+
+| Ajuste | Qué seleccionar |
+|---|---|
+| **Collation** | **`SQL_Latin1_General_CP1_CI_AS`** — la que ya viene puesta |
+| **User language** | **`English`** — el que ya viene puesto |
+
+**No se cambia ninguno de los dos.** Y las razones, en orden de peso:
+
+| # | Por qué esa colación |
+|---|---|
+| **1** | **Es la que espera el script de este proyecto.** La base se creó contra un SQL Server con esa colación. Con otra, al cargar el script las comparaciones de texto entre tablas pueden fallar — ver más abajo |
+| **2** | **`CI` es lo correcto para buscar.** No distingue mayúsculas: quien escriba `pedro` encuentra a `PEDRO`. Con `CS` no lo encontraría, y creería que el dato no existe |
+| **3** | **`AS` es lo correcto para el castellano.** Sí distingue tildes: `papá` y `papa` siguen siendo dos palabras. Con `AI` se volverían la misma |
+| **4** | **No se puede corregir del todo después.** Cambiarla más adelante solo afecta a las tablas que nazcan desde ese momento |
+
+**Y el idioma en inglés** porque cambia **los mensajes de error del servidor**:
+un error en inglés se busca y aparece resuelto mil veces; el mismo traducido,
+casi nunca. No toca sus datos — solo los mensajes y el formato de fecha. Ése sí
+se cambia cuando quiera, en **Database Management → Users**.
+
+#### Qué significa cada parte del nombre
+
+`SQL_Latin1_General_CP1_CI_AS` se lee por partes:
+
+| Parte | Qué significa |
+|---|---|
+| `Latin1_General` | El alfabeto: el latino, con sus reglas de orden |
+| `CP1` | La página de códigos para los datos que no son Unicode |
+| **`CI`** | **Case Insensitive**: no distingue mayúsculas. `PEDRO` = `pedro` |
+| **`AS`** | **Accent Sensitive**: sí distingue tildes. `José` ≠ `Jose` |
+
+**Las otras terminaciones que ofrece la lista, y por qué no:**
+
+| Terminación | Qué haría | ¿Sirve aquí? |
+|---|---|---|
+| `_CI_AI` | No distinguiría mayúsculas **ni** tildes | **No**: `José` y `Jose` serían la misma persona |
+| `_CS_AS` | Distinguiría ambas | **No**: buscar `pedro` no encontraría a `PEDRO` |
+| `Modern_Spanish_CI_AS` | Reglas de ordenamiento del español | Funciona, pero **no es la que esperan .NET y el script del proyecto** |
+
+#### El error que esto evita: *collation conflict*
+
+Es lo que responde SQL Server cuando tiene que **comparar dos textos guardados
+con reglas distintas** y no sabe cuáles aplicar. Entonces no escoge: se niega.
+
+```
+Cannot resolve the collation conflict between
+"SQL_Latin1_General_CP1_CI_AS" and "Modern_Spanish_CI_AS"
+in the equal to operation.
+```
+
+| | |
+|---|---|
+| **Cuándo aparece** | Cuando una consulta junta texto de dos sitios con colación distinta: un `JOIN` por un campo de texto, un `WHERE a.nombre = b.nombre`, un `UNION`, una concatenación |
+| **De dónde sale** | Cada columna **guarda la colación con la que nació**. Si la base se creó con una y las tablas vinieron de un script hecho contra otra, quedan columnas con reglas distintas en la misma base |
+| **Por qué es traicionero** | **Aparece al consultar, no al crear.** Las tablas se cargan bien y los datos entran bien; el fallo salta semanas después, en el `JOIN` de una pantalla. Y el mensaje habla de colaciones — no dice que las tablas vengan de bases distintas, que es la causa |
+| **Cómo se arregla** | En la consulta, forzando una con `COLLATE` — un parche, y hay que repetirlo en cada consulta que compare. De verdad: recreando la columna con la colación correcta, lo que implica mover los datos |
+
+> **Por eso se escoge bien ahora.** Es de los errores que se evitan en treinta
+> segundos al crear la base y cuestan horas después.
+
+> **Y el aviso verde del panel dice lo mismo en una línea:** *«Restoring a backup
+> from another server? Pick the **same collation** as the original»*.
+
+> **El panel también avisa lo otro:** *«The collation is applied when the
+> database is created… that only changes the default for new objects — columns
+> in existing tables keep the collation they were created with»*. O sea: se
+> escoge ahora, o se arrastra.
+
+#### El idioma del usuario
+
+`English`, y **déjelo así**. Cambia el idioma de los **mensajes del servidor** y
+el **formato de fecha** con que entra ese usuario — **no traduce sus datos**.
+
+> **Déjelo en inglés por una razón práctica:** cuando salga un error y lo vaya a
+> buscar, el mensaje en inglés tiene miles de resultados; el mismo mensaje
+> traducido, casi ninguno.
+
+Se puede cambiar después en **Database Management → Users**.
+
+## Pasos 3 a 5 — pendientes
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

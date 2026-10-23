@@ -521,6 +521,172 @@ el **formato de fecha** con que entra ese usuario — **no traduce sus datos**.
 
 Se puede cambiar después en **Database Management → Users**.
 
+### 2.3 · El paquete, que se salta solo
+
+Al oprimir **Continue** el asistente pasa del paso 2 al **4**. El paso 3,
+*Subscription*, **se resuelve solo**: en el plan gratuito no hay paquete que
+escoger, así que en el **Summary** esa línea se queda en guion. No es un error.
+
+### 2.4 · Escoger el centro de datos
+
+![El cuarto paso: Europa seleccionada, Estados Unidos bloqueado](docs/tutorial_publicar/img/11_crear_base_datacenter.png)
+
+#### Qué hay en la pantalla
+
+| Dónde | Qué dice |
+|---|---|
+| Los cuatro pasos | **Los cuatro con visto verde**: el asistente ya tiene todo |
+| **Summary** | `Free plan` · `SQL Server (MSSQL)` con su colación debajo · `Subscription —` · `Datacenter EU` |
+| **Europe Datacenter** | Ya aparece **Selected**, en verde |
+| **USA Datacenter** | **Gris, no se puede escoger** |
+| El aviso naranja | *USA datacenter is not available for the Free plan* |
+| **GREAT SPEED FOR VISITORS FROM** | Desde dónde responde rápido cada centro |
+| **TYPICAL LATENCY FROM MAJOR CITIES** | Cuánto tarda **un viaje de ida y vuelta** desde esa ciudad, en milisegundos |
+
+**No hay nada que escoger: oprima `Create Database`.**
+
+#### Y aquí hay una lección que conviene no pasar por alto
+
+**Mire la tarjeta de Estados Unidos: entre las ciudades que lista está
+Colombia.** Y está **bloqueada** porque el plan es gratuito.
+
+| | |
+|---|---|
+| Lo que convendría desde Colombia | El centro de **Estados Unidos** |
+| Lo que el plan gratuito permite | **Solo Europa** |
+| Lo que eso significa | Cada consulta de su aplicación **cruza el Atlántico y vuelve** |
+
+> **Por eso lo publicado va a responder más lento que en su máquina**, y no es
+> culpa del código. En `localhost` la base está a un milímetro; publicada, está
+> a un océano. Los números de la tarjeta lo dicen: desde Frankfurt son **5 ms**;
+> desde Barcelona, **42 ms**. Desde Bogotá, más.
+
+> **La regla que sale de esta pantalla, y que el panel escribe arriba:**
+> *«ideally the same datacenter as your website»*. **La base y el sitio van en
+> el mismo centro de datos.** Si la base queda en Europa y el sitio en Estados
+> Unidos, cada consulta cruza el océano **dos veces** — una de ida y otra de
+> vuelta— y la aplicación se arrastra.
+>
+> Como el plan gratuito solo ofrece Europa para las dos cosas, aquí salen
+> emparejadas sin que haya que pensarlo. **En el plan de pago sí hay que
+> escoger**, y es donde se comete el error.
+
+### 2.5 · La base ya existe
+
+![La lista de bases con la recién creada](docs/tutorial_publicar/img/12_base_creada.png)
+
+El panel vuelve a la lista y ahí está: **1 database found**.
+
+#### Por qué se llama `db75266` y no `bdfacturas`
+
+**El nombre no se escoge: lo pone el hospedaje.** Y hay una razón concreta.
+
+| | |
+|---|---|
+| **Todas las bases viven en un servidor compartido** | El suyo es `db75266.databaseasp.net`, y ahí están también las de otros clientes |
+| **El nombre tiene que ser único entre todos** | Si cada quien pudiera escoger, media docena de personas pondrían `facturas` y chocarían |
+| **Por eso es un número de la casa** | `db75266` es el identificador que su sistema le asignó. Lo mismo pasa con los sitios: `site70966` |
+| **Y el servidor se arma con él** | `db75266` + `.databaseasp.net`. Por eso el número aparece **tres veces** en la cadena de conexión: servidor, base y usuario |
+
+#### ¿Y se puede cambiar? No — y lo dice el panel
+
+![El diálogo de Rename, con Database ID cannot be modified](docs/tutorial_publicar/img/13_rename_base.png)
+
+El botón **`Rename`** existe también en el plan gratuito, pero al abrirlo se ve
+qué deja cambiar y qué no:
+
+| Campo | ¿Se puede cambiar? | Qué es |
+|---|---|---|
+| **Database ID** · `db75266` | **NO.** *«Database ID cannot be modified»* | **El nombre real en el servidor.** Es el que va en la cadena de conexión |
+| **Friendly name** | Sí | Un alias **para la lista del panel**. Viene con el nombre del servidor puesto |
+| **Description** | Sí | Sus propias notas — *«production, client XY, staging»*. **Solo se ven en este panel** |
+
+> **Y el aviso azul del diálogo lo cierra:** *«Friendly name and description are
+> displayed **only in the Control panel**… They are not visible in SQL
+> Management Studio or other database tools — **the real database name on the
+> server stays `db75266`**»*.
+
+> **Entonces el alias sirve, pero para otra cosa.** No para que la cadena de
+> conexión quede legible —eso no cambia nunca—, sino para **no confundirse en la
+> lista** cuando haya cinco bases con números parecidos.
+
+#### Qué ponerle, entonces
+
+| Campo | Qué escribir | Por qué |
+|---|---|---|
+| **Friendly name** | `bdfacturas` | Es como se llama la base **en su máquina**. Así el panel y el proyecto dicen lo mismo |
+| **Description** | `AySW4 · publicación del tutorial` | Para qué es. Cuando haya cinco, esta línea es la que evita borrar la equivocada |
+
+![El alias escrito, con la vista previa debajo](docs/tutorial_publicar/img/14_alias_escrito.png)
+
+**La vista previa —`PREVIEW IN LISTS`— muestra cómo va a quedar antes de
+guardar**, y confirma lo importante: el identificador `db75266` **no
+desaparece**, queda como etiqueta debajo.
+
+> **Son dos botones `Save` independientes**, uno por campo. Guardar el alias no
+> guarda la descripción.
+
+![La lista ya con el alias](docs/tutorial_publicar/img/15_alias_guardado.png)
+
+Cerrando con `Close`, la lista queda así: **`bdfacturas`** en grande, `db75266`
+como etiqueta.
+
+> **Para el proyecto de aula conviene un formato fijo**, por ejemplo
+> `bdfacturas — <equipo>`. Así, cuando un estudiante comparta su pantalla
+> pidiendo ayuda, se sabe de quién es la base sin preguntar.
+
+> **Y una advertencia sobre las capturas que siguen:** de aquí en adelante el
+> panel muestra `bdfacturas` donde antes decía `db75266.databaseasp.net`. Es la
+> misma base — solo cambió el nombre con el que el panel la llama.
+
+
+
+> **Y de ahí una consecuencia que conviene anticipar:** el nombre de la base en
+> el servidor **no se parece** al de su máquina. En su computador la base se
+> llama `bdfacturas`; publicada se llama `db75266`. Son la misma base de datos
+> con dos nombres, y lo único que cambia es la cadena de conexión. **El código
+> no se entera.**
+
+#### La fila, columna por columna
+
+| Columna | Qué dice | Qué significa |
+|---|---|---|
+| **STATUS** | `Enabled` | La base está **encendida** y acepta conexiones |
+| **TYPE** | `MSSQL` | SQL Server, que es lo que se escogió |
+| **DATABASE** | `db75266.databaseasp.net` | **El servidor.** Debajo, las etiquetas: `Free` el plan, `EU` el centro de datos, y **`db75266`** que es **la base y también el usuario** |
+| **SUBSCRIPTION** | `—` | Vacío porque el plan gratuito no tiene paquete |
+| **DISK USAGE** | `0 MB` de `1024 MB` | **Está vacía**: ni una tabla todavía. Eso lo pone el paso 3 |
+
+#### Los filtros de arriba, y para qué sirven cuando hay más de una
+
+| Control | Para qué |
+|---|---|
+| **Status** · `All` | Mostrar todas, o solo las encendidas |
+| **Plan** · `All` | Filtrar por gratuitas o de pago |
+| **Subscription** | Filtrar por paquete contratado. Sin uso en el plan gratuito |
+| **Search** | Buscar por nombre o descripción |
+| **Records** · `15` | Cuántas filas se ven por página |
+| Las etiquetas **STATUS / PLAN / TYPE** con números | Atajos de filtrado, y de paso un conteo: `MySQL 0`, `MSSQL 1` |
+
+> Con una sola base no hacen falta. Cuando el curso tenga cinco, sí — y el
+> contador de `TYPE` es la forma rápida de ver si alguien creó una MySQL por
+> error.
+
+#### Los tres botones de la fila
+
+| Botón | Qué hace |
+|---|---|
+| **Manage** | **Entra a la base**: ahí están las credenciales, la cadena de conexión, `Import`, `Run T-SQL`, `Backups` y `WebMSSQL`. Es a donde vamos ahora |
+| **Rename** | Cambia solo la **descripción** con que usted la distingue — no el nombre real |
+| **Delete** | Borrarla. Con su diálogo y su casilla, como en el paso 1 |
+
+> **El número de la base cambió, y hay que anotarlo.** La anterior era
+> `db53638`; la nueva es **`db75266`**. Ese número va en **tres sitios** de la
+> cadena de conexión, así que cópielo a `credenciales.local.txt` antes de
+> seguir.
+
+**Oprima `Manage`.** La contraseña no se ve en esta lista: está adentro.
+
 ## Pasos 3 a 5 — pendientes
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

@@ -3564,4 +3564,71 @@ decir **`Carlos Pérez`**.
 > archivos.
 
 
+### 7.7 · El certificado del front, y el sistema cerrado
+
+![La seccion HTTPS del front, asegurada y redirigiendo](docs/tutorial_publicar/img/51_https_front.png)
+
+**Es el mismo procedimiento del Paso 6.7**, en el otro sitio:
+
+| | |
+|---|---|
+| **1** | `HTTPS` → **`Enable HTTPS`** en la fila del dominio → `Let's Encrypt` → `Enable HTTPS` |
+| **2** | Esperar a **`Secured 1 of 1 domain`** |
+| **3** | `Force redirect to HTTPS` → **`Enabled`** |
+
+```
+Secured 1 of 1 domain      HTTPS redirect on
+facturas-carloscastro.runasp.net -> HTTPS
+Let's Encrypt - renews automatically - expires in 60 days (22.12.2026)
+```
+
+#### Comprobado desde la terminal
+
+```
+front  http -> 307 -> https://facturas-carloscastro.runasp.net/
+api    http -> 307 -> https://apifacturas-carloscastro.runasp.net/
+```
+
+**Los dos sitios cifrados y los dos redirigiendo.**
+
+#### Y aquí se cobra la decisión del Paso 7.1
+
+**Entre otra vez al front y abra cualquier pantalla con datos.** Funciona igual
+que antes — y eso **no era inevitable**.
+
+| Si el `UrlApi` dijera | Qué pasaría hoy |
+|---|---|
+| `http://apifacturas-...` | **El inicio de sesión seguiría funcionando** — el `307` conserva el cuerpo |
+| | **Pero toda pantalla con datos daría `401`** — el `307` descarta la cabecera `Authorization` |
+| **`https://apifacturas-...`** | **Todo funciona.** El front habla directo, sin redirect |
+
+> **Y ese es el peor tipo de defecto que existe:** el que deja entrar y falla
+> *después*. Un estudiante vería la pantalla de inicio de sesión aceptar su
+> clave y, un segundo más tarde, una tabla vacía o un error. **Buscaría el
+> problema en los datos, en el token, en los permisos** — en todo menos en una
+> letra `s` de un archivo de configuración.
+
+#### El sistema, completo
+
+```
+navegador
+   |  https
+front  facturas-carloscastro.runasp.net     site101138
+   |  https
+API    apifacturas-carloscastro.runasp.net  site101125
+   |  red interna del centro de datos
+base   db75266.databaseasp.net              db75266
+```
+
+| Tramo | Cómo va | Por qué |
+|---|---|---|
+| Navegador → front | **`https`** | Sale a internet |
+| Front → API | **`https`** | Sale a internet — son dos sitios distintos |
+| **API → base de datos** | **Sin cifrar** | **No sale a internet**: viajan por la red del centro de datos |
+
+> **Que el último tramo no vaya cifrado no es un descuido** — es el
+> `Local access` del Paso 3, y es más rápido justamente porque no sale. Los
+> dos primeros sí salen, y por eso los dos llevan certificado.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

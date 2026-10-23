@@ -3909,4 +3909,113 @@ appsettings.Production.postgres.json
 con su `.ejemplo` al lado, igual que hicimos con el de SQL Server.
 
 
+### 8.5 · Cargar el esquema en Neon
+
+**Neon no tiene un botón de «importar archivo» como MonsterASP.** Hay dos
+caminos, y los dos sirven:
+
+| Camino | Cuándo conviene |
+|---|---|
+| **El editor SQL de la consola** | Si no quiere instalar ni correr nada. Se pega el script y `Run` |
+| **`psql` desde la terminal** | **El que vamos a usar.** Más control, mejores mensajes de error |
+
+#### El editor SQL, por si lo prefiere
+
+![El editor SQL de Neon](docs/tutorial_publicar/img/59_neon_editor.png)
+
+`Postgres database` → **`SQL Editor`**. Trae un ejemplo cargado — una tabla
+`playing_with_neon`— que **hay que borrar**: clic dentro, `Ctrl+A`, `Supr`.
+
+Luego se abre `db/bdfacturas_postgres.sql` en VS Code, `Ctrl+A`, `Ctrl+C`, se
+pega y **`Run`**. Antes de oprimir, compruebe arriba que diga **`neondb`** y
+**`Primary`**.
+
+> **Sirve, pero son 55 KB en un editor de navegador.** Y si algo falla a mitad
+> de camino, el mensaje es más difícil de ubicar.
+
+#### El camino que usamos: `psql`, sin instalarlo
+
+**No hace falta instalar PostgreSQL.** El cliente `psql` vive dentro de la
+imagen de Docker que el proyecto **ya usa** para la base local.
+
+```powershell
+cd ...\proyecto_aplicacion_y_servicios_web4
+
+docker run --rm -e PGCLIENTENCODING=UTF8 -v "${PWD}\db:/db:ro" postgres:16-alpine psql "postgresql://neondb_owner:SU_CLAVE@ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech/neondb?sslmode=require" -v ON_ERROR_STOP=1 -f /db/bdfacturas_postgres.sql
+```
+
+#### Pieza por pieza
+
+| Parte | Qué hace |
+|---|---|
+| **`docker run --rm`** | Levanta un contenedor y **lo borra al terminar**. No deja nada instalado |
+| **`-e PGCLIENTENCODING=UTF8`** | **Le avisa a `psql` que el archivo está en UTF-8** — ver abajo |
+| **`-v "${PWD}\db:/db:ro"`** | Monta la carpeta `db` dentro del contenedor, **de solo lectura**. El archivo entra **como bytes** |
+| **`postgres:16-alpine`** | La imagen que el `docker-compose.yml` ya usa |
+| **`psql "postgresql://..."`** | El cliente, con la cadena **en el formato de Neon** — aquí sí sirve ese formato, no es .NET |
+| **`-v ON_ERROR_STOP=1`** | **Para en el primer error.** Sin esto sigue de largo y uno termina con media base cargada creyendo que todo salió bien |
+| **`-f /db/bdfacturas_postgres.sql`** | El archivo, visto **desde dentro** del contenedor |
+
+> **Por qué montar la carpeta y no mandar el archivo por la tubería.**
+> PowerShell **reescribe el texto** al pasárselo a un programa externo, y con
+> las tildes haría **el mismo destrozo** que hizo `sqlcmd` en MonsterASP.
+> Montando la carpeta, el archivo viaja intacto.
+
+#### La salida, cuando sale bien
+
+```
+CREATE TABLE        (x12)
+INSERT 0 3 / 0 6 / 0 8 / 0 5 ...
+ setval
+--------
+      5
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE PROCEDURE    (x16)
+```
+
+| Renglón | Qué es |
+|---|---|
+| **12 `CREATE TABLE`** | Las mismas doce de SQL Server |
+| **`INSERT 0 n`** | El `0` es el OID — en desuso— y **`n` es cuántas filas entraron** |
+| **`setval`** | **Alinea los contadores** de las columnas autonuméricas con los ids sembrados. Sin esto, el primer `INSERT` del sistema chocaría con una clave que ya existe |
+| **1 `CREATE FUNCTION` + 1 `CREATE TRIGGER`** | El disparador de totales y stock |
+| **16 `CREATE PROCEDURE`** | Los mismos dieciséis |
+
+**Y ningún `ERROR`**, con `ON_ERROR_STOP=1` encendido: **el script escrito para
+PostgreSQL 16 corrió tal cual en el 18.** El supuesto del paso anterior quedó
+comprobado.
+
+#### La comprobación que de verdad importa
+
+```powershell
+docker run --rm -e PGCLIENTENCODING=UTF8 postgres:16-alpine psql "postgresql://neondb_owner:SU_CLAVE@...neon.tech/neondb?sslmode=require" -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'; SELECT codigo, nombre FROM persona ORDER BY codigo LIMIT 4;"
+```
+
+```
+    12
+
+ P001   | Ana Torres
+ P002   | Carlos Pérez
+ P003   | María Gómez
+ P004   | Juan Díaz
+```
+
+**Doce tablas — y las tildes bien.**
+
+> **Compare con lo que quedó en SQL Server:** `Carlos PA(c)rez`, `MarA-a
+> GA3mez`. **El mismo contenido, el mismo origen, dos resultados distintos.**
+>
+> | | SQL Server, por el panel | **PostgreSQL, por `psql`** |
+> |---|---|---|
+> | Quién leyó el archivo | `sqlcmd`, **adivinando** la codificación | `psql`, **con `PGCLIENTENCODING=UTF8`** |
+> | Resultado | Tildes partidas en dos | **Tildes correctas** |
+> | ¿Avisó alguien? | **No** — dijo `Success` y `Errors 0` | No hizo falta |
+>
+> **La diferencia no fue el motor ni la herramienta: fue decirle la
+> codificación antes, en vez de descubrirla después en una pantalla.**
+
+**En la consola de Neon, `Tables` debe mostrar ahora las doce.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

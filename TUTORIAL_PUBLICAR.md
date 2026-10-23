@@ -4348,4 +4348,86 @@ Debe decir **`"Motor": "postgres"`** y la cadena de Neon. **Si dice
 > `msdeploy` se queja de un parámetro desconocido, mire ahí primero.
 
 
+### 8.10 · La trampa que nos cayó encima, y por qué usted no la va a sufrir
+
+**La primera vez que publicamos esta variante, la salida traía esto:**
+
+```
+Info: Adding directory (site101144\publicado).
+Info: Adding file (site101144\publicado\appsettings.Production.json).
+Info: Adding file (site101144\publicado\web.config).
+```
+
+**Se subió una carpeta `publicado` dentro del sitio nuevo** — la salida del
+Paso 6, **la de SQL Server**. Y adentro iba su `appsettings.Production.json`,
+**con la contraseña de la base de datos de MonsterASP**.
+
+> **O sea: el secreto de un sitio viajó al otro.** Exactamente lo que el paso
+> 8.7 advertiía que no debía pasar — y pasó **sin que nadie lo escribiera en
+> ninguna parte.**
+
+#### Por qué ocurre
+
+| | |
+|---|---|
+| **El SDK web de .NET** | Incluye en el paquete **todos los `.json` y el `web.config` de la carpeta del proyecto** |
+| **Y `publicado` está dentro de `api_facturas`** | Porque así lo pidió el comando: `-o publicado` |
+| **Entonces** | La segunda publicación **se lleva la primera adentro** |
+
+> **Y se repite sola.** La tercera vez tendría `publicado\publicado`, y así.
+> **Es una trampa clásica de .NET**, y no da ningún aviso: el paquete sale más
+> grande y nadie lo nota.
+
+#### El arreglo: cuatro renglones en el `.csproj`
+
+**Ya están en el repositorio**, en `api_facturas/ApiFacturas.csproj`:
+
+```xml
+<ItemGroup>
+  <Content Remove="publicado*/**" />
+  <None Remove="publicado*/**" />
+
+  <Content Remove="appsettings.Production.postgres.json*" />
+  <None Remove="appsettings.Production.postgres.json*" />
+</ItemGroup>
+```
+
+| Las dos primeras | **Las carpetas de salida no entran al paquete.** Da igual cómo las llame — `publicado`, `publicado_pg`, `publicado2` |
+| Las dos últimas | **La variante de PostgreSQL no viaja con el paquete.** Se copia a mano después, y así **cada sitio lleva únicamente la credencial que usa** |
+
+#### El estudiante no tiene que hacer nada de esto
+
+**Ese arreglo se versiona.** Cuando alguien clone el repositorio, **ya viene
+adentro** — publique una vez o publique diez, no se le anida nada.
+
+| | Qué hace |
+|---|---|
+| **El estudiante** | **Nada.** Corre los tres comandos del paso 8.9 |
+| **Quien publicó antes del arreglo** | Borrar a mano la carpeta que ya se le coló |
+
+**Si le tocó lo segundo** —porque publicó antes de traer este cambio—:
+
+```powershell
+Remove-Item -Recurse -Force publicado_pg\publicado
+copy appsettings.Production.postgres.json publicado_pg\appsettings.Production.json
+```
+
+> **Y después hay que volver a subir.** El servidor todavía tiene la carpeta
+> intrusa — pero como `msdeploy` usa **`-verb:sync`**, al volver a publicar
+> **la borra sola**: lo que no esté en el origen no sobrevive en el destino.
+>
+> **Es la misma propiedad que borró el `iisstart.htm` del Paso 6.3**, ahora
+> trabajando a favor nuestro para limpiar un error.
+
+#### La lección, que vale más que el arreglo
+
+> **El error no fue de código ni de configuración: fue de «dónde dejo los
+> archivos».** Publicar dentro de la carpeta del proyecto parecía cómodo — y
+> **convirtió la salida de una publicación en la entrada de la siguiente**.
+>
+> **Y lo peor: ningún paso falló.** `dotnet publish` dijo que todo bien,
+> `msdeploy` dijo `89 cambios`, el sitio arrancó. **Lo único que delataba el
+> problema eran tres renglones en medio de ochenta y nueve.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

@@ -53,4 +53,22 @@
     <None Remove="pruebas/**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Las carpetas que deja  dotnet publish -o publicado...  quedan DENTRO
+         del proyecto, y el SDK web incluye todos los .json y el web.config de
+         la carpeta del proyecto como contenido. Sin estas lineas, el segundo
+         publish se mete a si mismo adentro: publicado_pg\publicado\... con el
+         appsettings.Production.json de la OTRA base de datos. Paso en vivo el
+         22 de octubre de 2026: la clave de SQL Server viajo al sitio de
+         PostgreSQL. -->
+    <Content Remove="publicado*/**" />
+    <None Remove="publicado*/**" />
+
+    <!-- La variante de PostgreSQL NO viaja con el paquete: se copia a mano
+         sobre appsettings.Production.json despues de publicar. Si viajara,
+         cada sitio llevaria la credencial del otro. -->
+    <Content Remove="appsettings.Production.postgres.json*" />
+    <None Remove="appsettings.Production.postgres.json*" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,6 @@
+Las capturas del tutorial van aqui, con los nombres que TUTORIAL_PUBLICAR.md indica
+en la tabla de cada paso.
+
+Antes de guardar una captura: tape lo sensible. Una contrasena visible en una
+imagen queda en el historial de git igual que si estuviera escrita en el texto,
+y de una imagen es mas facil de pasar por alto.

@@ -4757,112 +4757,41 @@ PHP    --- [NONE]
 > ejecutar.** Hasta aquí todo cabía en un hospedaje porque todo era .NET. El
 > primer programa en otro lenguaje **obliga a salir a buscar.**
 
-### 9.2 · Dónde sí: las opciones, y por qué Render
+### 9.2 · Dónde podría ir: el panorama de 2026
 
-**Esto cambió mucho en 2026**, así que las opciones se revisaron antes de
-escoger — no de memoria:
+**Esto cambió mucho este año**, así que las opciones se revisaron en octubre de
+2026 — no de memoria:
 
-| Plataforma | Estado en octubre de 2026 | ¿Sirve? |
+| Plataforma | Estado | ¿Sirve? |
 |---|---|---|
-| **Render** | **750 horas/mes**, corre un `Dockerfile`, publica desde GitHub. Se duerme a los 15 min. El tráfico bajó a 5 GB en abril | **Sí — la escogida** |
-| **Koyeb** | Un servicio gratis y **sin dormirse**… pero **pide tarjeta desde febrero de 2026**, con retención de 29 USD | Riesgoso para un curso |
-| **Fly.io** | **Ya no tiene plan gratuito**: prueba de 7 días y tarjeta | No |
-| **Railway** | ~1 USD de crédito al mes | No |
+| **Render** | 750 horas/mes, corre un `Dockerfile`, publica desde GitHub. Se duerme a los 15 min | Sí, **con cuenta nueva** |
+| **Hugging Face Spaces** | **En 2026 los Spaces de Docker pasaron a plan de pago.** *«Gradio and Docker Spaces require a paid plan»* | **No** |
+| **Koyeb** | Docker gratis y sin dormirse… pero **pide tarjeta desde febrero de 2026** | No, para un curso |
+| **Northflank** | Siempre encendido, pero **pide tarjeta** | No |
+| **Fly.io** | **Ya no tiene plan gratuito** | No |
+| **Back4App** | Sin tarjeta y con Docker, **pero el contenedor gratuito vive 60 minutos por despliegue** | Solo para una demostración en vivo |
 | **PythonAnywhere** | Gratis, **pero bloquea las salidas HTTP** a sitios fuera de su lista blanca | **No** — no podría llamar a nuestra API |
 
 > **El de PythonAnywhere es el error que más caro sale**, y por eso vale
 > nombrarlo: el sitio *arranca*, la página *abre*, el login *falla* — porque la
-> plataforma no deja salir hacia `runasp.net`. **Un hospedaje puede correr su
-> lenguaje y aun así no servirle.**
+> plataforma no deja salir hacia la API. **Un hospedaje puede correr su lenguaje
+> y aun así no servirle.**
 
-### 9.3 · Qué es Render
+#### La conclusión, que es la lección
 
-![La pagina de Render](docs/tutorial_publicar/img/66_render_inicio.png)
-
-**Render es un hospedaje que publica desde su repositorio de GitHub.** Eso es
-lo que lo distingue de MonsterASP, y se ve en su propia portada: lo primero que
-muestra es `$ git push`.
-
-| | MonsterASP | **Render** |
-|---|---|---|
-| **Cómo llega el código** | Usted compila y **sube con `msdeploy`** | **Render clona su repositorio y compila él** |
-| **Qué corre** | Lo que IIS sepa: .NET, Node | **Lo que diga su `Dockerfile`** — cualquier lenguaje |
-| **Cada versión nueva** | Repetir `publish` + `msdeploy` | **Un `git push`** |
-| **El plan gratuito** | 5 sitios, 256 MB, duerme | 750 h/mes, 512 MB, **duerme a los 15 min** |
-
-> **Lo de «corre lo que diga su `Dockerfile`» es la clave**, y explica por qué
-> aquí sí cabe Python: **Render no tiene que soportar Flask — tiene que
-> soportar Docker.** El `Dockerfile` del proyecto dice `FROM python:3.12-slim`,
-> y eso basta.
-
-> **Y hay una simetría que vale señalar en clase:** el mismo `front_flask/`
-> que levanta `docker compose` en su máquina **es el que corre en Render, sin
-> cambios**. Eso es lo que prometía Docker desde la primera versión del curso
-> — y es la primera vez que se cobra la promesa.
-
-#### Entrar
-
-**`Get started`**, arriba a la derecha — o `Sign in` si ya tiene cuenta.
-
-Ofrece **GitHub**, GitLab, Google o correo. **Escoja GitHub**, por dos razones:
-
-| | |
-|---|---|
-| **Ya tiene cuenta** | Una contraseña menos — igual que con Neon |
-| **Y es lo que Render necesita** | Va a publicar **desde su repositorio**. Entrando con GitHub la conexión queda hecha; entrando con correo, hay que autorizar GitHub después |
-
-> **Al autorizar, Render pide permiso sobre sus repositorios — y se lo puede
-> dar solo a los que escoja.** Para la clase conviene: seleccione únicamente
-> `proyecto_aplicacion_y_servicios_web4`. **Lo que no se autoriza no se puede
-> filtrar.**
-
-
-### 9.4 · La búsqueda de hospedaje, y lo que se aprendió por el camino
-
-**Esta parte se escribe tal como ocurrió**, porque lo que pasó buscando dónde
-publicar enseña más que el resultado.
-
-#### Lo que se intentó, en orden
-
-| | Qué pasó |
-|---|---|
-| **1. MonsterASP** | **No corre Python.** `PHP: --- [NONE]` y solo .NET. Descartado antes de intentarlo |
-| **2. Render** | La cuenta del profesor estaba **suspendida por una factura de mayo de 2025**. No deja ni crear un espacio nuevo: *«update the card … before you create another workspace»* |
-| **3. Hugging Face Spaces** | **Ya no sirve: en 2026 los Spaces de Docker pasaron a plan de pago.** *«Gradio and Docker Spaces require a paid plan. Static Spaces stay free for everyone»* |
-| **4. Koyeb y Northflank** | Corren Docker gratis, pero **ahora piden tarjeta** |
-| **5. Back4App** | Sin tarjeta y con Docker, **pero el contenedor gratuito vive 60 minutos por despliegue** — hay que volver a desplegarlo a mano |
-
-> **Y la conclusión, que es la lección:** en octubre de 2026 **casi no queda
-> hospedaje Docker gratuito sin tarjeta.** Lo que en 2023 era normal —Heroku,
-> Fly.io, Railway, Hugging Face— se fue cerrando uno por uno.
+> **En octubre de 2026 casi no queda hospedaje Docker gratuito sin tarjeta.** Lo
+> que en 2023 era normal —Heroku, Fly.io, Railway, Hugging Face— se fue
+> cerrando uno por uno.
 >
 > **Esto no es un contratiempo del tutorial: es información del oficio.** Un
-> proyecto que *depende* de un plan gratuito ajeno **tiene fecha de
-> vencimiento que no controla.** Por eso importa que el proyecto corra en
-> Docker: **mudarlo de plataforma es cambiar de hospedaje, no reescribir la
-> aplicación.**
-
-#### Lo que sí sirve: Render, con una cuenta nueva
-
-**El plan gratuito de Render sigue existiendo y no pide tarjeta.** Lo que estaba
-bloqueado era **esa cuenta**, por una deuda vieja — no el plan.
-
-| | |
-|---|---|
-| **750 horas de instancia al mes** | De sobra para un curso |
-| **Instancia `Free`** | 512 MB, **se duerme a los 15 minutos** |
-| **Pero despierta sola** | Con la primera petición — **a diferencia de Back4App**, que hay que redesplegar a mano |
-| **Sin tarjeta** | Mientras no se escoja una instancia de pago |
-
-> **Y para el estudiante esto es lo normal:** una cuenta recién creada publica
-> gratis sin dar una tarjeta. **El profesor tuvo que crear otra cuenta —con el
-> correo institucional— justamente para hacer lo mismo que van a hacer ellos.**
+> proyecto que *depende* de un plan gratuito ajeno **tiene una fecha de
+> vencimiento que no controla.**
 >
-> **Eso también vale decirlo en clase:** escribir un tutorial desde una cuenta
-> con historial produce instrucciones que no le funcionan a nadie más. **La
-> única forma de saber qué va a ver el estudiante es empezar como él.**
+> **Y de ahí el valor de que el front corra en Docker:** mudarlo de plataforma
+> es **cambiar de hospedaje, no reescribir la aplicación**. El `Dockerfile` es
+> el que vuelve esa mudanza barata.
 
-### 9.5 · Un alto: ¿en MonsterASP usamos Docker?
+### 9.3 · Un alto: ¿en MonsterASP usamos Docker?
 
 **No. En ningún momento.** Y conviene detenerse aquí, porque es la confusión
 que aparece apenas entran dos hospedajes distintos al mismo proyecto.
@@ -4871,7 +4800,7 @@ que aparece apenas entran dos hospedajes distintos al mismo proyecto.
 |---|---|---|
 | **Su máquina** | **Sí** | `docker compose up` levanta cinco contenedores: las dos bases, la API y los dos fronts |
 | **MonsterASP** | **No** | Usted compiló con `dotnet publish` y **subió los archivos** con `msdeploy`. **IIS los ejecuta directamente** |
-| **Render** | **Sí** | La plataforma **lee el `Dockerfile`, construye la imagen** y corre el contenedor |
+| **Un hospedaje de contenedores** | **Sí** | La plataforma **lee el `Dockerfile`, construye la imagen** y corre el contenedor |
 
 #### La prueba está en la lista de archivos que subió
 
@@ -4886,11 +4815,11 @@ y los `appsettings`. **No hay ningún `Dockerfile`.**
 | | |
 |---|---|
 | **MonsterASP es un hospedaje de .NET** | **Ya tiene .NET 10 instalado.** No necesita que usted le diga cómo correr su aplicación: le basta el `web.config` que genera `publish` |
-| **Render no sabe qué es su aplicación** | Puede ser Python, Go o Rust. **El `Dockerfile` es la receta**: «parta de `python:3.12-slim`, instale esto, arranque así» |
+| **Un hospedaje de contenedores no sabe qué es su aplicación** | Puede ser Python, Go o Rust. **El `Dockerfile` es la receta**: «parta de `python:3.12-slim`, instale esto, arranque así» |
 
 > **Y de ahí sale, en una frase, por qué el front Flask no cabía en
-> MonsterASP:** ese hospedaje corre **lo que él tiene instalado**; Render corre
-> **lo que usted le describa**.
+> MonsterASP:** ese hospedaje corre **lo que él tiene instalado**; uno de
+> contenedores corre **lo que usted le describa**.
 >
 > **Dos filosofías distintas**, y el curso termina con un ejemplo vivo de cada
 > una.
@@ -4900,81 +4829,34 @@ y los `appsettings`. **No hay ningún `Dockerfile`.**
 | | La API (C#) | El front Blazor (C#) | **El front Flask (Python)** |
 |---|---|---|---|
 | **En su máquina** | Contenedor | Contenedor | **Contenedor** |
-| **Publicado en** | MonsterASP | MonsterASP | **Render** |
-| **Cómo llega** | `publish` + `msdeploy` | `publish` + `msdeploy` | **`git push`** |
-| **Quién lo ejecuta** | IIS | IIS | **Docker** |
+| **Publicado en** | MonsterASP | MonsterASP | **pendiente** — ver 9.4 |
+| **Cómo llegaría** | `publish` + `msdeploy` | `publish` + `msdeploy` | **la imagen del `Dockerfile`** |
+| **Quién lo ejecuta** | IIS | IIS | **Docker** (local, hoy) |
 | **¿Viaja el `Dockerfile`?** | **No** | **No** | **Sí — es lo único que viaja** |
 
-### 9.6 · Publicar el front Flask en Render
+### 9.4 · Publicar el front Flask: pendiente
 
-#### La cuenta
+**El front Flask funciona en Docker y está probado** — las siete pantallas con
+sesión, los datos con tildes, y gunicorn arrancando cuando `DEPURAR=0`.
 
-```
-https://render.com
-```
+**Lo que falta es escoger hospedaje y publicarlo**, y eso quedó pendiente a
+propósito: ninguna de las plataformas gratuitas de 2026 salió limpia en el
+primer intento, y **no vale la pena escribir un paso del tutorial con una
+plataforma que no se dejó probar entera.**
 
-**`Get started`** → entrar con **GitHub** o con correo.
-
-> **Si su cuenta de GitHub ya está ligada a una cuenta de Render con deudas,
-> entre con correo** — uno distinto del de esa cuenta.
-
-#### El servicio
-
-**`+ New` → `Web Service`.**
-
-| Campo | Qué poner | Por qué |
-|---|---|---|
-| **Source** | Conectar GitHub y escoger **`proyecto_aplicacion_y_servicios_web4`** | Render **clona y construye él**; usted no sube nada |
-| **Name** | `facturas-flask` | Queda en la dirección pública |
-| **Region** | **Frankfurt** | **La misma de la API y de Neon.** Cada salto que se evita son milisegundos |
-| **Branch** | `main` | |
-| **Root Directory** | **`front_flask`** | **El dato que más se olvida.** Sin él, Render busca el `Dockerfile` en la raíz del repositorio y no lo encuentra |
-| **Language / Runtime** | **`Docker`** | Debe detectarlo solo al ver el `Dockerfile` |
-| **Instance Type** | **`Free`** | **Lo que mantiene todo en cero.** Cualquier otra se cobra por hora |
-
-#### Las variables de entorno
-
-En `Environment` → `Add Environment Variable`:
-
-| Clave | Valor |
-|---|---|
-| **`API_FACTURAS_URL`** | `https://apifacturas-carloscastro.runasp.net` |
-| **`CLAVE_SESION`** | Una cadena larga cualquiera — **firma la cookie de sesión** |
-
-> **`DEPURAR` no hace falta ponerla.** La imagen ya trae `DEPURAR=0`, así que
-> arranca con **gunicorn** sin que nadie configure nada. Es el valor por
-> defecto que le pusimos al `Dockerfile` precisamente para esto.
-
-> **`PORT` tampoco:** Render la define sola, y el `app.py` la lee antes que
-> `PUERTO`. **Por eso el mismo código corre en Docker local y en Render sin un
-> solo cambio.**
-
-#### Qué esperar
+**Lo que ya está listo del lado del proyecto**, para cuando se retome:
 
 | | |
 |---|---|
-| **La primera construcción tarda** | Render baja `python:3.12-slim`, instala Flask, requests y gunicorn, y arma la imagen |
-| **En los registros debe aparecer** | `Booting worker with pid:` — ahí arrancó gunicorn |
-| **La dirección queda** | `https://facturas-flask.onrender.com` o parecida |
-| **La primera visita después de 15 min** | **Tarda** — el arranque en frío, por tercera vez en este tutorial |
+| **`front_flask/Dockerfile`** | Arranca **publicado por defecto** (`DEPURAR=0` → gunicorn). Un hospedaje que solo haga `build` + `run` no necesita configurar nada |
+| **`app.py`** | Lee **`PORT`** —lo que imponen las plataformas— antes que `PUERTO`. **El mismo código corre en Docker local y en la nube** |
+| **Dos variables** | `API_FACTURAS_URL` y `CLAVE_SESION`. Nada más |
+| **`front_flask/publicar_en_space.ps1`** | Para plataformas que reciben el código por git, como Hugging Face |
 
-#### Y la prueba
-
-**Entre con `admin@correo.com` / `admin123` y abra `Personas`.**
-
-| Si ve | |
-|---|---|
-| La lista con nombres | **Todo funciona**: el front en Render le habló a la API en MonsterASP, y ésta a su base de datos |
-| Un error de conexión | Revise `API_FACTURAS_URL` — **con `https`**, sin barra al final |
-
-> **Y fíjese en lo que acaba de pasar, que es el final del tutorial:** una
-> interfaz en **Python**, hospedada en **Render**, le pide datos a una API en
-> **C#**, hospedada en **MonsterASP**, que los lee de **SQL Server** — o de
-> **PostgreSQL en Neon**, según cuál API se apunte.
->
-> **Cuatro proveedores, tres lenguajes, dos motores de base de datos — y un
-> solo sistema.** Eso es lo que hace posible que las piezas se hablen por
-> contratos y no por dentro.
+> **Y mientras tanto el argumento del curso se sostiene igual:** las dos
+> interfaces —Blazor y Flask— corren contra **la misma API** en `docker
+> compose`. **Que una esté publicada y la otra no es un asunto de hospedaje, no
+> de arquitectura.**
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

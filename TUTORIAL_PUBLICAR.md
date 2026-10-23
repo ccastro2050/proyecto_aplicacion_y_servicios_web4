@@ -3156,9 +3156,30 @@ cd ...\proyecto_aplicacion_y_servicios_web4\front_blazor
 dotnet publish -c Release -o publicado
 ```
 
-> **El front pesa más que la API**, y tiene sentido: trae los archivos
-> estáticos — el CSS, los iconos, el JavaScript que mantiene abierto el
-> circuito de Blazor. La API no tiene nada de eso: solo manda JSON.
+#### Y una sorpresa en la balanza
+
+| | La API | **El front** |
+|---|---|---|
+| Archivos | 54 | **30** |
+| Tamaño | **17,8 MB** | **1,6 MB** |
+
+**El front pesa once veces menos**, y uno esperaría lo contrario — al fin y al
+cabo trae pantallas, CSS e iconos, y la API solo manda JSON.
+
+> **La explicación está en el `FrontFacturas.csproj`**, que lo dice en un
+> comentario: *«Sin paquetes: Blazor Server viene en el SDK web, y el front no
+> necesita NADA de acceso a datos»*.
+>
+> **Los 18 MB de la API eran las bibliotecas que el front no tiene:**
+> `Microsoft.Data.SqlClient` con sus `runtimes` para cuatro plataformas,
+> `Npgsql`, `Dapper`, `Azure.Identity` y los trece idiomas de los mensajes de
+> error. **El front no habla con ninguna base de datos — habla con la API por
+> HTTP**, y eso no necesita un solo paquete.
+
+> **Es la arquitectura, hecha peso.** Que el front sea incapaz de llegar a la
+> base de datos no es una promesa del diseño: **se comprueba mirando la
+> carpeta.** Si mañana alguien le agregara un conector de base de datos, los
+> archivos publicados lo delatarían.
 
 #### Subir
 

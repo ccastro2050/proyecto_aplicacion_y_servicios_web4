@@ -1816,14 +1816,16 @@ usuario y la contraseña adentro.
 
 #### Sobre las contraseñas de aquí en adelante
 
-En este tutorial **las capturas muestran los valores reales** — sin eso no se
-entendería de dónde sale cada dato. Pero **en el texto van como
-`SU_CONTRASENA`**, por dos razones:
+En este tutorial **las contraseñas van completas**, en las capturas y en el
+texto. Es deliberado: un tutorial con `SU_CONTRASENA` en los comandos obliga a
+adivinar dónde va cada cosa, **y es justo ahí donde la gente se equivoca** —
+como vamos a ver en el paso 6.1, donde confundimos dos claves.
 
 | | |
 |---|---|
-| **La suya va a ser otra** | Cada sitio genera la propia. Copiar la de la captura no le va a servir |
-| **Para poder copiar y pegar** | Los comandos quedan listos para usar, cambiando solo lo que es suyo |
+| **Aquí se ven** | Para que se entienda **cuál valor va en cuál hueco** |
+| **La suya va a ser otra** | Cada cuenta genera las propias. **No copie éstas** — copie el **lugar** de donde se sacan |
+| **Y éstas se cambian al final** | Con el `Change` de cada pantalla. Son de una demostración, no de un sistema en uso |
 
 > **Y al terminar la clase, estas dos se cambian:** la de WebDeploy, con el
 > `Change` de esta pantalla, y la de la base de datos, con el suyo. **Quedaron
@@ -1970,7 +1972,7 @@ comentarios y todo:
 
   "ConnectionStrings": {
     "_comentario": "Es la cadena de Local access, no la de Remote access. La API vive en el mismo centro de datos que la base de datos, asi que no sale a internet: por eso el servidor NO lleva .public y por eso Encrypt=False.",
-    "SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=SU_CONTRASENA; Encrypt=False; MultipleActiveResultSets=True;"
+    "SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=Cd3?2F#iYm8_; Encrypt=False; MultipleActiveResultSets=True;"
   }
 }
 ```
@@ -2003,24 +2005,116 @@ comentarios y todo:
 > y nadie va a poder preguntarle a `git log` por qué existe. **Lo único que va
 > a quedar es lo que diga adentro.**
 
-> **Por qué la local y no la remota, otra vez.** La API va a correr **en el
-> mismo centro de datos** que la base de datos. No necesita salir a internet
-> para hablarle — por eso el servidor **no lleva `.public`** y por eso
-> **`Encrypt=False`**. Es más rápida, y además funciona **aunque el
-> `Remote access` esté apagado**.
+#### ¿Por qué la del `Local access` y no la del `Remote access`?
 
-#### Lo único que usted tiene que hacer
+**Porque la API no es un cliente de afuera: vive adentro.** Y esta vez no hay
+que deducirlo — **el panel lo dice con todas las letras**, en la pestaña
+`Local access`:
 
-**Abra `api_facturas/appsettings.Production.json` y reemplace `SU_CONTRASENA`**
-por la contraseña real de la base de datos.
+> *«Use these details in the connection string of **a website hosted with us**.
+> The connection **stays inside our datacenter network** — fast, and **not
+> reachable from outside**»*
+>
+> *«Direct connection **from your hosted websites** to the MSSQL server — both
+> run inside our datacenter network. **Only usable from applications running on
+> your hosted websites**, not from your local computer or external services»*
 
-**¿Dónde está?** En el panel: **`Databases` → `bdfacturas` → `Local access` →
-`Password` → `Show`**. Hay un botón de copiar al lado.
+**Leído al revés, eso también explica otra cosa:** por eso, cuando usted quiso
+entrar con SSMS **desde su computador**, tuvo que encender el `Remote access`.
+La cadena local **no le habría servido** — no porque la clave estuviera mal,
+sino porque esa puerta **no existe desde afuera**.
 
-> **Ojo con un detalle que cuesta tiempo:** copie la contraseña **con el botón
-> de copiar**, no seleccionándola con el ratón. Estas claves traen símbolos
-> como `#`, `+` y `-`, y un espacio de más al final **no se ve** — pero el
-> servidor lo cuenta, y rechaza la conexión sin decir por qué.
+La base de datos está en Europa, el sitio está en Europa, y los dos cuelgan de
+la misma red del centro de datos. Para hablarse **no necesitan salir a
+internet** — y si no salen, no tiene sentido tratarlos como si salieran.
+
+| | `Local access` **← la API** | `Remote access` |
+|---|---|---|
+| **Quién la usa** | **Lo que corre dentro del hospedaje**: su API publicada | **Lo que corre fuera**: SSMS, Azure Data Studio, Visual Studio en su casa |
+| **Por dónde va** | Por la red interna del centro de datos | **Por internet abierto** |
+| **Velocidad** | **La más rápida.** Cada consulta cuenta | Depende de su conexión |
+| **Cifrado** | `Encrypt=False` — no sale a ninguna parte, no hay nada que proteger en el camino | `Encrypt=True`, obligatorio |
+| **¿Se puede apagar?** | **No existe el interruptor**: siempre está | **Sí, y viene apagado** |
+
+**Y de ahí salen las tres razones de peso:**
+
+| | |
+|---|---|
+| **1. No depende de un interruptor** | Si un día apaga el `Remote access` —que es lo recomendable cuando no lo esté usando— **la API publicada sigue funcionando**. Con la cadena remota, se le caería el sistema sin saber por qué |
+| **2. Es más rápida** | Una pantalla de facturas hace varias consultas. Por dentro son milisegundos; por internet, cada una paga el viaje |
+| **3. No expone nada de más** | La cadena remota es un **punto público**. Si esa cadena se filtra, cualquiera en el mundo puede intentar entrar a sus datos. La interna **no sirve desde afuera** aunque la publiquen |
+
+> **Y hay una trampa concreta con la remota**, que el propio panel advierte:
+> *«Repeated failed logins get an IP **blocked automatically**»*. Una API con la
+> clave mal puesta reintenta sola, muchas veces — y puede terminar **bloqueando
+> la IP del servidor**.
+
+> **La regla, en una frase:** `Remote access` es **para usted**, cuando se
+> conecta con SSMS desde su computador. `Local access` es **para la aplicación
+> publicada**. Y por eso el `Remote access` se puede volver a apagar cuando
+> termine — **la API no lo necesita**.
+
+#### De dónde sale esa contraseña — y cuál NO es
+
+![La pestaña de la base de datos con la contraseña a la vista](docs/tutorial_publicar/img/39_clave_base_datos.png)
+
+En el panel: **`Databases` → `bdfacturas` → `Password` → `Show`**, y hay un
+botón de copiar al lado.
+
+> **Aquí nos equivocamos en vivo, y vale la pena dejarlo escrito.** Al llenar
+> este archivo pegé **la contraseña de WebDeploy** — la de la pantalla
+> anterior. **No es ésa.** A esa altura hay **dos contraseñas distintas
+> abiertas en el mismo navegador**, y se parecen hasta en la forma:
+>
+> | Contraseña | Dónde vive | Para qué sirve |
+> |---|---|---|
+> | `c+3LK6h#-iM4` | `Websites` → `Visual Studio access` | **Subir el código** |
+> | `Cd3?2F#iYm8_` | `Databases` → `bdfacturas` | **Leer y escribir los datos** |
+>
+> **Y el error no avisa a tiempo.** Con la clave equivocada, `msdeploy` publica
+> perfecto — porque esa clave no se usa al publicar— y la API arranca bien.
+> Falla **en la primera petición que toque la base de datos**, con un error de
+> inicio de sesión. Uno busca el problema en el comando de publicar, que es
+> donde no está.
+
+#### Y una que confunde todavía más: `Local` y `Remote` comparten contraseña
+
+**La misma clave sirve en las dos pestañas.** Si abre `Local access` o
+`Remote access`, el campo `Password` muestra **el mismo valor** — como ya
+dijimos en el paso 3.6: lo único que cambia entre las dos es **el nombre del
+servidor**.
+
+| | `Local access` | `Remote access` |
+|---|---|---|
+| **Server** | `db75266.databaseasp.net` | `db75266.`**`public`**`.databaseasp.net` |
+| **Login** | `db75266` | `db75266` |
+| **Password** | `Cd3?2F#iYm8_` | **la misma** |
+| **Encrypt** | `False` | `True` + `TrustServerCertificate=True` |
+
+> **Por eso la pregunta «¿no es la del remoto?» tiene una respuesta tranquila:
+> sí, y también la del local — es una sola.** La contraseña es **del usuario
+> `db75266`**, no de la puerta por donde entra. Lo que usted escoge al armar la
+> cadena no es qué clave usar, sino **por dónde entrar**: y nosotros entramos
+> por dentro, sin `.public`.
+
+#### Cómo queda el renglón, entonces
+
+```
+"SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=Cd3?2F#iYm8_; Encrypt=False; MultipleActiveResultSets=True;"
+```
+
+**Compruébelo contra el panel antes de seguir.** En la pestaña `Local access`,
+el recuadro `CONNECTION STRING` tiene un botón **`Show with password`**: ahí
+sale la cadena entera, armada por el hospedaje. **Si la suya no coincide, la
+que manda es la del panel.**
+
+> **Tres descuidos que cuestan media hora cada uno:**
+>
+> | | |
+> |---|---|
+> | **Copiar con el ratón** | Use el botón de copiar. Un espacio de más al final **no se ve**, pero el servidor lo cuenta |
+> | **Borrar el `;` del final** | Separa los parámetros de la cadena |
+> | **Ponerle comillas a la contraseña** | Va dentro de la cadena, no entre comillas propias |
 
 #### Y por qué ese archivo no va a GitHub
 

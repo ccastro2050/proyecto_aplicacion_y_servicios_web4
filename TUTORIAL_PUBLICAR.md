@@ -1365,8 +1365,10 @@ sitio ya aparece, pero todavía no sirve.**
 
 > **Por qué tarda.** Un sitio no es una carpeta: el hospedaje registra el
 > dominio en su servidor web, le asigna un *application pool* propio con sus
-> 256 MB, y genera **el usuario y la clave de WebDeploy**. Eso último es lo que
-> vamos a necesitar en seguida.
+> 256 MB, y le reserva **su identificador —`site101125`— y su cuenta de FTP**.
+>
+> **La cuenta de WebDeploy no**, y eso sorprende: esa se crea después, cuando
+> usted la pida. Lo vemos en el paso 5.9.
 
 #### Después: `Enabled`
 
@@ -1671,6 +1673,89 @@ La fila de íconos —`Files`, `Domains`, `HTTPS`, `Deploy`, `Git`, `Logs`…—
 
 **Siga a la pestaña `Visual Studio access`**, que es donde están los datos de
 WebDeploy.
+
+
+### 5.9 · `Visual Studio access`: WebDeploy viene apagado
+
+![La pestaña de WebDeploy, con el interruptor en Disabled](docs/tutorial_publicar/img/36_webdeploy_apagado.png)
+
+**Y aquí pasa lo mismo que con la base de datos:** la pestaña existe, pero
+**está en `Disabled`**. Donde debería estar el servidor se lee
+`---- Disabled ----`, el `Show` de la contraseña está gris y
+`Test connection` también.
+
+#### Lo que dice el panel, que es exacto
+
+> *«WebDeploy is switched off — **no publishing account exists on the server**.
+> Switch it to **Enabled** to get the server address, password and publish
+> profile»*
+
+**Léalo con cuidado, porque no dice lo que uno supone.** No es que la clave
+esté escondida: **es que todavía no existe.** La cuenta de publicación **se
+crea en el momento de encender el interruptor**.
+
+> **Por eso no servía buscarla antes.** En el Paso 5.6 dijimos que al crear el
+> sitio se generaban las credenciales de WebDeploy. Esta pantalla lo corrige:
+> el sitio se creó, sí, pero **la cuenta de publicación no — esa la crea
+> usted**, aquí, cuando la pida.
+
+#### Lo único que sí se ve estando apagado
+
+| Dato | Valor | Qué es |
+|---|---|---|
+| **Port** | **`8172`** | **El puerto de WebDeploy**, no el 21 del FTP ni el 443 de la web. Es fijo y no cambia |
+| **Site** | `site101125` | **El nombre del sitio dentro de IIS.** El comando de publicar lo pide aparte |
+| **Login** | `site101125` | El usuario |
+| **Server** | `---- Disabled ----` | **Lo que falta.** Aparece al encender |
+| **Password** | `*****`, con `Show` **gris** | Tampoco existe todavía |
+
+> **`Site` y `Login` se parecen tanto que confunden**, y son dos cosas: `Site`
+> es **cuál aplicación** del servidor se está actualizando, y `Login` es
+> **quién** la actualiza. Que tengan el mismo valor es casualidad del
+> hospedaje, no una regla.
+
+#### Qué es WebDeploy, en una frase
+
+> *«Best deployment solution for **IIS** — built by Microsoft specifically for
+> publishing .NET applications to Windows hosting»*
+
+| | FTP | **WebDeploy** |
+|---|---|---|
+| Qué hace | **Copia archivos**, uno por uno | **Sincroniza la aplicación**: compara lo que hay con lo que usted manda |
+| Archivos que no cambiaron | Se vuelven a subir | **Se saltan** |
+| Archivos que sobran | Quedan ahí | **Los borra**, si se le pide |
+| El proceso en marcha | Hay que pararlo a mano | **Lo detiene y lo reanuda solo** |
+
+> **Por eso usamos WebDeploy y no FTP.** Publicar la segunda versión de la API
+> por FTP es volver a subirlo todo y rezar para que no quede un archivo viejo
+> suelto. Con WebDeploy, **lo que queda arriba es exactamente lo que usted
+> publicó.**
+
+#### Enciéndalo
+
+**Oprima `Enabled`.**
+
+Al hacerlo aparecen **los dos datos que faltan** — el servidor y la
+contraseña— y se habilitan dos botones:
+
+| Botón | Para qué |
+|---|---|
+| **`Test connection`** | Comprueba que el servidor de WebDeploy responde **y que esas credenciales entran**. Útil antes de pelear con el comando |
+| **`Download publish profile`** | Baja un archivo **`.PublishSettings`** con todo lo anterior adentro. Visual Studio lo importa y queda configurado |
+
+> **Y una diferencia con el acceso remoto de la base de datos, que conviene no
+> mezclar:**
+>
+> | | `Remote access` de la base | **WebDeploy** |
+> |---|---|---|
+> | Qué expone | **Los datos** | **La publicación** |
+> | ¿La aplicación lo necesita? | **No** — ella usa `Local access` | **No** — solo se usa al publicar |
+> | Cuándo se usa | Cuando usted entra con SSMS | Cada vez que sube una versión nueva |
+>
+> **Los dos se pueden apagar cuando no se estén usando**, y ninguno de los dos
+> le hace falta al sitio para responder. La diferencia práctica es que a
+> WebDeploy se vuelve seguido — cada publicación—, así que en clase se deja
+> encendido mientras dure el trabajo.
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

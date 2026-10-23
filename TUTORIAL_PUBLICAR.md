@@ -2718,6 +2718,81 @@ Y el primer cliente llegó así:
 **La lista no viene suelta: viene envuelta.** Es el contrato del curso — el
 front no tiene que adivinar cuántos hay ni de dónde salieron.
 
+#### Así se ve el inicio de sesión, hecho
+
+![El POST a api/sesion respondiendo 200 con el token](docs/tutorial_publicar/img/44_swagger_sesion.png)
+
+```json
+{
+  "estado": 200,
+  "mensaje": "Sesion iniciada.",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "email": "admin@correo.com",
+  "roles": [ "Administrador" ],
+  "expira": "2026-10-23T04:15:01.6051958Z"
+}
+```
+
+**Tres cosas de esta respuesta vale la pena mirar:**
+
+| | |
+|---|---|
+| **`roles: ["Administrador"]`** | **No lo dice el token nada más: lo averiguó en la base de datos.** Esa consulta cruza `usuario`, `rol_usuario` y `rol` — tres tablas de las doce que importó |
+| **`expira`** | Una hora exacta después. La cabecera `date` dice `03:15:00 GMT` y el token expira a las `04:15:01`: **es el `DuracionMinutos: 60`** del `appsettings.json`, confirmado con reloj |
+| **El recuadro `Curl`** | Swagger arma **el comando equivalente**. Cópielo y tiene la misma petición para una terminal, un script o Postman |
+
+**Y las cabeceras de respuesta dicen dónde está corriendo:**
+
+```
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+```
+
+> **Eso no sale cuando usted corre en su máquina.** Ahí contesta Kestrel
+> directamente; aquí contesta **IIS**, que recibe la petición y se la pasa a su
+> aplicación por el `AspNetCoreModuleV2` — el del `web.config`.
+
+#### Y con el token puesto, los datos
+
+![El GET a api/usuario con el token, respondiendo ocho usuarios](docs/tutorial_publicar/img/45_swagger_usuarios.png)
+
+```json
+{ "tabla": "usuario", "limite": 1000, "total": 8, "datos": [ ... ] }
+```
+
+**`total: 8`**, y los ocho correos son **exactamente** los del `INSERT INTO
+usuario` del `bdfacturas_publicar.sql`:
+
+| | |
+|---|---|
+| Los cuatro de rol | `admin@` · `vendedor1@` · `jefe@` · `cliente1@correo.com` |
+| Los dos de prueba | `test_encript@` · `nuevo@correo.com` |
+| Los dos reales | `carlos.castro@usbmed.edu.co` · `carloscastro5033@correo.itm.edu.co` |
+
+> **Ocho en el archivo, ocho en la respuesta.** Es la misma comprobación que
+> hicimos con las doce tablas, pero ahora **atravesando todo el sistema**: del
+> `.sql` a la base de datos, de la base de datos a la API, de la API a
+> internet.
+
+> **Y fíjese en lo que NO viene:** la respuesta trae `email` y nada más.
+> **La contraseña no sale** — ni cifrada. Un `SELECT *` habría mandado los
+> hashes a cualquiera con un token. **Que no estén ahí es una decisión del
+> código**, no un regalo del framework.
+
+#### Una cosa pendiente: `Not secure` en la barra
+
+La barra del navegador dice **`Not secure`**, porque entramos por **`http://`**.
+
+> **No significa que el sitio no tenga certificado.** El panel tiene una
+> sección **`HTTPS` · SSL certificates**, y los subdominios `runasp.net` suelen
+> traer el suyo puesto. **Pruebe la misma dirección con `https://`** — si
+> abre, úsela siempre.
+>
+> **Y por qué importa más aquí que en otras páginas:** por `http://`,
+> **la contraseña y el token viajan legibles**. Acabamos de mandar
+> `admin123` en el cuerpo de una petición. En una red compartida —la
+> universidad, un café— eso se puede leer.
+
 #### Lo que falta: la interfaz
 
 **La API ya sirve. Lo que no hay todavía es la pantalla**, y es el Paso 7.

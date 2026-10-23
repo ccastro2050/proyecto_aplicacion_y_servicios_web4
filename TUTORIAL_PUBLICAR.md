@@ -4503,10 +4503,25 @@ cada una, y pida lo mismo.
 
 **Pida `GET /api/persona` en las dos:**
 
+![La respuesta de persona en la API de PostgreSQL](docs/tutorial_publicar/img/62_persona_postgres.png)
+
+```json
+{
+  "tabla": "persona",
+  "total": 6,
+  "datos": [
+    { "codigo": "P001", "nombre": "Ana Torres",    "email": "ana.torres@correo.com" },
+    { "codigo": "P002", "nombre": "Carlos Pérez",  "email": "carlos.perez@correo.com" },
+    { "codigo": "P003", "nombre": "María Gómez",   "email": "maria.gomez@correo.com" },
+    { "codigo": "P004", "nombre": "Juan Díaz",     "email": "juan.diaz@correo.com" }
+  ]
+}
+```
+
 | | |
 |---|---|
-| **PostgreSQL** | `Carlos Pérez`, `María Gómez` |
-| **SQL Server** | `Carlos PA(c)rez`, `MarA-a GA3mez` |
+| **PostgreSQL** | **`Carlos Pérez`, `María Gómez`, `Juan Díaz`** |
+| **SQL Server** | `Carlos PA(c)rez`, `MarA-a GA3mez`, `Juan DA-az` |
 
 **Es el defecto del Paso 7.6**, pendiente de reimportar. Y de paso, **la prueba
 de que las dos bases se cargaron por caminos distintos**: una por el panel con

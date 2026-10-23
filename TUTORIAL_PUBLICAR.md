@@ -1282,12 +1282,68 @@ funcionando de una vez.
 > aplicación. Si lo deja, después hay que borrar sus archivos a mano — y
 > mientras tanto conviven dos aplicaciones en el mismo sitio.
 
+#### Pero la lista dice algo que sí importa: qué corre en este servidor
+
+**No vamos a instalar ninguno, y aun así vale leerlos.** Cada tarjeta es una
+demostración de algo que el hospedaje **sabe ejecutar** — y eso contesta, sin
+tener que probarlo, si lo que usted va a subir va a funcionar aquí.
+
+| Tarjeta | Qué trae | Qué demuestra |
+|---|---|---|
+| **My own application** `DEFAULT` | Sitio vacío. Etiquetas: **`FTP`**, **`WebDeploy`**, **`Git`**, **`Any framework`** | **Tres formas de subir** su código. Nosotros vamos a usar **WebDeploy** |
+| **.NET 10 Web API** | `ASP.NET Core Minimal API` con un documento **OpenAPI**. *No database needed* | **.NET 10 ya está instalado.** No hay que pedirlo ni instalarlo |
+| **Blazor** | `Blazor Web App (.NET 10)`, etiqueta **`Blazor Server`**. *«Sample interactive UI written in C# running on the server — no JavaScript required»* | **Blazor Server corre aquí** |
+| **SignalR Chat** | `ASP.NET Core SignalR` sobre **WebSockets**, con presencia en vivo | **El servidor permite conexiones persistentes.** Sin esto, Blazor Server no funcionaría |
+| **Angular SPA** | `.NET 10 API + Angular`, el front servido por el mismo back | **Angular corre**, servido como archivos estáticos desde ASP.NET Core |
+| **Next.js** | `Node.js / Next.js / React` bajo **`iisnode`** | **Aquí también corre Node.js**, no solo .NET |
+
+#### Entonces sí: Blazor, Angular y React
+
+| | |
+|---|---|
+| **Blazor** | Sí, y **es exactamente lo que vamos a publicar en el Paso 6** |
+| **Angular** | Sí, compilado y servido como archivos estáticos |
+| **React / Next.js** | Sí, porque el servidor corre **Node.js bajo IIS** |
+
+> **Y la tarjeta de Blazor es la respuesta a la pregunta de este proyecto.**
+> Nuestro front —`front_blazor`— es **Blazor Server**: en `Program.cs` dice
+> `AddInteractiveServerComponents()` y en `App.razor`,
+> `InteractiveServerRenderMode`. Es **la misma clase de aplicación** que la
+> tarjeta `Blazor`. Si el hospedaje la ofrece como ejemplo, la soporta.
+
+> **Pero hay una advertencia que viene del plan gratuito.** Blazor Server
+> mantiene **una conexión abierta con cada navegador** —el *circuito*— y el
+> estado de la pantalla **vive en la memoria del servidor**. Con los 256 MB y
+> sin `AlwaysRunning`, pasan dos cosas:
+>
+> | Qué pasa | Qué ve el estudiante |
+> |---|---|
+> | El sitio se duerme y el proceso se apaga | *«Attempting to reconnect to the server…»* en una franja arriba. Se recupera recargando |
+> | Muchos usuarios a la vez | Cada uno ocupa memoria. Con 256 MB **no es para una demostración masiva** |
+>
+> **Para el proyecto de aula alcanza de sobra.** Pero si va a mostrarlo,
+> ábralo antes — igual que la API.
+
+#### Dos avisos más de la pantalla
+
+| Aviso | Qué dice |
+|---|---|
+| El recuadro amarillo, arriba | *«These are **small demo projects, not finished products**»*. Son de arranque, no un producto |
+| El recuadro verde, abajo | *«Looking for a real application instead of a demo? Install **WordPress, Umbraco, Oqtane** and others later from the full catalogue in **Website Management → App Installer**»* |
+
+> **O sea que el catálogo no se cierra aquí.** Lo que no instale ahora se puede
+> instalar después desde `Website Management → App Installer`, y ahí mismo se
+> sigue la instalación mientras corre.
+
 **Oprima `Create Website`.**
 
 > **Para qué sirven los ejemplos, entonces.** Para comprobar que el hospedaje
 > funciona cuando uno todavía no tiene nada que subir. Si un estudiante duda de
 > si el problema es su código o el servidor, instalar el ejemplo de `.NET 10
-> Web API` en un sitio aparte lo resuelve en dos minutos.
+> Web API` **en un sitio aparte** lo resuelve en dos minutos: si el ejemplo
+> responde, el hospedaje está bien y el problema está en su código. Y como
+> *«none of the examples needs a database»*, la prueba no depende de que la
+> conexión a la base esté bien.
 
 
 

@@ -4235,4 +4235,117 @@ git status
 > otro no.
 
 
+### 8.8 · El tercer sitio
+
+**`Websites` → `Add website`**, el mismo asistente del Paso 5:
+
+| Paso | Qué escoger |
+|---|---|
+| **Plan** | `Select FREE website` |
+| **Domain** | **`apifacturas-pg-carloscastro`** → `.runasp.net` |
+| **Location** | **Europa** — el mismo de todo lo demás |
+| **Example** | `My own application` |
+
+**El `-pg-` en el nombre es lo que las distingue.** Con tres sitios y
+direcciones parecidas, esas tres letras son lo que evita publicar una encima de
+la otra.
+
+**La descripción:**
+
+```
+API facturas v4 - PostgreSQL/Neon - AySW 2026-2
+```
+
+**Y las credenciales:** `Deploy` → `Visual Studio access` → **`Enabled`**.
+
+| | La de SQL Server | **La de PostgreSQL** |
+|---|---|---|
+| **Site / Login** | `site101125` | **`site101144`** |
+| **Password** | `c+3LK6h#-iM4` | **`6La_Xy=93Nt?`** |
+
+> **Tres sitios, tres identificadores, tres contraseñas.** Ninguna sirve en el
+> otro sitio. Esa separación es a propósito: **si una se compromete, los otros
+> dos siguen cerrados.**
+
+### 8.9 · Publicar: tres comandos, y uno es el que importa
+
+#### 1. Compilar — **exactamente lo mismo de siempre**
+
+```powershell
+cd ...\proyecto_aplicacion_y_servicios_web4\api_facturas
+dotnet publish -c Release -o publicado_pg
+```
+
+```
+Restauracion completada (0,6s)
+  ApiFacturas net10.0 realizado correctamente (6,5s) -> publicado_pg\
+
+Compilacion realizado correctamente en 8,3s
+```
+
+> **Fíjese en lo que NO tiene este comando:** ni una palabra sobre PostgreSQL.
+> **Es el mismo `dotnet publish` del Paso 6.2**, cambiando únicamente la carpeta
+> de salida —`publicado_pg` en vez de `publicado`— **para no pisar la otra**.
+>
+> **El `ApiFacturas.dll` que acaba de salir es idéntico al que ya está
+> publicado.** Mismo código, misma compilación, mismos bytes.
+
+#### 2. Cambiarle la configuración — **éste es el paso**
+
+```powershell
+copy appsettings.Production.postgres.json publicado_pg\appsettings.Production.json
+```
+
+**Lea los dos nombres con cuidado, porque son distintos a propósito:**
+
+```
+copy  appsettings.Production.postgres.json     publicado_pg\appsettings.Production.json
+      |                                        |
+      el archivo de PostgreSQL                 se llama como el de SIEMPRE
+      -el que usted creó en el paso 8.7-       -el nombre que .NET va a buscar-
+```
+
+| | |
+|---|---|
+| **Por qué se renombra** | Porque **.NET busca `appsettings.Production.json` y nada más**. No sabe que existe una variante: **le llega un archivo con el nombre de siempre y un contenido distinto** |
+| **Por qué después de compilar** | Porque `publish` **acaba de copiar ahí el de SQL Server**. Este comando lo reemplaza |
+| **Por qué no se compila distinto** | **Porque no hace falta.** El motor no está en el código: está en una clave de configuración |
+
+**El comando no responde nada**, y eso está bien: **en PowerShell el silencio
+es éxito.** Si el archivo de origen no existiera, ahí sí habría un error en
+rojo.
+
+**Compruébelo**, que es más seguro que confiar:
+
+```powershell
+type publicado_pg\appsettings.Production.json
+```
+
+Debe decir **`"Motor": "postgres"`** y la cadena de Neon. **Si dice
+`sqlserver`**, el `copy` no corrió — o corrió desde la carpeta equivocada.
+
+> **Este comando de una línea es el curso entero.** Si la aplicación estuviera
+> mal hecha —con SQL escrito dentro de los controladores, o con el motor
+> decidido en tiempo de compilación— **esto sería imposible** y habría que
+> mantener dos versiones del proyecto.
+
+#### 3. Subir — al sitio nuevo
+
+```powershell
+& "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="...\api_facturas\publicado_pg" -dest:contentPath="site101144",computerName="https://site101144.siteasp.net:8172/msdeploy.axd?site=site101144",userName="site101144",password="6La_Xy=93Nt?",authType="Basic" -enableRule:AppOffline -allowUntrusted
+```
+
+**Antes de oprimir Enter, dos comprobaciones:**
+
+| | |
+|---|---|
+| **`site101144` aparece cinco veces** | Una en `contentPath`, dos en `computerName`, una en `userName`, y el `site=` de la dirección |
+| **La carpeta dice `publicado_pg`** | **Si se le cuela `publicado` a secas, sube la API de SQL Server** y los dos sitios quedan iguales — sin ningún error que lo avise |
+
+> **Y un detalle de esta contraseña en particular:** `6La_Xy=93Nt?` **tiene un
+> `=`**, que es justo el carácter que `msdeploy` usa para separar
+> `nombre=valor`. **Va entre comillas y pasa bien** — pero si alguna vez
+> `msdeploy` se queja de un parámetro desconocido, mire ahí primero.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

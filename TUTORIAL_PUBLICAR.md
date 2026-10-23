@@ -2209,6 +2209,60 @@ publicada»:
 > diferencia entre publicar una aplicación .NET y publicar un PHP, donde lo que
 > se sube **es** el código.
 
+#### Así se ve cuando sale bien
+
+```
+Restauracion completada (0,7s)
+  ApiFacturas net10.0 realizado correctamente (8,3s) -> publicado\
+
+Compilacion realizado correctamente en 10,7s
+```
+
+| Renglón | Qué pasó |
+|---|---|
+| `Restauracion completada` | Resolvió los paquetes NuGet. **Menos de un segundo** porque ya estaban bajados |
+| `ApiFacturas net10.0 ... -> publicado\` | **Compiló y dejó el resultado ahí.** El `net10.0` confirma la versión |
+| `Compilacion realizado correctamente` | **Cero errores.** Si hubiera uno, aquí diría cuántos |
+
+**Y esto es lo que quedó**, medido en la carpeta:
+
+| | |
+|---|---|
+| **50 archivos** | 18 MB en total |
+| **`0` archivos `.cs`** | **El código fuente no viaja** |
+| **`web.config`** | Generado por `publish` — no estaba en el proyecto |
+| **`appsettings.Production.json`** | Con la cadena de la base de datos adentro |
+
+#### El `web.config`, que nadie escribió
+
+Ábralo: son diez renglones, y **es la pieza que hace que IIS sepa arrancar una
+aplicación .NET**.
+
+```xml
+<aspNetCore processPath="dotnet"
+            arguments=".\ApiFacturas.dll"
+            stdoutLogEnabled="false"
+            stdoutLogFile=".\logs\stdout"
+            hostingModel="inprocess" />
+```
+
+| Atributo | Qué dice |
+|---|---|
+| `processPath="dotnet"` · `arguments=".\ApiFacturas.dll"` | **Cómo arrancarla**: literalmente, `dotnet ApiFacturas.dll` |
+| `hostingModel="inprocess"` | La aplicación corre **dentro del proceso de IIS**. Es lo más rápido |
+| **`stdoutLogEnabled="false"`** | **Los mensajes de arranque NO se guardan** |
+| `stdoutLogFile=".\logs\stdout"` | Dónde se guardarían si se encendiera |
+
+> **Guarde ese `stdoutLogEnabled`, que vale oro cuando algo falle.** Si la API
+> publicada responde **error 500 desde la primera petición** y los `Logs` del
+> panel no dicen nada útil, es porque **ni siquiera llegó a arrancar** — y lo
+> que explica por qué está en esos mensajes de arranque que están apagados.
+>
+> **La solución:** cambiar ese `false` por `true` en el `web.config` **de la
+> carpeta `publicado`**, volver a subir, provocar el error y mirar
+> `logs\stdout_*.log` con el administrador de archivos del panel. **Y apagarlo
+> otra vez después**: encendido, escribe en cada arranque y llena el disco.
+
 #### Si lo vuelve a correr
 
 **No hay problema: `publish` sobreescribe.** Pero si antes había archivos que

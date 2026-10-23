@@ -1948,6 +1948,50 @@ puesta el valor por defecto es `Production`**.
 > **`appsettings.Production.json`** **se ignora en su computador y manda en el
 > hospedaje**, sin tocar nada más y sin un solo `if` en el código.
 
+#### De dónde sale ese nombre tan raro
+
+**No es un nombre: es una fórmula que el framework arma y busca solo.**
+
+```
+appsettings  .  Production  .  json
+     |              |
+  fijo: lo que   EL ENTORNO: tiene que coincidir
+  busca .NET     con ASPNETCORE_ENVIRONMENT
+```
+
+| Pieza | De dónde sale |
+|---|---|
+| **`appsettings`** | **Fijo.** Es el nombre que ASP.NET Core busca al arrancar |
+| **`Production`** | **El valor de la variable `ASPNETCORE_ENVIRONMENT`.** El framework arma el nombre con ella: `appsettings.{lo-que-diga-la-variable}.json` |
+| **`.json`** | El formato |
+
+**Y `Production` es el valor por defecto**, que es justo lo que lo hace útil:
+
+| Dónde | `ASPNETCORE_ENVIRONMENT` | Archivo que gana |
+|---|---|---|
+| Su máquina, con `dotnet run` | `Development` | `appsettings.Development.json` |
+| **El hospedaje** | **Nadie la fija** → **`Production`** | **`appsettings.Production.json`** |
+
+> **No configuramos nada para que esto funcione.** Aprovechamos que **cuando la
+> variable no está, .NET asume `Production`** — y el hospedaje no la pone.
+
+**Los tres nombres de la convención son `Development`, `Staging` y
+`Production`.** No son palabras mágicas del lenguaje: son los tres valores que
+Microsoft estandarizó, y el framework trae ayudas para ellos — como
+`app.Environment.IsDevelopment()`.
+
+> **Podría inventarse otro.** Un archivo `appsettings.Hospedaje.json`
+> funcionaría **si** usted pusiera `ASPNETCORE_ENVIRONMENT=Hospedaje` en el
+> servidor. Con `Production` no hay que configurar nada — **un paso menos que
+> puede fallar.**
+
+**Dos trampas del nombre:**
+
+| | |
+|---|---|
+| **La `P` mayúscula** | Tiene que coincidir **exactamente** con el valor de la variable. En Windows da igual; **en Linux, `appsettings.production.json` no se carga**, y el error es mudo |
+| **No lo menciona ningún código** | Búsquelo en `Program.cs`: no está. **Lo carga `WebApplication.CreateBuilder`**, que registra los dos archivos antes de que su código corra. Por eso funciona «solo» |
+
 #### El archivo: créelo usted
 
 **En `api_facturas`, al lado de `appsettings.json`, cree un archivo nuevo

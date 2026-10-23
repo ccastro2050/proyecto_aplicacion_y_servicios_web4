@@ -4129,20 +4129,89 @@ la fila relacionada.
 
 ### 8.7 · El archivo de configuración de la variante
 
-**Cree `api_facturas/appsettings.Production.postgres.json`**, al lado de los
-otros dos. En el repositorio está la plantilla
-`appsettings.Production.postgres.json.ejemplo`: cópiela, quítele el `.ejemplo`
-y reemplace la contraseña.
+#### Cuándo se crea: **ahora, antes de compilar**
+
+Igual que con los otros dos:
+
+| | |
+|---|---|
+| **1. Ahora** | Se crea `api_facturas/appsettings.Production.postgres.json` |
+| **2. Después** | `dotnet publish` — que **no lo usa todavía** |
+| **3. Y en seguida** | **Se copia encima** del `appsettings.Production.json` de la carpeta publicada |
+
+> **Esa tercera línea es la que hace distinta a esta variante**, y se explica
+> en el paso siguiente. Por ahora basta con que el archivo exista.
+
+#### Dónde y cómo se crea
+
+**En `api_facturas`**, al lado de los otros `appsettings`. **El atajo:** en el
+repositorio ya está la plantilla
+
+```
+api_facturas/appsettings.Production.postgres.json.ejemplo
+```
+
+**Cópiela, péguela al lado, quítele el `.ejemplo` del nombre** y reemplace
+`SU_CLAVE` por la contraseña que le dio Neon.
+
+#### Cómo queda el archivo, completo
 
 ```json
 {
+  "_comentario": "ESTE ARCHIVO NO SE VERSIONA -esta en .gitignore- porque trae la contrasena real de Neon. La plantilla que si se versiona es appsettings.Production.postgres.json.ejemplo, al lado.",
+
+  "_para_que_sirve": "Es la MISMA API publicada en otro sitio, hablandole a PostgreSQL en vez de SQL Server. No se compila nada distinto: al publicar, este archivo reemplaza al appsettings.Production.json dentro de la carpeta publicada. Mismo ApiFacturas.dll, mismo contrato, otro motor.",
+
+  "_las_dos_claves": "Motor y ConnectionStrings:Postgres tienen que coincidir. Si deja Motor en sqlserver, la API lee la cadena de SQL Server -que aqui no existe- y falla con un error de conexion que no menciona PostgreSQL por ninguna parte.",
+
   "Motor": "postgres",
 
   "ConnectionStrings": {
+    "_comentario": "Es la cadena de Neon, traducida al formato de Npgsql: pares Clave=Valor separados por punto y coma. El formato postgresql://... que muestra Neon es el de psql, y Npgsql NO lo entiende. El servidor lleva -pooler porque el Connection pooling esta encendido: la API abre y cierra conexion en cada peticion, y sin el pooler se agotan.",
     "Postgres": "Host=ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=SU_CLAVE;SSL Mode=Require"
   }
 }
 ```
+
+#### Renglón por renglón
+
+| Clave | ¿La usa la API? | Para qué está |
+|---|---|---|
+| `_comentario` | **No** | Qué es el archivo y por qué no se versiona |
+| `_para_que_sirve` | **No** | **La idea entera en tres renglones**: mismo `.dll`, otro motor |
+| `_las_dos_claves` | **No** | El error que viene, escrito **antes** de cometerlo |
+| **`Motor`** | **Sí** | Escoge el dialecto |
+| `ConnectionStrings._comentario` | **No** | Por qué la cadena está en ese formato y no en el de Neon |
+| **`ConnectionStrings.Postgres`** | **Sí** | La cadena |
+
+#### Las dos claves que tienen que coincidir
+
+| | |
+|---|---|
+| **`"Motor": "postgres"`** | **Sin ella la API sigue hablando T-SQL**, aunque la cadena sea de Neon |
+| **`ConnectionStrings:`**`Postgres` | **El nombre importa: `Postgres`, no `SqlServer`.** El `Program.cs` lee las dos por separado, y **la que no corresponda al motor ni se mira** |
+
+> **Cómo se ve el error si se equivoca:** con `"Motor": "sqlserver"` y la cadena
+> de Neon, **la API arranca perfecto**, busca `ConnectionStrings:SqlServer`
+> —que en este archivo no existe— y falla en la primera consulta con un error
+> de conexión **que no menciona PostgreSQL por ninguna parte**. Uno revisa la
+> cadena de Neon veinte veces antes de mirar la otra línea.
+
+#### Al `.gitignore`
+
+```
+appsettings.Production.postgres.json
+```
+
+**Compruébelo:**
+
+```powershell
+git status
+```
+
+| Debe aparecer | No debe aparecer |
+|---|---|
+| `appsettings.Production.postgres.json`**`.ejemplo`** | `appsettings.Production.postgres.json` |
 
 #### Ahora hay tres archivos de producción, y conviene no confundirlos
 
@@ -4152,12 +4221,6 @@ y reemplace la contraseña.
 | `api_facturas/appsettings.Production.postgres.json` | **PostgreSQL** en Neon | **No** |
 | `front_blazor/appsettings.Production.json` | **La API**, por su dirección pública | **Sí** — no tiene secretos |
 
-**Al `.gitignore`:**
-
-```
-appsettings.Production.postgres.json
-```
-
 #### Lo que NO hay que hacer
 
 > **No cambie el `appsettings.Production.json` que ya funciona.** La tentación
@@ -4165,10 +4228,11 @@ appsettings.Production.postgres.json
 > de SQL Server** — y la gracia del paso es tener las dos vivas al mismo
 > tiempo.
 
-> **Y no ponga las dos cadenas en el mismo archivo** «por si acaso». Funcionaría
-> —la API solo lee la que corresponda al `Motor`— **pero entonces el secreto de
-> Neon viaja al sitio de SQL Server y al revés.** Cada sitio debe llevar
-> **únicamente la credencial que necesita**: si uno se compromete, el otro no.
+> **Y no ponga las dos cadenas en el mismo archivo** «por si acaso».
+> Funcionaría —la API solo lee la que corresponda al `Motor`— **pero entonces
+> el secreto de Neon viaja al sitio de SQL Server y al revés.** Cada sitio debe
+> llevar **únicamente la credencial que necesita**: si uno se compromete, el
+> otro no.
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

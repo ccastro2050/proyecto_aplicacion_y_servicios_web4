@@ -20,8 +20,19 @@
 # ============================================================
 
 param(
+    # La carpeta donde clono el Space. Es lo unico obligatorio.
     [Parameter(Mandatory = $true)]  [string] $Space,
+
+    # El puerto en que escucha SU aplicacion. Tiene que ser el mismo que
+    # el contenedor expone: Hugging Face lo escribe en app_port y manda ahi
+    # todo el trafico. Si no coinciden, el Space compila bien y queda
+    # mostrando «Application starting» para siempre.
+    [Parameter(Mandatory = $false)] [int]    $Puerto = 8118,
+
+    # La direccion de la API que consume el front. Si su aplicacion no
+    # consume ninguna, pase cadena vacia: solo sale en el README.
     [Parameter(Mandatory = $false)] [string] $UrlApi = "https://apifacturas-carloscastro.runasp.net",
+
     [Parameter(Mandatory = $false)] [string] $Titulo = "Facturas - front en Flask"
 )
 
@@ -54,7 +65,7 @@ emoji: 🧾
 colorFrom: blue
 colorTo: gray
 sdk: docker
-app_port: 8118
+app_port: $Puerto
 pinned: false
 ---
 
@@ -74,7 +85,7 @@ dormida, la primera carga tarda unos segundos.
 Material del curso **Aplicación y Servicios Web** — ITM, 2026-2.
 "@
 Set-Content -Path (Join-Path $Space "README.md") -Value $readme -Encoding utf8
-Write-Host "README.md escrito (sdk: docker, app_port: 8118)"
+Write-Host "README.md escrito (sdk: docker, app_port: $Puerto)"
 
 Write-Host ""
 Write-Host "LISTO. Ahora, dentro de la carpeta del Space:"

@@ -3631,4 +3631,282 @@ base   db75266.databaseasp.net              db75266
 > dos primeros sí salen, y por eso los dos llevan certificado.
 
 
+## Paso 8 — El mismo sistema, contra PostgreSQL
+
+**Hasta aquí el sistema corre contra SQL Server.** Pero la v4 habla con **dos
+motores**, y hasta ahora eso ha sido una promesa del diseño. **Este paso la
+pone a prueba.**
+
+| Lo que vamos a hacer | |
+|---|---|
+| Crear una base PostgreSQL en **Neon**, gratis | |
+| Cargarle **el mismo esquema**, en su dialecto | |
+| Publicar **la misma API** en un tercer sitio, cambiando **un archivo** | |
+
+> **Y aquí está la apuesta:** los dos sitios van a correr el **mismo
+> `ApiFacturas.dll`, byte por byte**. Mismas rutas, mismo contrato, mismas
+> respuestas. Lo único distinto será un archivo de texto de ocho renglones.
+>
+> **Si funciona, las capas están bien hechas:** la API no sabe contra qué motor
+> habla. **Si falla, tampoco se pierde el viaje** — el sitio donde falle es
+> exactamente la capa que se coló.
+
+### 8.1 · Por qué Neon y no otro
+
+![La pagina de Neon](docs/tutorial_publicar/img/52_neon_inicio.png)
+
+**MonsterASP ofrece MySQL y MSSQL, pero no PostgreSQL.** Hay que buscarlo
+afuera, y Neon es la opción razonable para un curso:
+
+| | |
+|---|---|
+| **Gratis de verdad** | No pide tarjeta |
+| **Se apaga solo** | *Serverless*: cuando nadie la consulta, **no hay ningún proceso encendido**. Por eso puede ser gratis |
+| **Se crea en menos de un segundo** | Literal — lo vamos a medir |
+| **Entra con GitHub** | Los estudiantes ya tienen cuenta. Una contraseña menos |
+
+**El precio de que se apague sola:** la primera consulta después de un rato
+**tarda segundos** mientras la base despierta. Es el mismo arranque en frío del
+sitio — pero ahora hay **dos siestas encadenadas**: la del sitio y la de la
+base.
+
+> **Y una advertencia que conviene decir en voz alta:** arriba, en su propia
+> página, Neon anuncia que **fue comprada** — *NEON IS PART OF THE DATABRICKS
+> PLATFORM*. **El plan gratuito de hoy puede no existir el año entrante.** Por
+> eso el proyecto **no depende de Neon**: el motor se cambia por configuración,
+> y volver a SQL Server no cuesta una línea de código.
+
+**`Sign up`** → entrar con **GitHub**.
+
+### 8.2 · El proyecto, y la única decisión que importa
+
+![La consola de Neon con los proyectos](docs/tutorial_publicar/img/53_neon_proyectos.png)
+
+La consola abre en **`Projects`**. Arriba, el consumo del mes — `Compute`,
+`Storage`, `History`, `Network transfer`— y abajo, los proyectos que haya.
+
+**`New project`.**
+
+![El dialogo de crear proyecto](docs/tutorial_publicar/img/54_neon_crear_opciones.png)
+
+#### Los `Services`: encéndase solo uno
+
+| Servicio | Qué es | ¿Se usa? |
+|---|---|---|
+| **`Postgres database`** | **La base de datos** | **Sí** — viene encendido |
+| `Object storage` | Baldes para archivos e imágenes | No |
+| `Functions` | Código que corre al lado de los datos | No — la lógica está en la API |
+| `AI gateway` | Un punto de entrada para modelos de IA | No |
+| `Realtime` | Consultas que se actualizan solas | No — el front pregunta cuando necesita |
+| **`Better Auth`** | Autenticación empaquetada | **No, y es importante**: el proyecto ya tiene la suya, con JWT y roles. **Eso es lo que el curso enseña** |
+
+> **Encender servicios que no se usan no es gratis**: consumen del mismo plan y
+> ensucian la consola. **Un proyecto de clase necesita una base de datos y nada
+> más.**
+
+#### La región: **esto es lo que hay que cambiar**
+
+**El desplegable viene en una región de Estados Unidos** — `AWS US East 2
+(Ohio)`, o la que le toque. **Cámbielo a `AWS Europe Central 1 (Frankfurt)`.**
+
+![El dialogo con Frankfurt seleccionado](docs/tutorial_publicar/img/55_neon_frankfurt.png)
+
+| | Ohio | **Frankfurt** |
+|---|---|---|
+| Distancia a la API (Europa) | **Cruza el Atlántico** | Misma región |
+| Ida y vuelta por consulta | **~90–100 ms** | **~1–5 ms** |
+| Una pantalla con cinco consultas | **medio segundo solo en viajes** | imperceptible |
+
+> **Es la misma decisión del Paso 5.4**, cuando escogimos Europa para el sitio
+> *porque la base de datos estaba en Europa*. Lo que cambia es que ahora **la
+> base no es del hospedaje**, y por primera vez usted escoge dónde ponerla.
+
+> **Y la región NO se puede cambiar después.** La primera vez que hicimos esto
+> se quedó en Ohio: hubo que borrar el proyecto y empezar otra vez.
+>
+> **El orden que lo evita:** **primero la región, después el nombre.** Al revés
+> uno escribe el nombre, da por hecho que ya está, y oprime el botón sin volver
+> a mirar arriba.
+
+**Tres indicadores tienen que coincidir antes de crear:** el desplegable, **el
+recuadro negro de la derecha** y **el globo** — que gira hasta mostrar la
+región escogida.
+
+![El proyecto creado](docs/tutorial_publicar/img/56_neon_creado.png)
+
+```
+Your new project was created in 672 ms
+```
+
+> **Esos 672 ms explican por qué rehacerlo no era drama.** Y también por qué
+> este modelo existe: **no se aprovisiona un servidor**, se registra una base en
+> una infraestructura que ya está corriendo.
+
+**De esa pantalla, ignore el `Agent prompt`** — es para que una IA cablee una
+aplicación de Node con `npm`. **Nosotros ya tenemos la aplicación hecha, y en
+.NET.** El enlace útil es `Prefer to wire it up yourself?`.
+
+**`Go to project`.**
+
+### 8.3 · El tablero del proyecto
+
+![La vista general de la rama](docs/tutorial_publicar/img/57_neon_rama.png)
+
+#### Lo primero: no está viendo «la base de datos» — está viendo **una rama**
+
+El título dice **`Branch overview`** y la ruta es
+`All projects / facturas_aysw4 / production`.
+
+**Ésa es la idea central de Neon:** no hay «la base» y ya — hay **ramas, como
+en git**. La de por defecto se llama **`production`**. De ahí se sacan copias
+instantáneas para probar algo destructivo y botarlas después.
+
+> **Es lo que uno quisiera tener la noche anterior a una migración.** Hoy no la
+> vamos a usar, pero vale que los estudiantes sepan que existe.
+
+#### El gráfico vacío dice algo
+
+```
+ENDPOINT INACTIVE
+```
+
+**La base está dormida.** Nadie la ha consultado, así que **no hay ningún
+proceso encendido**. No es un error: es el *scale to zero* a la vista.
+
+#### La ficha de la derecha
+
+| Dato | Valor | Qué significa |
+|---|---|---|
+| **Region** | `AWS Europe Central 1 (Frankfurt)` | **Lo que costó rehacer el proyecto** |
+| **Project ID** | `dawn-sky-10056593` | Aparece en la cadena de conexión |
+| **Branch** | `production` · `Expires Never` | La rama por defecto no caduca |
+| **`IP restrictions`** | **`None set`** | **Cualquiera con la contraseña entra, desde donde sea** |
+| **Default compute** | `0.25 ↔ 2 CU` | Arranca con un cuarto de unidad y crece hasta 2. Un cuarto es ~0,25 de CPU y 1 GB de RAM: **sobra** |
+| **History retention** | `6 horas` | Puede devolver la base a cualquier instante de las últimas seis horas |
+| **Version** | **`18`** | **PostgreSQL 18** |
+
+> **Lo de `IP restrictions: None set` marca una diferencia de fondo con
+> MonsterASP.** Allá el acceso remoto **viene apagado** y hay que encenderlo;
+> aquí **el acceso desde afuera es lo normal**, porque Neon está pensada
+> justamente para eso. **La contraseña es toda la puerta**, y por eso importa
+> más que la otra.
+
+> **Y `Version 18` contra el `postgres:16-alpine` del `docker-compose.yml`:**
+> el esquema del proyecto no usa nada exclusivo de una versión, así que
+> **debería cargar sin problema** — pero eso es un supuesto, no un hecho. **Se
+> comprueba al importar**, y si algo falla el mensaje lo dirá.
+
+### 8.4 · La cadena de conexión, y dónde va
+
+![El dialogo de conexion](docs/tutorial_publicar/img/58_neon_conectar.png)
+
+**El botón verde `Connect`**, arriba a la izquierda.
+
+#### Lo que hay que mirar en el diálogo
+
+| Campo | Valor | Qué es |
+|---|---|---|
+| **Las cuatro pestañas** | `Postgres database` · `Storage` · `Data API` · `Auth` | Formas distintas de llegar a los datos. **La nuestra es la primera**: conexión SQL de toda la vida |
+| **Compute** | `Primary` · **`Active`** | **Se despertó.** Hace un minuto el gráfico decía `ENDPOINT INACTIVE`; **abrir esta pantalla la encendió** |
+| **Database** | **`neondb`** | El nombre que Neon le pone. No vale la pena cambiarlo |
+| **Role** | **`neondb_owner`** | El usuario. En PostgreSQL los usuarios se llaman *roles* |
+| **`Reset password`** | | Cambia la contraseña. Es lo que se usa cuando una clave se filtra |
+
+#### El interruptor `Connection pooling`: déjelo encendido
+
+Mire lo que le hace al nombre del servidor:
+
+```
+ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech
+                      ^^^^^^^
+                      esto lo agrega el pooling
+```
+
+| Sin pooling | **Con pooling** |
+|---|---|
+| Cada conexión abre un proceso en la base | **Un intermediario reparte un puñado de conexiones** entre todos |
+| Se agota rápido | Aguanta muchos más clientes |
+
+> **Y para esta API es justo lo que hace falta:** abre y cierra conexión **en
+> cada petición**. Sin el *pooler*, veinte estudiantes probando a la vez la
+> tumban.
+
+#### La cadena, y lo que dice el final
+
+```
+postgresql://neondb_owner:CLAVE@ep-calm-heart-...-pooler.c-7.eu-central-1.aws.neon.tech/neondb
+             ?sslmode=require&channel_binding=require
+```
+
+| Parte | Qué dice |
+|---|---|
+| `postgresql://` | El formato estándar de PostgreSQL — **no es el de .NET** |
+| `...eu-central-1...` | **Frankfurt.** Ahí queda confirmada la región |
+| **`sslmode=require`** | **Cifrado obligatorio.** Es lo contrario de la conexión a MonsterASP: **ésta sí sale a internet** |
+| **`channel_binding=require`** | Amarra la autenticación al canal cifrado, para que nadie se interponga |
+
+#### Traducirla al formato de .NET
+
+**Npgsql no entiende ese formato.** Hay que pasarla a pares `Clave=Valor`:
+
+```
+Host=ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=SU_CLAVE;SSL Mode=Require
+```
+
+| El formato de Neon | **El de .NET** |
+|---|---|
+| `postgresql://usuario:clave@servidor/base` | Pares `Clave=Valor` separados por `;` |
+| `?sslmode=require` | **`SSL Mode=Require`** — con espacio y mayúsculas |
+| `&channel_binding=require` | **Se omite.** Npgsql no tiene esa opción: **ya usa amarre de canal por su cuenta** cuando la conexión va cifrada |
+
+> **Cópiela con `Copy snippet`, nunca a mano.** Esa contraseña mezcla
+> mayúsculas, minúsculas y dígitos que se confunden entre sí — `l` con `1`,
+> `O` con `0`— y un carácter mal leído se manifiesta como un error de
+> autenticación que no dice que el problema sea un carácter.
+
+#### Y ahora sí: **dónde va**
+
+**En un archivo de configuración nuevo**, al lado del que ya existe:
+
+```
+api_facturas/
+   appsettings.Production.json            -> SQL Server  (el sitio que ya publicamos)
+   appsettings.Production.postgres.json   -> Neon        (el sitio que falta)
+```
+
+**Su contenido:**
+
+```json
+{
+  "Motor": "postgres",
+
+  "ConnectionStrings": {
+    "Postgres": "Host=ep-calm-heart-b9e1zu5w-pooler.c-7.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=SU_CLAVE;SSL Mode=Require"
+  }
+}
+```
+
+**Dos claves, y las dos tienen que coincidir:**
+
+| Clave | Por qué |
+|---|---|
+| **`"Motor": "postgres"`** | Es la que escoge el dialecto. **Sin ella la API sigue hablando T-SQL** |
+| **`ConnectionStrings:`**`Postgres` | **Ojo con el nombre: `Postgres`, no `SqlServer`.** El `Program.cs` lee las dos por separado, y **la que no corresponda al motor ni se mira** |
+
+> **El error que viene, y cómo se ve:** si pone la cadena de Neon pero deja
+> `"Motor": "sqlserver"`, **la API arranca bien**, lee la cadena de SQL Server
+> —que en ese archivo no existe— y falla con un error de conexión **que no
+> menciona PostgreSQL por ninguna parte**. Uno revisa la cadena de Neon veinte
+> veces antes de mirar la otra línea.
+
+**Y este archivo tampoco se versiona:** trae la contraseña de Neon. Al
+`.gitignore`:
+
+```
+appsettings.Production.postgres.json
+```
+
+con su `.ejemplo` al lado, igual que hicimos con el de SQL Server.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

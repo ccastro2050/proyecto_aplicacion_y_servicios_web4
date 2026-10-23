@@ -3031,25 +3031,65 @@ corriendo:
 > encontraría nada: todas las pantallas saldrían vacías o con error, y el
 > mensaje no diría que el problema es la dirección.
 
+#### Cuándo se crea: **ahora, antes de compilar**
+
+**El orden importa y no es negociable:**
+
+| | |
+|---|---|
+| **1. Ahora** | Se crea `front_blazor/appsettings.Production.json` |
+| **2. Después** | `dotnet publish` — que **lo copia** a la carpeta `publicado` |
+| **3. Por último** | `msdeploy` — que **sube esa copia** al servidor |
+
+> **Si lo crea después de compilar, no viaja.** `publish` copia lo que
+> encuentra **en el momento en que corre**; un archivo creado después se queda
+> en su disco, el front publicado sigue buscando `localhost:8035` y las
+> pantallas salen vacías. **Y nada en la salida de `msdeploy` lo advierte.**
+
+> **Dos archivos con el mismo nombre, y uno de ellos no se toca:**
+>
+> | Ruta | Qué es |
+> |---|---|
+> | **`front_blazor/appsettings.Production.json`** | **El suyo.** Aquí se edita |
+> | `front_blazor/publicado/appsettings.Production.json` | **Una copia**, que `publish` vuelve a generar cada vez |
+>
+> **Editar el de `publicado` no sirve de nada:** el siguiente `dotnet publish`
+> lo sobreescribe.
+
 #### Créelo
 
-**En `front_blazor`, al lado de `appsettings.json`, cree:**
+**En `front_blazor`, al lado de `appsettings.json`, cree un archivo llamado:**
 
 ```
 appsettings.Production.json
 ```
 
-**Con este contenido** — cambiando la dirección por la de **su** API:
+**Con este contenido completo** — cambiando la dirección por la de **su** API:
 
 ```json
 {
   "_comentario": "La configuracion del front PUBLICADO. A diferencia de la de la API, esta SI se versiona: no tiene un solo secreto. Lo unico que dice es a que direccion le habla, y esa direccion es publica.",
+
+  "_por_que_Production": "ASP.NET Core lee appsettings.json y encima appsettings.<Entorno>.json. En el hospedaje no se fija ASPNETCORE_ENVIRONMENT y el entorno por defecto es Production: por eso este archivo gana SOLO publicado. En su maquina sigue mandando appsettings.json, que apunta a localhost:8035; dentro de Docker manda la variable UrlApi del compose.",
 
   "_por_que_https": "Con la redireccion forzada encendida, la API responde 307 a toda peticion http. Apuntar directo a https evita ese salto en cada llamada -y evita que el navegador bloquee la mezcla de http con https cuando el front si esta cifrado-.",
 
   "UrlApi": "https://apifacturas-carloscastro.runasp.net"
 }
 ```
+
+#### Qué hace cada clave
+
+| Clave | ¿La usa el front? | Para qué está |
+|---|---|---|
+| `_comentario` | **No** | Dice **qué es este archivo** y por qué éste sí se versiona |
+| `_por_que_Production` | **No** | Deja escrito **por qué se llama así** — y las tres direcciones posibles |
+| `_por_que_https` | **No** | Deja escrito **por qué `https` y no `http`** |
+| **`UrlApi`** | **Sí** | **La única clave que lee el programa.** Lo demás es para quien lea |
+
+> **Tres de cuatro claves son comentarios**, y no sobra ninguna. Es un archivo
+> de una línea útil que **nadie va a volver a mirar en seis meses** — y cuando
+> lo mire, la pregunta no va a ser *«qué dice»* sino *«por qué existe»*.
 
 **Tres cosas que se equivocan y cuestan una tarde:**
 

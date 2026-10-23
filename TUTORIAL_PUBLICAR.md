@@ -3399,4 +3399,77 @@ servidor, manda los clics y recibe los pedacitos de HTML que cambian.**
 > front pesa 1,6 MB: **no hay una aplicación JavaScript aquí**, solo el cable.
 
 
+### 7.5 · Los archivos del front en el servidor
+
+![El administrador de archivos del front](docs/tutorial_publicar/img/48_archivos_front.png)
+
+```
+1 folder  ·  9 files  ·  668.5 KB
+```
+
+**Cabe todo en una página**, sin paginación — a diferencia de la API, que
+necesitaba cuatro.
+
+#### Las dos `wwwroot`, que no son un error
+
+Fíjese en la ruta: está en `Home > wwwroot`, y **adentro hay otra `wwwroot`**.
+
+| Cuál | De quién es | Qué contiene |
+|---|---|---|
+| **La de afuera** | **Del hospedaje** | La raíz del sitio: donde IIS busca la aplicación |
+| **La de adentro** | **De su proyecto** | Los archivos estáticos de ASP.NET Core: CSS, JavaScript, iconos |
+
+> **La API no tenía la de adentro**, y esa ausencia dice qué es cada cosa:
+> **una API no sirve archivos — solo manda JSON.** Un front sí: el navegador
+> le pide la hoja de estilos, los iconos y el JavaScript.
+
+#### Los nueve archivos de la raíz
+
+| Archivo | Tamaño | Qué es |
+|---|---|---|
+| **`FrontFacturas.dll`** | **304,5 KB** | **Todo el código del front**: las catorce pantallas, el menú, los servicios |
+| `FrontFacturas.exe` | 158,5 KB | El lanzador |
+| `FrontFacturas.pdb` | 155,4 KB | Símbolos de depuración |
+| `FrontFacturas.staticwebassets.endpoints.json` | **47,6 KB** | **El mapa de los archivos estáticos** — ver abajo |
+| `FrontFacturas.deps.json` · `runtimeconfig.json` | menos de 1 KB | De qué depende y con qué .NET corre |
+| **`web.config`** | 499 B | El que hace que IIS lo sepa arrancar |
+| `appsettings.json` | 331 B | La configuración base — `localhost:8035` |
+| **`appsettings.Production.json`** | **892 B** | **La que manda aquí** — apunta a la API publicada |
+
+> **Y no hay ni un solo `.dll` de terceros.** Compárelo con la API, que traía
+> cuarenta y tantos: `Microsoft.Data.SqlClient`, `Npgsql`, `Dapper`,
+> `Swashbuckle`, `Azure.Identity`… **El front no depende de nada que no venga
+> con .NET.** Eso es lo que explica los 1,6 MB contra 18.
+
+#### El archivo raro: `staticwebassets.endpoints.json`
+
+**47,6 KB — pesa más que todos los demás archivos de configuración juntos.**
+
+Es **el catálogo de los archivos estáticos**: por cada uno dice su tamaño, su
+huella y **qué versiones comprimidas existen**. Es lo que le permite al
+servidor contestar «¿acepta Brotli? tome el `.br`» sin salir a mirar el disco.
+
+> **Por eso la compresión funciona sin configurar nada**: no es magia de IIS,
+> es este archivo.
+
+#### Y otra vez la columna `UPDATED`
+
+| Archivo | `CREATED` | `UPDATED` |
+|---|---|---|
+| `appsettings.Production.json` | hace 5 min | **hace 27 min** |
+| `appsettings.json` | hace 5 min | **hace 18 días** |
+
+**Las mismas fechas que tenían en su disco.** El de producción dice 27 minutos
+— cuando se escribió— y el base, 18 días, que es desde cuando nadie lo toca.
+
+#### Compruébelo y siga
+
+**Abra `appsettings.Production.json` con `Edit`.** Debe decir su dirección
+`https://`. **Si dice `localhost:8035`, el archivo no viajó** — lo creó
+después de compilar, y hay que volver a hacer `dotnet publish` y `msdeploy`.
+
+> **Y el `Disk usage` de arriba sigue diciendo `0 B used`.** Igual que con la
+> API: es un número viejo. `Recalculate` lo pone al día.
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

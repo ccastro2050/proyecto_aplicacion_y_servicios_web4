@@ -1,5 +1,193 @@
 # Cómo se conecta cada front con su API
 
+## Qué se escribe en el front, y dónde
+
+**Conectar un front con una API no es una configuración: es código que hay que
+escribir.** Y en los tres fronts son **las mismas tres piezas**, cambiando
+solo el lenguaje:
+
+| | La pieza | Qué hace |
+|---|---|---|
+| **1** | De dónde sale la dirección | Se lee de afuera, no se escribe en el código |
+| **2** | **Un solo archivo** que habla con la API | Arma la dirección completa y hace la petición HTTP |
+| **3** | El token en la cabecera | `Authorization: Bearer <token>` en cada llamada |
+
+> **La pieza 2 es la que más se descuida, y es la que más importa.** Si cada
+> pantalla llamara a la API por su cuenta, la dirección quedaría repetida en
+> veinte sitios y cambiar de API sería buscar y reemplazar. En los tres fronts
+> de este proyecto **hay un solo archivo que sabe hablar HTTP**; las pantallas
+> le piden datos a él y no saben que existe una API.
+
+---
+
+### En Blazor — `front_blazor/Program.cs` y `front_blazor/Servicios/`
+
+**Dónde se escribe cada pieza:**
+
+| Pieza | Archivo |
+|---|---|
+| 1 y 2 | [`Program.cs`](front_blazor/Program.cs) |
+| 3 | cada servicio de [`Servicios/`](front_blazor/Servicios/) |
+
+**1. Leer la dirección** — [`Program.cs:19`](front_blazor/Program.cs#L19):
+
+```csharp
+var urlApi = builder.Configuration["UrlApi"] ?? "http://localhost:8035";
+```
+
+`builder.Configuration["UrlApi"]` busca esa clave en **todas** las fuentes de
+configuración; el `??` es el valor de respaldo si no la encuentra en ninguna.
+
+**2. Registrar el cliente HTTP** con esa dirección como base:
+
+```csharp
+builder.Services.AddHttpClient<ServicioProducto>(cliente =>
+{
+    cliente.BaseAddress = new Uri(urlApi);
+});
+```
+
+| | |
+|---|---|
+| `AddHttpClient<ServicioProducto>` | Le dice a .NET: *«cuando alguien pida un `ServicioProducto`, créelo y métale un `HttpClient` ya configurado»*. Eso es **inyección de dependencias** |
+| `BaseAddress` | La dirección base. **Por eso los servicios usan rutas relativas** — `"api/producto"`, no la dirección completa |
+
+**3. Usarlo, en el servicio** — [`Servicios/ServicioProducto.cs`](front_blazor/Servicios/ServicioProducto.cs):
+
+```csharp
+public class ServicioProducto(HttpClient cliente, EstadoSesion sesion)
+{
+    private const string Ruta = "api/producto";
+
+    private void Autorizar()
+    {
+        cliente.DefaultRequestHeaders.Authorization =
+            string.IsNullOrWhiteSpace(sesion.Token)
+                ? null
+                : new AuthenticationHeaderValue("Bearer", sesion.Token);
+    }
+}
+```
+
+> **Ese `null` cuando no hay token no es descuido:** se manda la petición
+> **sin** la cabecera y la API responde `401`, que es lo correcto. Inventar un
+> token falso para «que no falle» escondería el problema.
+
+**Fíjese en que la dirección no aparece:** el servicio solo conoce
+`"api/producto"`. Quién es el servidor lo puso el `BaseAddress` del paso 2.
+
+---
+
+### En Flask — `front_flask/cliente_api.py`
+
+**Las tres piezas están en un solo archivo**, y el archivo lo dice en su
+primera línea: *«es al front lo que el repositorio es al back: la ÚNICA pieza
+que sabe dónde viven los datos»*.
+
+**1. Leer la dirección** — [`cliente_api.py:18`](front_flask/cliente_api.py#L18):
+
+```python
+URL_API = os.environ.get("API_FACTURAS_URL", "http://localhost:8035")
+TIEMPO_MAXIMO = 10
+```
+
+`os.environ.get(nombre, respaldo)` lee una variable de entorno y, si no
+existe, devuelve el segundo valor.
+
+**2. Hacer la petición:**
+
+```python
+def _llamar(metodo, ruta, **kwargs):
+    try:
+        return requests.request(metodo, f"{URL_API}{ruta}",
+                                timeout=TIEMPO_MAXIMO, **kwargs)
+    except requests.RequestException:
+        return None
+```
+
+| | |
+|---|---|
+| `f"{URL_API}{ruta}"` | Aquí se arma la dirección completa: la base más `"/api/producto"` |
+| `timeout=TIEMPO_MAXIMO` | **No es opcional.** Sin él, si la API no contesta, el front se queda colgado para siempre. Una interfaz que avisa es mejor que una colgada |
+| `except ... return None` | Distingue *«la API contestó un error»* de *«la API no contestó»*. Son dos problemas distintos y el usuario merece mensajes distintos |
+
+**3. El token:**
+
+```python
+def _cabecera(token=None):
+    if token is None:
+        token = session.get("token")
+    return {"Authorization": f"Bearer {token}"} if token else {}
+```
+
+Y cada operación lo usa así:
+
+```python
+r = _llamar("GET", "/api/producto", headers=_cabecera())
+```
+
+---
+
+### En React — `front_react/src/api.js`
+
+Igual que en Flask: **las tres piezas en un archivo**, y ninguna pantalla
+llama a la API directamente.
+
+**1. Leer la dirección** — [`src/api.js:25`](front_react/src/api.js#L25):
+
+```javascript
+export const URL_API =
+  import.meta.env.VITE_URL_API || 'http://localhost:8035'
+```
+
+`import.meta.env` es la forma de Vite de entregar la configuración. **Y aquí
+está la diferencia de fondo con los otros dos: ese valor lo escribe Vite al
+compilar**, no se lee al arrancar.
+
+**2. Hacer la petición, y 3. el token** — en la misma función:
+
+```javascript
+async function pedir(ruta, opciones = {}) {
+  const sesion = leerSesion()
+  const cabeceras = { ...(opciones.headers || {}) }
+
+  if (opciones.body) cabeceras['Content-Type'] = 'application/json'
+  if (sesion?.token) cabeceras['Authorization'] = `Bearer ${sesion.token}`
+
+  const respuesta = await fetch(`${URL_API}${ruta}`, { ...opciones, headers: cabeceras })
+  ...
+}
+```
+
+| | |
+|---|---|
+| `fetch` | El cliente HTTP que **ya trae el navegador**. No hace falta instalar nada |
+| `` `${URL_API}${ruta}` `` | La dirección completa, igual que en Flask |
+| `Authorization` | Mismo encabezado que en los otros dos. **La palabra `Bearer` la pone el cliente**, no el servidor |
+
+> **Y una cosa que solo le pasa a éste:** como la llamada sale **del
+> navegador**, si la API no autoriza este origen el navegador la bloquea
+> **antes de enviarla**. Eso es CORS, y está más abajo.
+
+---
+
+### Los tres, lado a lado
+
+| | Blazor | Flask | React |
+|---|---|---|---|
+| El archivo que habla con la API | `Servicios/*.cs` | `cliente_api.py` | `src/api.js` |
+| Con qué hace la petición | `HttpClient` | `requests` | `fetch` |
+| Cómo arma la dirección | `BaseAddress` + ruta relativa | `f"{URL_API}{ruta}"` | `` `${URL_API}${ruta}` `` |
+| Dónde pone el token | `DefaultRequestHeaders` | `headers=_cabecera()` | `cabeceras['Authorization']` |
+| Dónde guarda la sesión | el circuito del servidor | la cookie firmada de Flask | el `sessionStorage` |
+
+**Lo único que cambia es el lenguaje.** Las tres piezas, el encabezado del
+token y la forma de armar la dirección son las mismas — porque **lo que manda
+es el contrato HTTP de la API**, no la tecnología del front. Esa es la razón
+de que exista un tercer front sin que la API haya cambiado una línea.
+
+---
+
 **Una sola hoja, para consultar rápido.** Los tres fronts del proyecto —Blazor,
 Flask y React— son la misma aplicación y le hablan a la misma API. Ninguno
 tiene la dirección de la API escrita en el código: **los tres la leen de

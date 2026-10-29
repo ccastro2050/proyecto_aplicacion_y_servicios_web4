@@ -2,17 +2,32 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Facturas · React · Comercial Los Andes S.A.</title>
+
+    <!-- LOS MISMOS DOS ARCHIVOS que usan el front de Blazor y el de Flask, y
+         en el MISMO ORDEN. No es casualidad ni comodidad: si las tres
+         interfaces no se vieran iguales, la comparacion entre ellas no
+         probaria nada. Lo que cambia es la tecnologia, no la marca.
+
+         BOOTSTRAP SE SIRVE DESDE ESTE REPOSITORIO, no desde un CDN: un front
+         que necesita internet para verse bien no arranca en un salon sin red.
+
+         Y LA MARCA VA DESPUES DE BOOTSTRAP: a igual especificidad gana el
+         ultimo que se carga, asi marca.css puede ajustar lo de Bootstrap y no
+         al reves. -->
+    <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="/marca.css" />
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2317495B'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23E39B2D'>▲</text></svg>" />
   </head>
   <body>
-    <!-- Esto es TODO el HTML que manda el servidor. La pantalla la arma
-         React en el navegador: esa es la diferencia con los otros dos
-         fronts, donde el servidor manda el HTML ya hecho.
-
-         Mire el codigo fuente de esta pagina en el navegador y va a ver
-         justo esto: un div vacio. -->
+    <!-- Esto es TODO el HTML que manda el servidor: un div vacio. La pantalla
+         la arma React en el navegador. Mire el codigo fuente de esta pagina
+         y va a ver justo esto — en los otros dos fronts veria la tabla ya
+         hecha. -->
     <div id="raiz"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script src="/lib/bootstrap/bootstrap.bundle.min.js"></script>
   </body>
 </html>

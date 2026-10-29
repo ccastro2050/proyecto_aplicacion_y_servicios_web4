@@ -1,10 +1,9 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
-import './estilos.css'
 
-// El punto de entrada: monta la aplicacion dentro del <div id="raiz"> del
-// index.html. Todo lo que se ve en pantalla cuelga de esa linea.
+// No hay hoja de estilos propia: la marca entra por el index.html, con los
+// MISMOS archivos que los otros dos fronts.
 createRoot(document.getElementById('raiz')).render(
   <React.StrictMode>
     <App />

@@ -10,6 +10,6 @@
 
   "ConnectionStrings": {
     "_comentario": "Es la cadena de Local access, no la de Remote access. La API vive en el mismo centro de datos que la base, asi que no sale a internet: por eso el servidor NO lleva .public y por eso Encrypt=False.",
-    "SqlServer": "Server=db75266.databaseasp.net; Database=db75266; User Id=db75266; Password=SU_CONTRASENA; Encrypt=False; MultipleActiveResultSets=True;"
+    "SqlServer": "Server=db75640.databaseasp.net; Database=db75640; User Id=db75640; Password=SU_CONTRASENA; Encrypt=False; MultipleActiveResultSets=True;"
   }
 }

@@ -117,5 +117,24 @@ export const api = {
   borrar: (endpoint, id) =>
     pedir(`${endpoint}/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
+  // ----------------------------------------------------------
+  // Facturas — CUATRO operaciones, no cinco, y a proposito.
+  //
+  // No hay `reemplazarFactura` ni `borrarFactura`: el contrato de la v2 dice
+  // que una factura emitida es un documento, y un documento no se corrige ni
+  // desaparece. Se ANULA, y eso es un POST a /anular —un hecho nuevo que
+  // queda registrado— y no un DELETE.
+  //
+  // Fijese ademas en el sobre: `listarFacturas` trae {tabla, total, datos},
+  // pero `obtenerFactura` trae LA factura con sus renglones adentro. Una
+  // factura no es una lista, asi que no viene envuelta como tal.
+  // ----------------------------------------------------------
+  listarFacturas: () => pedir('/api/factura'),
+  obtenerFactura: (numero) => pedir(`/api/factura/${numero}`),
+  crearFactura: (cuerpo) =>
+    pedir('/api/factura', { method: 'POST', body: JSON.stringify(cuerpo) }),
+  anularFactura: (numero) =>
+    pedir(`/api/factura/${numero}/anular`, { method: 'POST' }),
+
   misPermisos: () => pedir('/api/permisos/mios'),
 }

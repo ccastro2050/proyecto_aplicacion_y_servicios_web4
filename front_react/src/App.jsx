@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { ProveedorSesion, useSesion } from './Sesion.jsx'
 import { ENTIDADES, POR_VERSION } from './entidades.js'
 import Entidad from './Entidad.jsx'
+import { ListaFacturas, DetalleFactura, NuevaFactura } from './Facturas.jsx'
 import { api, URL_API } from './api.js'
 
 // ============================================================
@@ -126,6 +127,32 @@ function Inicio() {
           </div>
         </div>
       ))}
+
+      {/* Las facturas van APARTE de las tarjetas de arriba, y no por diseño:
+          las ocho de arriba son el mismo CRUD repetido, y por eso las dibuja
+          una sola pantalla generica. La factura tiene su propia pantalla
+          porque tiene su propio comportamiento — se emite y se anula, no se
+          edita ni se borra. */}
+      {puede('interfaz.facturas') && (
+        <div className="mb-4">
+          <h2 className="h6 text-uppercase text-body-secondary">
+            De la versión 2 — maestro-detalle
+          </h2>
+          <div className="row g-3">
+            <div className="col-md-4">
+              <NavLink to="/facturas" className="card h-100 text-decoration-none">
+                <div className="card-body">
+                  <h3 className="h6 card-title">Facturas</h3>
+                  <p className="card-text small text-body-secondary mb-0">
+                    La factura y sus renglones. Se emite de un solo envío y se
+                    anula; los subtotales y el total los calcula la base de datos.
+                  </p>
+                </div>
+              </NavLink>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
@@ -152,6 +179,9 @@ function Marco({ children }) {
             <div className="collapse navbar-collapse" id="menuPrincipal">
               <div className="navbar-nav flex-wrap me-auto">
                 <NavLink className="nav-link" to="/">Inicio</NavLink>
+                {puede('interfaz.facturas') && (
+                  <NavLink className="nav-link" to="/facturas">Facturas</NavLink>
+                )}
                 {/* El menu se arma con los PERMISOS de quien entro. Y ojo:
                     esconder una entrada NO protege nada — quien escriba la
                     direccion a mano llega igual, y lo que lo para es el 403
@@ -209,6 +239,13 @@ export default function App() {
           <Route path="/login" element={<Marco><Login /></Marco>} />
           <Route path="/" element={<Protegida><Marco><Inicio /></Marco></Protegida>} />
           <Route path="/e/:clave" element={<Protegida><Marco><Entidad /></Marco></Protegida>} />
+
+          {/* Las tres pantallas del maestro-detalle. Ojo al ORDEN: /facturas/nueva
+              va ANTES de /facturas/:numero, porque si no la palabra «nueva»
+              entraria como si fuera el numero de una factura. */}
+          <Route path="/facturas" element={<Protegida><Marco><ListaFacturas /></Marco></Protegida>} />
+          <Route path="/facturas/nueva" element={<Protegida><Marco><NuevaFactura /></Marco></Protegida>} />
+          <Route path="/facturas/:numero" element={<Protegida><Marco><DetalleFactura /></Marco></Protegida>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

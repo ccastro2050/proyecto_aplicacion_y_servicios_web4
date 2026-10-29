@@ -161,6 +161,23 @@ distintos**, hablando con **la misma API** por HTTP.
 > **Y ninguno de los dos sabe que existe una base de datos.** Apague la API y
 > las dos interfaces siguen en pie, con su aviso y sin una sola fila.
 
+### Y cuando esto tenga que salir a internet
+
+**Lo de arriba corre en su máquina.** Para publicarlo en servidores de verdad
+—gratis y sin tarjeta— el repositorio trae tres tutoriales, pantalla por
+pantalla:
+
+| | Qué publica | Dónde |
+|---|---|---|
+| [**Tutorial 1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | **SQL Server + la API en C# + el front en Blazor** | MonsterASP |
+| [**Tutorial 2**](TUTORIAL_2_POSTGRES_FLASK.md) | **PostgreSQL + la misma API + el front en Flask** | Neon · MonsterASP · Render |
+| [**Tutorial 3**](TUTORIAL_PUBLICAR.md) | **Todo junto**, de punta a punta | los cuatro |
+
+> **Empiece por el 1.** El 2 da por hecho que ya hizo el 1 — reutiliza la
+> cuenta y la API publicada— y a cambio demuestra lo que el 1 no alcanza a
+> mostrar: **que el motor de base de datos y la interfaz se cambian sin tocar
+> el código.**
+
 ### El menú de la interfaz gráfica
 
 **Doce entradas**, agrupadas por versión — y es la forma más rápida de ver que cada versión **incluye la anterior**:

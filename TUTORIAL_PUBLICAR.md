@@ -1,14 +1,32 @@
-# Tutorial — publicar la API y el front en un hospedaje
+# Tutorial 3 — Publicar el sistema completo
 
-> **Qué es este documento.** Cómo se publica el sistema en un servidor de
-> verdad: la base de datos, la API y la interfaz gráfica, cada una con su
-> comando y con cómo se comprueba que quedó arriba.
+> **Qué es este documento.** Cómo se publica el sistema en servidores de
+> verdad: las dos bases de datos, la API —dos veces, contra dos motores— y las
+> dos interfaces, cada una con su comando y con cómo se comprueba que quedó
+> arriba.
 >
-> **Qué NO es.** No es un tutorial de Docker. Aquí el sistema **no corre en
-> contenedores**: corre en un hospedaje de Windows con IIS, que es otra cosa y
-> tiene otros problemas.
+> **Qué NO es.** No es un tutorial de Docker — aunque el paso 9 sí publica un
+> contenedor. En MonsterASP el sistema **no corre en contenedores**: corre en un
+> hospedaje de Windows con IIS, que es otra cosa y tiene otros problemas.
 >
-> Versión 0.1 · en construcción · 22 de octubre de 2026.
+> Versión 0.2 · 29 de octubre de 2026.
+
+### Esta serie son tres tutoriales
+
+**Éste es el completo.** Los otros dos son **recortes de éste mismo**, con el
+texto idéntico — para quien solo necesita una de las dos mitades.
+
+| | Qué publica | Dónde | Pasos |
+|---|---|---|---|
+| [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | **SQL Server + API en C# + front en Blazor** | MonsterASP | 1 a 7 |
+| [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | **PostgreSQL + la misma API + front en Flask** | Neon · MonsterASP · Render | 8 y 9 |
+| **3 — éste** | **Todo junto**, de punta a punta | los cuatro | 1 a 9 |
+
+> **Por qué partido así, y no por tecnología:** el 1 se puede hacer en una
+> sesión y deja un sistema funcionando. El 2 **da por hecho el 1** — reutiliza
+> la cuenta, la API publicada y el hábito de `publish` + `msdeploy`— y a cambio
+> demuestra lo que el 1 no alcanza a mostrar: **que el motor y la interfaz se
+> cambian sin tocar el código.**
 
 ---
 

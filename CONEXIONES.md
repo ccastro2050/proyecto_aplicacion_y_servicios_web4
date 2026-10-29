@@ -211,6 +211,80 @@ La lista está en `api_facturas/appsettings.json` y, publicada, en
 
 ---
 
+## Dónde se busca el valor que está usando AHORA
+
+**Lo primero es saber de cuál de los tres está preguntando**, porque se buscan
+en lugares completamente distintos:
+
+| | Dónde vive el valor |
+|---|---|
+| **Publicado, en internet** | En el hospedaje. **No en el repositorio** |
+| En su máquina, dentro de Docker | En el `docker-compose.yml` |
+| En su máquina, fuera de Docker | En el archivo del front, o en el respaldo del código |
+
+> **Y lo que más confunde:** el repositorio dice **qué valor usted dejó
+> escrito**, no **qué valor está usando el programa que está arriba**. Si
+> alguien lo cambió en el panel, el repositorio no se enteró.
+
+### El que está publicado
+
+| Front | Dónde se mira |
+|---|---|
+| **Blazor** | El archivo **que está subido al servidor**: `appsettings.Production.json`, dentro del sitio. Se ve con el explorador de archivos del panel de MonsterASP, en **Websites → el sitio → File Manager** |
+| **Flask** | El **panel de Render**: su servicio → **Environment** → *Environment Variables*. Ahí está `API_FACTURAS_URL`, y ahí mismo se cambia |
+| **React** | **Dentro del JavaScript** que está publicado. No hay archivo de configuración en el servidor: hay que mirar el `.js` (el comando está en la sección siguiente) |
+
+> **Ojo con el de Flask:** su interfaz **no muestra en ninguna pantalla** contra
+> qué API está hablando. El único lugar donde se sabe es el panel de Render. El
+> de React sí lo muestra, en la tarjeta «Contra qué está hablando» de la
+> pantalla de inicio — y ese dato no lo escribe el front, se lo pregunta a la
+> API.
+
+> **Y un atajo que sirve para los tres:** si lo que quiere saber es **contra
+> qué motor de base de datos** terminó hablando el sistema, pregúntele
+> directamente a la API con el comando de la sección siguiente. Es una sola
+> línea y no necesita entrar a ningún panel.
+
+### El que corre en su máquina
+
+| Front | Dónde se mira |
+|---|---|
+| **Blazor** | `front_blazor/appsettings.json` · y en Docker, `UrlApi` en el [`docker-compose.yml`](docker-compose.yml) |
+| **Flask** | El respaldo escrito en [`front_flask/cliente_api.py:18`](front_flask/cliente_api.py#L18) · y en Docker, `API_FACTURAS_URL` en el compose |
+| **React** | `front_react/.env.development` |
+
+**Para ver el valor que de verdad tiene un contenedor encendido** —que no es lo
+mismo que leer el archivo y suponer—, con Docker arriba:
+
+```powershell
+docker compose exec front-flask printenv API_FACTURAS_URL
+```
+
+`docker compose exec <servicio>` ejecuta una orden **dentro** del contenedor, y
+`printenv` imprime esa variable. **Si no contesta nada, la variable no llegó** y
+el front está usando el respaldo del código — que es la explicación de por qué
+a veces «funciona» apuntando a donde uno no quería.
+
+### Y quién pide la dirección, en el código
+
+Un renglón por front, y vale la pena verlos porque los tres dicen lo mismo de
+tres maneras:
+
+| Front | Dónde |
+|---|---|
+| Blazor | [`front_blazor/Program.cs:19`](front_blazor/Program.cs#L19) |
+| Flask | [`front_flask/cliente_api.py:18`](front_flask/cliente_api.py#L18) |
+| React | [`front_react/src/api.js:25`](front_react/src/api.js#L25) |
+
+**Para encontrar cualquiera de estos nombres sin saber en qué archivo está:**
+
+| Cómo | Qué hacer |
+|---|---|
+| En VS Code | **Ctrl + Shift + F** y escriba `UrlApi`, `API_FACTURAS_URL` o `VITE_URL_API` |
+| En PowerShell | `Select-String -Path . -Pattern "API_FACTURAS_URL" -Recurse` |
+
+---
+
 ## Cómo comprobar, en un renglón
 
 **¿A qué API le está hablando un front?** Entre e inicie sesión: la pantalla

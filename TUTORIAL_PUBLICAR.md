@@ -1,4 +1,4 @@
-# Tutorial 3 — Publicar el sistema completo
+# Tutorial completo — publicar todo el sistema
 
 > **Qué es este documento.** Cómo se publica el sistema en servidores de
 > verdad: las dos bases de datos, la API —dos veces, contra dos motores— y las
@@ -16,17 +16,22 @@
 **Éste es el completo.** Los otros dos son **recortes de éste mismo**, con el
 texto idéntico — para quien solo necesita una de las dos mitades.
 
-| | Qué publica | Dónde | Pasos |
+| | Motor | Interfaz | Dónde |
 |---|---|---|---|
-| [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | **SQL Server + API en C# + front en Blazor** | MonsterASP | 1 a 7 |
-| [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | **PostgreSQL + la misma API + front en Flask** | Neon · MonsterASP · Render | 8 y 9 |
-| **3 — éste** | **Todo junto**, de punta a punta | los cuatro | 1 a 9 |
+| [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
+| [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
+| [**3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
+| **completo — éste** | los dos | las dos | los cuatro |
 
-> **Por qué partido así, y no por tecnología:** el 1 se puede hacer en una
-> sesión y deja un sistema funcionando. El 2 **da por hecho el 1** — reutiliza
-> la cuenta, la API publicada y el hábito de `publish` + `msdeploy`— y a cambio
-> demuestra lo que el 1 no alcanza a mostrar: **que el motor y la interfaz se
-> cambian sin tocar el código.**
+> **Por qué partido así, y no por tecnología:** el **1** se hace en una sesión
+> y deja un sistema funcionando. El **2** y el **3** dan por hecho el 1
+> —reutilizan la cuenta, la API publicada y el hábito de `publish` +
+> `msdeploy`— y a cambio demuestran lo que el 1 no alcanza a mostrar:
+>
+> | | Qué cambia, para probar qué |
+> |---|---|
+> | **3** | **Solo el motor.** Misma API, mismo front — dos bases de datos |
+> | **2** | **Motor e interfaz.** Otro lenguaje y otro hospedaje para la pantalla |
 
 ---
 

@@ -30,11 +30,16 @@ el repositorio — lo que se aprende aquí es a **publicarlo**.
 
 ### Los tres tutoriales de esta serie
 
-| | Qué publica | Dónde |
-|---|---|---|
-| [1](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server + API en C# + front en Blazor | MonsterASP |
-| **2 — éste** | **PostgreSQL + la misma API + front en Flask** | Neon · MonsterASP · Render |
-| [3](TUTORIAL_PUBLICAR.md) | **Todo junto**, de punta a punta | los cuatro |
+| | Motor | Interfaz | Dónde |
+|---|---|---|---|
+| [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
+| **2 — éste** | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
+| [**3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
+| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
+
+> **El 2 y el 3 comparten toda la primera mitad** — la base en Neon y la API
+> contra PostgreSQL son las mismas. **Se separan al final**, cuando cada uno
+> publica su interfaz.
 
 > **Sobre la numeración:** los pasos conservan el número que tienen en el
 > [tutorial completo](TUTORIAL_PUBLICAR.md). **No empieza en 1 porque no es un

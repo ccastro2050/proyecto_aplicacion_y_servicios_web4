@@ -167,11 +167,12 @@ distintos**, hablando con **la misma API** por HTTP.
 —gratis y sin tarjeta— el repositorio trae tres tutoriales, pantalla por
 pantalla:
 
-| | Qué publica | Dónde |
-|---|---|---|
-| [**Tutorial 1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | **SQL Server + la API en C# + el front en Blazor** | MonsterASP |
-| [**Tutorial 2**](TUTORIAL_2_POSTGRES_FLASK.md) | **PostgreSQL + la misma API + el front en Flask** | Neon · MonsterASP · Render |
-| [**Tutorial 3**](TUTORIAL_PUBLICAR.md) | **Todo junto**, de punta a punta | los cuatro |
+| | Motor | Interfaz | Dónde |
+|---|---|---|---|
+| [**Tutorial 1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
+| [**Tutorial 2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
+| [**Tutorial 3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
+| [**Completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
 
 > **Empiece por el 1.** El 2 da por hecho que ya hizo el 1 — reutiliza la
 > cuenta y la API publicada— y a cambio demuestra lo que el 1 no alcanza a

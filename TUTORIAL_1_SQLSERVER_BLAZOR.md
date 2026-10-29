@@ -13,14 +13,15 @@ cosas vivas en internet y hablando entre ellas:
 
 ### Los tres tutoriales de esta serie
 
-| | Qué publica | Dónde |
-|---|---|---|
-| **1 — éste** | **SQL Server + API en C# + front en Blazor** | MonsterASP |
-| [2](TUTORIAL_2_POSTGRES_FLASK.md) | **PostgreSQL + la misma API + front en Flask** | Neon · MonsterASP · Render |
-| [3](TUTORIAL_PUBLICAR.md) | **Todo junto**, de punta a punta | los cuatro |
+| | Motor | Interfaz | Dónde |
+|---|---|---|---|
+| **1 — éste** | SQL Server | Blazor | MonsterASP |
+| [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
+| [**3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
+| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
 
-> **Empiece por éste.** El 2 da por hecho que usted ya tiene la cuenta creada y
-> la API publicada, porque reutiliza las dos.
+> **Empiece por éste.** Los otros tres dan por hecho que usted ya tiene la
+> cuenta creada y la API publicada, porque reutilizan las dos.
 
 ---
 ## Antes de empezar: las credenciales NO van en este documento
@@ -3774,8 +3775,11 @@ base   db75266.databaseasp.net              db75266
 | La API | `https://su-api.runasp.net` · con Swagger y HTTPS |
 | La interfaz | `https://su-front.runasp.net` · Blazor Server |
 
-**Lo que sigue, si quiere seguir:**
-[**Tutorial 2 — PostgreSQL y el front en Flask**](TUTORIAL_2_POSTGRES_FLASK.md),
-donde el **mismo** `ApiFacturas.dll` se publica otra vez contra **otro motor de
-base de datos**, y una segunda interfaz —en Python— consume **la misma API**
-desde **otro hospedaje**.
+**Lo que sigue, si quiere seguir** — los dos empiezan igual, creando la base
+en Neon y publicando la **misma** API contra **otro motor**, y se separan al
+final:
+
+| | En qué termina |
+|---|---|
+| [**Tutorial 3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | **El mismo front Blazor**, publicado otra vez, leyendo de PostgreSQL. **Los dos sistemas abiertos lado a lado** |
+| [**Tutorial 2**](TUTORIAL_2_POSTGRES_FLASK.md) | Una **segunda interfaz, en Python**, consumiendo la misma API desde **otro hospedaje** |

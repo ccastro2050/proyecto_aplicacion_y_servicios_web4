@@ -111,8 +111,42 @@ URL_API = os.environ.get("API_FACTURAS_URL", "http://localhost:8035")
 TIEMPO_MAXIMO = 10
 ```
 
-`os.environ.get(nombre, respaldo)` lee una variable de entorno y, si no
-existe, devuelve el segundo valor.
+**Esos dos renglones, por partes.** El primero dice *«busque en el entorno una
+variable llamada `API_FACTURAS_URL`; si existe, guarde su valor; si no existe,
+guarde `http://localhost:8035`»*:
+
+| Parte | Qué es |
+|---|---|
+| `os.environ` | El entorno del programa — todas las variables que le pasó quien lo arrancó |
+| `.get(nombre, respaldo)` | Busca por nombre; si no está, devuelve el respaldo |
+| `"API_FACTURAS_URL"` | El **nombre** que busca |
+| `"http://localhost:8035"` | El **valor** si no lo encuentra |
+| `URL_API` | Donde queda guardado, para usarlo en todas las llamadas |
+
+Y `TIEMPO_MAXIMO = 10` son los **segundos** que el front espera a la API antes
+de rendirse y avisar. Son las dos cosas que necesita saber antes de su primera
+llamada: **a dónde** llamar y **cuánto** esperar.
+
+> **El error que se comete siempre: confundir los dos argumentos.**
+>
+> ```python
+> URL_API = os.environ.get("http://localhost:8035")   # ✗ MAL
+> ```
+>
+> Eso busca **una variable llamada `http://localhost:8035`**, no la encuentra, y
+> devuelve `None`. El front arma entonces `None/api/sesion` y falla con
+> `Invalid URL 'None/api/sesion'` — un mensaje que **no menciona la
+> configuración por ninguna parte**, y ahí se pierde media hora.
+
+> **Es la misma idea que el `??` de Blazor**, con otra sintaxis:
+>
+> | | |
+> |---|---|
+> | C# | `builder.Configuration["UrlApi"] ?? "http://localhost:8035"` |
+> | Python | `os.environ.get("API_FACTURAS_URL", "http://localhost:8035")` |
+>
+> En C# el respaldo va como **operador**; en Python, como **segundo
+> argumento**. Hacen lo mismo: *si no hay valor, use este.*
 
 **2. Hacer la petición:**
 

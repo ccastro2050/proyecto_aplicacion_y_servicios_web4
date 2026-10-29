@@ -51,3 +51,6 @@ publicados/
 # Dependencias y compilados de Node: los baja npm y los genera vite.
 node_modules/
 dist/
+
+# Archivos temporales que deja Vite al leer su configuracion.
+vite.config.js.timestamp-*

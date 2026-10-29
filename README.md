@@ -170,6 +170,12 @@ distintos**, hablando con **la misma API** por HTTP.
 > está en `OrigenesPermitidos` de `appsettings.json`. Si esa lista no incluye
 > la dirección del front, la llamada se bloquea **antes de salir**: en la API
 > no queda ni rastro, y el error solo se ve en la consola del navegador.
+
+> **[Cómo se conecta cada front con su API →](CONEXIONES.md)**
+> Una sola hoja con **de dónde lee cada front la dirección de la API** y **qué
+> hay que cambiar para apuntarlo a otra**, en su máquina, en Docker y
+> publicado. Con los comandos para comprobarlo y qué mirar cuando no conecta.
+> **Es la hoja que hay que tener abierta** al cambiar de API.
 >
 > **Y ninguno de los dos sabe que existe una base de datos.** Apague la API y
 > las dos interfaces siguen en pie, con su aviso y sin una sola fila.
@@ -189,6 +195,10 @@ distintos**, hablando con **la misma API** por HTTP.
 
 Los cuatro primeros van **pantalla por pantalla**, salvo el 4 — ese va por los
 comandos, porque las pantallas que necesita son las mismas del 1.
+
+**Y para lo que se pregunta todo el tiempo —«¿a qué API le está hablando esto,
+y qué cambio para que le hable a otra?»—** está
+[**CONEXIONES.md**](CONEXIONES.md), que es una sola hoja de consulta rápida.
 
 > **Empiece por el 1.** El 2 da por hecho que ya hizo el 1 — reutiliza la
 > cuenta y la API publicada— y a cambio demuestra lo que el 1 no alcanza a

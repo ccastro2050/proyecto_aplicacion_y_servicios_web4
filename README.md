@@ -177,26 +177,29 @@ distintos**, hablando con **la misma API** por HTTP.
 ### Y cuando esto tenga que salir a internet
 
 **Lo de arriba corre en su máquina.** Para publicarlo en servidores de verdad
-—gratis y sin tarjeta— el repositorio trae cuatro documentos, pantalla por
-pantalla:
+—gratis y sin tarjeta— el repositorio trae cinco documentos:
 
 | | Motor | Interfaz | Dónde |
 |---|---|---|---|
 | [**Tutorial 1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
 | [**Tutorial 2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
 | [**Tutorial 3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
+| [**Tutorial 4**](TUTORIAL_4_POSTGRES_REACT.md) | PostgreSQL | **React** | Neon · MonsterASP |
 | [**Completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
+
+Los cuatro primeros van **pantalla por pantalla**, salvo el 4 — ese va por los
+comandos, porque las pantallas que necesita son las mismas del 1.
 
 > **Empiece por el 1.** El 2 da por hecho que ya hizo el 1 — reutiliza la
 > cuenta y la API publicada— y a cambio demuestra lo que el 1 no alcanza a
 > mostrar: **que el motor de base de datos y la interfaz se cambian sin tocar
 > el código.**
 
-> **El front de React todavía no tiene su tutorial.** Está publicado y
-> funcionando, pero publicarlo trae dos asuntos que los otros dos no tienen
-> —**CORS** en la API y el `web.config` que hace que toda dirección devuelva
-> `index.html`— y eso está por escribir. Lo que sí está es el código, con el
-> por qué comentado en `front_react/public/web.config` y en `vite.config.js`.
+> **El front de React tiene su propio tutorial, el 4**, porque publicarlo trae
+> dos asuntos que los otros dos no tienen: **CORS** en la API y el `web.config`
+> que hace que toda dirección devuelva `index.html`. Y trae una diferencia de
+> fondo: **este front no se reconfigura, se vuelve a compilar.** La dirección de
+> la API va escrita *dentro* del JavaScript.
 
 ### El menú de la interfaz gráfica
 

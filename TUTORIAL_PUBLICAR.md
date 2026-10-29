@@ -35,20 +35,24 @@
 > excepción es la variable `API_FACTURAS_URL` del paso 9: ahí hay que poner la
 > API que exista de verdad, porque el front de Flask le va a hablar.
 >
-> **Lo que a este documento le falta:** el front de **React** está publicado y
-> funcionando, pero **su publicación no está escrita aquí** — ni **CORS** en la
-> API, ni el `web.config` que hace que toda dirección devuelva `index.html`.
+> **Lo que a este documento le falta, y dónde está:** el front de **React** no
+> se publica aquí. Eso —con **CORS** en la API y el `web.config` que hace que
+> toda dirección devuelva `index.html`— está en el
+> [**tutorial 4**](TUTORIAL_4_POSTGRES_REACT.md), que es material nuevo y no un
+> recorte de este documento.
 
-### Esta serie son tres tutoriales
+### Esta serie son cuatro tutoriales
 
-**Éste es el completo.** Los otros dos son **recortes de éste mismo**, con el
-texto idéntico — para quien solo necesita una de las dos mitades.
+**Éste es el completo.** El 1, el 2 y el 3 son **recortes de éste mismo**, con
+el texto idéntico — para quien solo necesita una de las dos mitades. **El 4 no
+es un recorte:** es material nuevo, y lo único que cubre el front de React.
 
 | | Motor | Interfaz | Dónde |
 |---|---|---|---|
 | [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
 | [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
 | [**3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
+| [**4**](TUTORIAL_4_POSTGRES_REACT.md) | PostgreSQL | **React** | Neon · MonsterASP |
 | **completo — éste** | los dos | las dos | los cuatro |
 
 > **Por qué partido así, y no por tecnología:** el **1** se hace en una sesión

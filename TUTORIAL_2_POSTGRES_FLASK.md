@@ -51,18 +51,19 @@ De él se reutilizan:
 **Lo que NO hace falta:** saber Python. El front en Flask **ya está escrito** en
 el repositorio — lo que se aprende aquí es a **publicarlo**.
 
-### Los tres tutoriales de esta serie
+### Los cuatro tutoriales de esta serie
 
 | | Motor | Interfaz | Dónde |
 |---|---|---|---|
 | [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
 | **2 — éste** | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
 | [**3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
-| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
+| [**4**](TUTORIAL_4_POSTGRES_REACT.md) | PostgreSQL | **React** | Neon · MonsterASP |
+| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las tres | los cuatro |
 
-> **El 2 y el 3 comparten toda la primera mitad** — la base en Neon y la API
-> contra PostgreSQL son las mismas. **Se separan al final**, cuando cada uno
-> publica su interfaz.
+> **El 2, el 3 y el 4 comparten toda la primera mitad** — la base de datos en
+> Neon y la API contra PostgreSQL son las mismas. **Se separan al final**,
+> cuando cada uno publica su interfaz.
 
 > **Sobre la numeración:** los pasos conservan el número que tienen en el
 > [tutorial completo](TUTORIAL_PUBLICAR.md). **No empieza en 1 porque no es un

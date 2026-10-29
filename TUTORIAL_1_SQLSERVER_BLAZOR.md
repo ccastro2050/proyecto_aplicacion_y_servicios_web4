@@ -34,17 +34,23 @@ cosas vivas en internet y hablando entre ellas:
 > va a abrir una dirección de una captura esperando que cargue, no va a
 > cargar.
 
-### Los tres tutoriales de esta serie
+### Los cuatro tutoriales de esta serie
 
 | | Motor | Interfaz | Dónde |
 |---|---|---|---|
 | **1 — éste** | SQL Server | Blazor | MonsterASP |
 | [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
 | [**3**](TUTORIAL_3_POSTGRES_BLAZOR.md) | PostgreSQL | Blazor | Neon · MonsterASP |
-| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
+| [**4**](TUTORIAL_4_POSTGRES_REACT.md) | PostgreSQL | **React** | Neon · MonsterASP |
+| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las tres | los cuatro |
 
-> **Empiece por éste.** Los otros tres dan por hecho que usted ya tiene la
-> cuenta creada y la API publicada, porque reutilizan las dos.
+> **Empiece por éste.** Los otros dan por hecho que usted ya tiene la cuenta
+> creada y la API publicada, porque reutilizan las dos.
+
+> **El 4 es distinto de los otros tres: no tiene capturas del panel.** Va por
+> los comandos y por el razonamiento, porque las pantallas que necesita son
+> las mismas de este documento. A cambio enseña lo que ninguno de los otros
+> puede: que **el front de React no se reconfigura, se vuelve a compilar**.
 
 ---
 ## Antes de empezar: las credenciales NO van en este documento

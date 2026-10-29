@@ -10,6 +10,29 @@ distintos que se hablan por HTTP.
 | **La MISMA API** | El mismo `ApiFacturas.dll`, **byte por byte**, publicado otra vez |
 | **Una segunda interfaz** | **Flask + Jinja2**, en Python, hospedada en **Render** |
 
+> **Antes de empezar: los nombres de las capturas no van a ser los suyos — ni
+> son los del sistema que está vivo hoy.**
+>
+> Las capturas de esta serie se tomaron en la **primera vuelta** de la cuenta,
+> cuando el usuario era `carloscastro` y la base de datos era `db75266`. Esa
+> cuenta se reconstruyó después, así que **las direcciones que aparecen en las
+> capturas ya no responden**. Comprobado el 29 de octubre de 2026:
+>
+> | Lo que está vivo hoy | Qué es |
+> |---|---|
+> | `https://apifacturas-carrloscastro.runasp.net` | La API contra **SQL Server** |
+> | `https://apifacturas-pg-carrloscastro.runasp.net` | La **misma** API contra **PostgreSQL** en Neon |
+> | `https://front-facturas-react-carrloscastro.runasp.net` | El front de **React** |
+>
+> La dirección del front de **Blazor publicado no está registrada en ningún
+> archivo del repositorio**: hay que leerla del panel.
+>
+> **Ojo en este tutorial:** la variable `API_FACTURAS_URL` de Render tiene que
+> apuntar a **la API que exista de verdad** —la de la tabla de arriba, no la de
+> las capturas—. Es el único dato de la serie donde la diferencia se nota de
+> inmediato: con la dirección vieja, el front sube bien y falla al iniciar
+> sesión.
+
 > **Lo único que cambia entre la API de SQL Server y la de PostgreSQL es un
 > archivo de texto de ocho renglones.** Si eso funciona, las capas están bien
 > puestas. Si no, el sitio donde falle es exactamente la capa que se coló.
@@ -1437,6 +1460,11 @@ antes de intentar entrar.
 |---|---|
 | **`API_FACTURAS_URL`** | `https://apifacturas-carrloscastro.runasp.net` |
 | **`CLAVE_SESION`** | Una cadena larga cualquiera |
+
+> **Esta dirección no es la de las capturas de más arriba, y está bien así.**
+> Es **la API que existe hoy** —la del recuadro del principio—, y aquí no sirve
+> ninguna otra: esto no es un ejemplo, es el dato que el front va a usar para
+> iniciar sesión. **Ponga la suya**, la que le quedó al publicar la API.
 
 > **`CLAVE_SESION` firma la cookie de sesión.** Sin ella, el front usa la clave
 > de desarrollo **que está escrita en el código** — y cualquiera que lea el

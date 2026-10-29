@@ -117,9 +117,9 @@ docker compose up -d --build
 
 **Eso es todo.** La primera vez tarda unos minutos (descarga imágenes,
 el inicializador crea la base de datos, y la primera compilación
-toma ~1 minuto más). Al terminar quedan corriendo **cinco contenedores**: las
-**dos bases de datos** —SQL Server y PostgreSQL—, la API y **las dos
-interfaces gráficas**, una en Blazor y otra en Flask.
+toma ~1 minuto más). Al terminar quedan corriendo **seis contenedores**: las
+**dos bases de datos** —SQL Server y PostgreSQL—, la API y **las tres
+interfaces gráficas**, una en Blazor, una en Flask y una en React.
 
 ### Lo primero que hay que abrir
 
@@ -127,36 +127,49 @@ interfaces gráficas**, una en Blazor y otra en Flask.
 |---|---|
 | **La interfaz gráfica en Blazor** — por aquí se empieza | **http://localhost:8099** |
 | **La interfaz gráfica en Flask** — la misma, en Python | **http://localhost:8118** |
+| **La interfaz gráfica en React** — la misma, en el navegador | **http://localhost:8119** |
 | **Swagger** — la API, para verla y probarla | http://localhost:8035/swagger |
 | La API — diagnóstico | http://localhost:8035/ |
 | SQL Server (para SQLTools/SSMS, opcional) | `localhost,11466` · `sa`/`Paradigmas123!` |
 
-**Para entrar a cualquiera de las dos interfaces:** `admin@correo.com` /
+**Para entrar a cualquiera de las tres interfaces:** `admin@correo.com` /
 `admin123`.
 
 > **Las interfaces y la API son puertos distintos**, y conviene no
-> confundirlos: el **8099** y el **8118** son lo que se abre en el navegador;
-> el **8035** es lo que esas interfaces consumen. Abrir `8099/swagger` da
-> 404 — Swagger vive en la API.
+> confundirlos: el **8099**, el **8118** y el **8119** son lo que se abre en
+> el navegador; el **8035** es lo que esas interfaces consumen. Abrir
+> `8099/swagger` da 404 — Swagger vive en la API.
 
-#### Dos interfaces, una sola API
+#### Tres interfaces, una sola API
 
-**Ábralas en dos pestañas y compárelas.** Son la misma aplicación — el mismo
-menú, las mismas facturas, los mismos totales— escritas en **dos lenguajes
+**Ábralas en tres pestañas y compárelas.** Son la misma aplicación — el mismo
+menú, las mismas facturas, los mismos totales— escritas en **tres lenguajes
 distintos**, hablando con **la misma API** por HTTP.
 
-| | En Blazor (`8099`) | En Flask (`8118`) |
-|---|---|---|
-| Lenguaje | **C#** | **Python** |
-| Qué corre en el navegador | El circuito de Blazor Server | HTML y Bootstrap, nada más |
-| Dónde guarda la sesión | En el servidor, con el circuito | En la **cookie firmada** de Flask |
-| A quién le pide los datos | **`api-facturas:8035`** | **`api-facturas:8035`** |
+| | En Blazor (`8099`) | En Flask (`8118`) | En React (`8119`) |
+|---|---|---|---|
+| Lenguaje | **C#** | **Python** | **JavaScript** |
+| Quién arma el HTML | El **servidor** | El **servidor** (Jinja2) | **El navegador** |
+| Qué corre en el navegador | El circuito de Blazor Server | HTML y Bootstrap, nada más | La aplicación entera |
+| Dónde guarda la sesión | En el servidor, con el circuito | En la **cookie firmada** de Flask | En el `sessionStorage` del navegador |
+| A quién le pide los datos | **`api-facturas:8035`** | **`api-facturas:8035`** | **`api-facturas:8035`** |
+| ¿Necesita CORS? | No | No | **Sí** |
 
 > **Por qué esto importa y no es un capricho:** si la API tuviera algo de la
 > interfaz adentro —HTML, sesiones, reglas de pantalla— **el segundo front no
-> podría existir**. Que dos programas en dos lenguajes consuman lo mismo sin
-> tocar una línea de la API **es la demostración de que las capas están bien
-> puestas.**
+> podría existir**, y menos el tercero. Que tres programas en tres lenguajes
+> consuman lo mismo sin tocar una línea de la API **es la demostración de que
+> las capas están bien puestas.**
+
+> **Por qué solo el de React necesita CORS.** Fíjese en la fila «quién arma el
+> HTML». Los de Blazor y Flask llaman a la API **desde el servidor**, y entre
+> servidores no hay ningún guardia que pregunte nada. El de React llama **desde
+> el navegador de la persona**, y ahí sí hay guardia: el navegador no deja que
+> una página de un origen —`localhost:8119`— llame a otro —`localhost:8035`—
+> a menos que **la API diga por escrito que acepta ese origen**. Eso es CORS, y
+> está en `OrigenesPermitidos` de `appsettings.json`. Si esa lista no incluye
+> la dirección del front, la llamada se bloquea **antes de salir**: en la API
+> no queda ni rastro, y el error solo se ve en la consola del navegador.
 >
 > **Y ninguno de los dos sabe que existe una base de datos.** Apague la API y
 > las dos interfaces siguen en pie, con su aviso y sin una sola fila.
@@ -164,7 +177,7 @@ distintos**, hablando con **la misma API** por HTTP.
 ### Y cuando esto tenga que salir a internet
 
 **Lo de arriba corre en su máquina.** Para publicarlo en servidores de verdad
-—gratis y sin tarjeta— el repositorio trae tres tutoriales, pantalla por
+—gratis y sin tarjeta— el repositorio trae cuatro documentos, pantalla por
 pantalla:
 
 | | Motor | Interfaz | Dónde |
@@ -178,6 +191,12 @@ pantalla:
 > cuenta y la API publicada— y a cambio demuestra lo que el 1 no alcanza a
 > mostrar: **que el motor de base de datos y la interfaz se cambian sin tocar
 > el código.**
+
+> **El front de React todavía no tiene su tutorial.** Está publicado y
+> funcionando, pero publicarlo trae dos asuntos que los otros dos no tienen
+> —**CORS** en la API y el `web.config` que hace que toda dirección devuelva
+> `index.html`— y eso está por escribir. Lo que sí está es el código, con el
+> por qué comentado en `front_react/public/web.config` y en `vite.config.js`.
 
 ### El menú de la interfaz gráfica
 
@@ -200,6 +219,11 @@ pantalla:
 
 > **El menú nombra RECURSOS del dominio, no tablas ni rutas de la API.**
 > Dice «Facturas», no `/api/factura`.
+
+> **El de React va por nueve de esas entradas**: las ocho entidades y las
+> facturas. Le faltan el tablero y las tres pantallas de usuarios y roles.
+> Las nueve que tiene están completas —incluido el maestro-detalle— y es
+> suficiente para la comparación de arriba.
 
 ### Y en esta versión hay que identificarse primero
 
@@ -332,6 +356,21 @@ proyecto_aplicacion_y_servicios_web4/
 │                                #   LA MISMA aplicación que front_blazor, en otro
 │                                #   lenguaje y contra LA MISMA API: la prueba de
 │                                #   que la API no tiene nada de la interfaz adentro
+│
+├── front_react/                  # INTERFAZ 3 — React + Vite, JavaScript (puerto 8119)
+│   ├── src/api.js                # LO ÚNICO que habla con la API, por fetch
+│   ├── src/entidades.js          # El registro de las 8 entidades: la misma tabla
+│   │                            #   de datos que entidades.py, en otro lenguaje
+│   ├── src/Entidad.jsx           # UNA pantalla para las ocho: no hay ocho copias
+│   ├── src/Facturas.jsx          # El maestro-detalle: lista, detalle y emisión
+│   ├── src/Sesion.jsx            # El token y los permisos de quien entró
+│   ├── src/App.jsx               # El ensamblador: la barra, las rutas y la puerta
+│   ├── public/web.config         # Para IIS: toda dirección devuelve index.html.
+│   │                            #   Sin esto, /facturas da 404 PUBLICADO — el
+│   │                            #   servidor busca una carpeta que no existe
+│   └── Dockerfile                # node:22-alpine, solo para desarrollar
+│                                #   EL ÚNICO que corre en el navegador, y por eso
+│                                #   el único que necesita CORS en la API
 │
 ├── docs/
 │   ├── spec_kit/                # LAS ESPECIFICACIONES: constitución permanente +

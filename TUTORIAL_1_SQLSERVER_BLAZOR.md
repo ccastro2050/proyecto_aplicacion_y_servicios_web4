@@ -11,6 +11,29 @@ cosas vivas en internet y hablando entre ellas:
 
 **Todo gratis y sin tarjeta.**
 
+> **Antes de empezar: los nombres de las capturas no van a ser los suyos — ni
+> son los del sistema que está vivo hoy.**
+>
+> Las capturas de esta serie se tomaron en la **primera vuelta** de la cuenta,
+> cuando el usuario era `carloscastro` y la base de datos era `db75266`. Esa
+> cuenta se reconstruyó después, así que **las direcciones que aparecen en las
+> capturas ya no responden**. Comprobado el 29 de octubre de 2026:
+>
+> | Lo que está vivo hoy | Qué es |
+> |---|---|
+> | `https://apifacturas-carrloscastro.runasp.net` | La API contra **SQL Server** |
+> | `https://apifacturas-pg-carrloscastro.runasp.net` | La **misma** API contra **PostgreSQL** en Neon |
+> | `https://front-facturas-react-carrloscastro.runasp.net` | El front de **React** |
+>
+> La dirección del front de **Blazor publicado no está registrada en ningún
+> archivo del repositorio**: hay que leerla del panel.
+>
+> **Para seguir el tutorial esto no estorba.** A cada quien le toca su propio
+> número de sitio y de base de datos, y el tutorial lo dice en cada paso: lo
+> que importa es **de dónde se lee cada dato**, no cuál número salió. Pero si
+> va a abrir una dirección de una captura esperando que cargue, no va a
+> cargar.
+
 ### Los tres tutoriales de esta serie
 
 | | Motor | Interfaz | Dónde |

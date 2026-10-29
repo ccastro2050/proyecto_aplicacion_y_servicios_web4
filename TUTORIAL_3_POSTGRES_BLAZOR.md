@@ -8,6 +8,25 @@
 | **La MISMA API** | El mismo `ApiFacturas.dll`, **byte por byte**, publicado otra vez |
 | **El MISMO front** | El mismo `FrontFacturas.dll`, publicado otra vez |
 
+> **Antes de empezar: los nombres de las capturas no van a ser los suyos — ni
+> son los del sistema que está vivo hoy.**
+>
+> Las capturas de esta serie se tomaron en la **primera vuelta** de la cuenta,
+> cuando el usuario era `carloscastro` y la base de datos era `db75266`. Esa
+> cuenta se reconstruyó después, así que **las direcciones que aparecen en las
+> capturas ya no responden**. Comprobado el 29 de octubre de 2026:
+>
+> | Lo que está vivo hoy | Qué es |
+> |---|---|
+> | `https://apifacturas-carrloscastro.runasp.net` | La API contra **SQL Server** |
+> | `https://apifacturas-pg-carrloscastro.runasp.net` | La **misma** API contra **PostgreSQL** en Neon |
+> | `https://front-facturas-react-carrloscastro.runasp.net` | El front de **React** |
+>
+> La dirección del front de **Blazor publicado no está registrada en ningún
+> archivo del repositorio**: hay que leerla del panel — y en este tutorial
+> hace falta, porque el cuarto sitio se compara **contra el front que ya está
+> arriba**.
+
 > **Al terminar va a tener dos sistemas idénticos, abiertos en dos pestañas.**
 > Las mismas pantallas, las mismas facturas, los mismos totales — **y abajo,
 > dos motores de base de datos distintos.**

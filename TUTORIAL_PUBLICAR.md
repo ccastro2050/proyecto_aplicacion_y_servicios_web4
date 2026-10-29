@@ -9,7 +9,35 @@
 > contenedor. En MonsterASP el sistema **no corre en contenedores**: corre en un
 > hospedaje de Windows con IIS, que es otra cosa y tiene otros problemas.
 >
-> Versión 0.2 · 29 de octubre de 2026.
+> Versión 0.3 · 29 de octubre de 2026.
+
+> **Antes de empezar: los nombres de las capturas no van a ser los suyos — ni
+> son los del sistema que está vivo hoy.**
+>
+> Las 67 capturas de este documento se tomaron en la **primera vuelta** de la
+> cuenta, cuando el usuario era `carloscastro` y la base de datos era
+> `db75266`. Esa cuenta se reconstruyó después, así que **las direcciones que
+> aparecen en las capturas ya no responden**. Comprobado el 29 de octubre de
+> 2026:
+>
+> | Lo que está vivo hoy | Qué es |
+> |---|---|
+> | `https://apifacturas-carrloscastro.runasp.net` | La API contra **SQL Server** |
+> | `https://apifacturas-pg-carrloscastro.runasp.net` | La **misma** API contra **PostgreSQL** en Neon |
+> | `https://front-facturas-react-carrloscastro.runasp.net` | El front de **React** |
+>
+> La dirección del front de **Blazor publicado no está registrada en ningún
+> archivo del repositorio**: hay que leerla del panel.
+>
+> **Para seguir el tutorial esto no estorba.** A cada quien le toca su propio
+> número de sitio y de base de datos, y el tutorial lo dice en cada paso: lo
+> que importa es **de dónde se lee cada dato**, no cuál número salió. La única
+> excepción es la variable `API_FACTURAS_URL` del paso 9: ahí hay que poner la
+> API que exista de verdad, porque el front de Flask le va a hablar.
+>
+> **Lo que a este documento le falta:** el front de **React** está publicado y
+> funcionando, pero **su publicación no está escrita aquí** — ni **CORS** en la
+> API, ni el `web.config` que hace que toda dirección devuelva `index.html`.
 
 ### Esta serie son tres tutoriales
 
@@ -5163,6 +5191,11 @@ antes de intentar entrar.
 |---|---|
 | **`API_FACTURAS_URL`** | `https://apifacturas-carrloscastro.runasp.net` |
 | **`CLAVE_SESION`** | Una cadena larga cualquiera |
+
+> **Esta dirección no es la de las capturas de más arriba, y está bien así.**
+> Es **la API que existe hoy** —la del recuadro del principio—, y aquí no sirve
+> ninguna otra: esto no es un ejemplo, es el dato que el front va a usar para
+> iniciar sesión. **Ponga la suya**, la que le quedó al publicar la API.
 
 > **`CLAVE_SESION` firma la cookie de sesión.** Sin ella, el front usa la clave
 > de desarrollo **que está escrita en el código** — y cualquiera que lea el

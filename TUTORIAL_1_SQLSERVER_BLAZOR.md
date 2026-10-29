@@ -55,6 +55,11 @@ cosas vivas en internet y hablando entre ellas:
 ---
 ## Antes de empezar: las credenciales NO van en este documento
 
+> **Cómo se manejan de verdad está en [SECRETOS.md](SECRETOS.md):** las cuatro
+> prácticas con su comando, qué protege cada mecanismo **y qué no** —porque en
+> un hospedaje gratuito compartido hay un límite real—, y qué hacer si una
+> clave ya se escapó.
+
 > **Este repositorio es público.** Una contraseña escrita aquí queda en el
 > historial de git para siempre, y rotarla después no la borra del historial.
 

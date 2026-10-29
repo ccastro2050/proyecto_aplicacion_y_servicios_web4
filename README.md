@@ -200,6 +200,12 @@ comandos, porque las pantallas que necesita son las mismas del 1.
 y qué cambio para que le hable a otra?»—** está
 [**CONEXIONES.md**](CONEXIONES.md), que es una sola hoja de consulta rápida.
 
+**Antes de publicar, lea [SECRETOS.md](SECRETOS.md).** Los tutoriales muestran
+las contraseñas a propósito —sin verlas no se entiende de dónde sale cada
+dato—, pero **en el proyecto de aula no van así**. Esa hoja dice qué hacer en
+su lugar, **qué protege cada mecanismo y qué no**, y qué hacer si una clave ya
+se escapó.
+
 > **Empiece por el 1.** El 2 da por hecho que ya hizo el 1 — reutiliza la
 > cuenta y la API publicada— y a cambio demuestra lo que el 1 no alcanza a
 > mostrar: **que el motor de base de datos y la interfaz se cambian sin tocar

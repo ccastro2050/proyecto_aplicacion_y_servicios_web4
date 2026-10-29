@@ -35,8 +35,28 @@ solo el lenguaje:
 var urlApi = builder.Configuration["UrlApi"] ?? "http://localhost:8035";
 ```
 
-`builder.Configuration["UrlApi"]` busca esa clave en **todas** las fuentes de
-configuración; el `??` es el valor de respaldo si no la encuentra en ninguna.
+**Esa línea, por partes:**
+
+| Parte | Qué es |
+|---|---|
+| `builder.Configuration` | El objeto que **junta todas las fuentes**: `appsettings.json`, `appsettings.Production.json`, variables de entorno. Las consulta como si fueran una sola |
+| `["UrlApi"]` | Busca esa clave. Si no está en ninguna, devuelve **`null`** — no revienta |
+| `??` | **Fusión nula:** *«si lo de la izquierda es `null`, use lo de la derecha»* |
+| `"http://localhost:8035"` | El respaldo |
+
+**En una frase:** *la dirección es lo que diga la configuración; y si no dice
+nada, es `http://localhost:8035`.*
+
+> **Por qué el respaldo y no confiar en el archivo:** si alguien escribe mal la
+> clave o publica sin ella, sin `??` el programa arrancaría con `null` y
+> fallaría **más adelante**, con un error que no menciona la configuración por
+> ninguna parte.
+>
+> **Y por qué la misma línea sirve en los tres escenarios:** `Configuration`
+> consulta las fuentes en orden y **la última que tenga la clave manda** —
+> `appsettings.json` → `appsettings.Production.json` → variables de entorno—.
+> Por eso publicado apunta a internet y dentro de Docker apunta a
+> `api-facturas`, **sin tocar el código**.
 
 **2. Registrar el cliente HTTP** con esa dirección como base:
 

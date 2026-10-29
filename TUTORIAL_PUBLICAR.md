@@ -4953,29 +4953,107 @@ y los `appsettings`. **No hay ningún `Dockerfile`.**
 | **Quién lo ejecuta** | IIS | IIS | **Docker** (local, hoy) |
 | **¿Viaja el `Dockerfile`?** | **No** | **No** | **Sí — es lo único que viaja** |
 
-### 9.4 · Publicar el front Flask: pendiente
+### 9.4 · La cuenta en Render
 
-**El front Flask funciona en Docker y está probado** — las siete pantallas con
-sesión, los datos con tildes, y gunicorn arrancando cuando `DEPURAR=0`.
+```
+https://render.com
+```
 
-**Lo que falta es escoger hospedaje y publicarlo**, y eso quedó pendiente a
-propósito: ninguna de las plataformas gratuitas de 2026 salió limpia en el
-primer intento, y **no vale la pena escribir un paso del tutorial con una
-plataforma que no se dejó probar entera.**
+**`Get started`**, arriba a la derecha.
 
-**Lo que ya está listo del lado del proyecto**, para cuando se retome:
+![La pantalla de registro de Render](docs/tutorial_publicar/img/66_render_registro.png)
+
+Ofrece **GitHub**, GitLab, Bitbucket, Google o correo.
+
+> **Hágalo en una ventana de incógnito.** No es paranoía: la primera vez que
+> intentamos esto, el navegador tenía sesión abierta con **tres cuentas de
+> GitHub distintas** —`ccastro2050`, `carloscastroest` y `ccastro2050-50`— y
+> Render se conectó con la que no era. **En incógnito no hay sesión previa que
+> lo meta donde no quiere.**
+
+> **Y una advertencia que costó una madrugada:** si ya tuvo una cuenta de Render
+> con una factura sin pagar, **el espacio de trabajo queda suspendido y no deja
+> ni crear uno nuevo**:
+>
+> ```
+> Workspace suspended — Render has suspended your services due to non-payment.
+> ```
+>
+> **La salida es una cuenta nueva, con otro correo.** Y de paso es lo correcto
+> para escribir un tutorial: **la única forma de saber qué va a ver el
+> estudiante es empezar como él.**
+
+### 9.5 · El servicio
+
+**`Deploy a Web Service`** → y ahí aparecen tres pestañas.
+
+![La pestana de repositorio publico con la direccion pegada](docs/tutorial_publicar/img/67_render_repo_publico.png)
+
+| Pestaña | Qué hace | |
+|---|---|---|
+| `Git Provider` | Render **se conecta a su cuenta** y republica con cada `git push` | Lo ideal |
+| **`Public Git Repository`** | Se le pega la dirección y ya. **Sin conexión de cuenta** | **La que usamos** |
+| `Existing Image` | Para una imagen Docker ya construida en un registro | No |
+
+**Pegue la dirección del repositorio y oprima `Connect`:**
+
+```
+https://github.com/ccastro2050/proyecto_aplicacion_y_servicios_web4
+```
+
+> **Por qué la del medio:** entrando con Google, GitHub no queda conectado — y
+> conectarlo abre otra vez el enredo de las cuentas. **El repositorio es
+> público, así que Render lo clona sin pedirle permiso a nadie.**
+>
+> **Lo único que se pierde** es que republique solo: para subir una versión
+> nueva hay que oprimir un botón. **Se puede conectar después, con calma.**
+
+#### El formulario
+
+![El formulario con el nombre y el lenguaje detectado](docs/tutorial_publicar/img/68_render_formulario.png)
+
+**Render clona, mira el repositorio y detecta `Docker` solo** — porque
+encuentra el `Dockerfile`. Eso no hay que escogerlo.
+
+**Pero no oprima `Deploy` todavía:** abajo a la izquierda dice **`$7 / month`**.
+
+#### Los cuatro campos que sí hay que tocar
+
+![Region, Root Directory y el plan gratuito](docs/tutorial_publicar/img/69_render_opciones.png)
+
+| Campo | Qué poner | Por qué |
+|---|---|---|
+| **`Name`** | **`facturas-flask`** | Queda en la dirección pública: `facturas-flask.onrender.com`. El que trae por defecto es el del repositorio entero |
+| **`Region`** | **`Frankfurt (EU Central)`** | Viene en `Oregon (US West)`. **Su API está en Europa** — desde Oregón cada llamada cruza Estados Unidos **y** el Atlántico |
+| **`Root Directory`** | **`front_flask`** | **El que más se olvida.** Sin él, Render busca el `Dockerfile` en la raíz del repositorio, y ahí no está |
+| **`Compute`** | **`$0 / month · Free`** | Viene en el de 7 dólares |
+
+> **`Root Directory` es un buscador, no una caja de texto.** Al escribir
+> `front_flask` le va a ofrecer las carpetas de adentro —`front_flask/static/`,
+> `front_flask/templates/`—. **No escoja ninguna**: la que sirve es
+> `front_flask/`, que ya queda escrita arriba. Cierre la lista haciendo clic
+> afuera.
+
+> **Y compruebe el renglón de abajo:** debe decir **`front_flask/ .`** en
+> `Dockerfile Path`. Es Render armando la ruta solo. **Si dice otra cosa, el
+> `Root Directory` no quedó.**
+
+#### Lo que dice el aviso del plan gratuito
+
+> *«Free instances **spin down after periods of inactivity**. They do not support
+> SSH access, scaling, one-off jobs, or persistent disks»*
 
 | | |
 |---|---|
-| **`front_flask/Dockerfile`** | Arranca **publicado por defecto** (`DEPURAR=0` → gunicorn). Un hospedaje que solo haga `build` + `run` no necesita configurar nada |
-| **`app.py`** | Lee **`PORT`** —lo que imponen las plataformas— antes que `PUERTO`. **El mismo código corre en Docker local y en la nube** |
-| **Dos variables** | `API_FACTURAS_URL` y `CLAVE_SESION`. Nada más |
-| **`front_flask/publicar_en_space.ps1`** | Para plataformas que reciben el código por git, como Hugging Face |
+| **Se duerme** | Igual que MonsterASP. **Pero despierta sola con la primera petición** |
+| `0.1 CPU` · `512 MB RAM` | De sobra para un front que solo arma HTML |
+| **Sin disco persistente** | **No importa aquí**: este front no guarda nada. Todo lo pide por HTTP |
 
-> **Y mientras tanto el argumento del curso se sostiene igual:** las dos
-> interfaces —Blazor y Flask— corren contra **la misma API** en `docker
-> compose`. **Que una esté publicada y la otra no es un asunto de hospedaje, no
-> de arquitectura.**
+> **Ese último punto no es casualidad: es la arquitectura pagándose sola.** Un
+> front que guardara archivos o sesiones en disco **no cabría en un plan
+> gratuito sin disco**. Éste cabe porque **no tiene estado que perder.**
+
+**Y ahora sí: `Deploy web service`.**
 
 
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->

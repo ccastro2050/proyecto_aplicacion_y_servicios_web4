@@ -2420,72 +2420,122 @@ Numero total de cambios: 81 (80 agregados, 1 eliminados, 0 actualizados, 0 param
 
 #### Si el comando falla: envuélvalo en `cmd.exe /c`
 
-**Este comando no siempre corre igual en todas las máquinas**, y el proyecto lo
-sufrió en vivo: el mismo comando que funcionó en una computadora **falló en
-otra**, con el mismo `msdeploy` y la misma versión de Windows.
+**El mismo comando no corre igual en todas las máquinas**, y el proyecto lo
+sufrió en vivo: lo que funcionó en una computadora **falló en la del salón**,
+con el mismo `msdeploy` y el mismo Windows.
 
-**La salida** — cómo se ve el fallo:
+**Así se ve el fallo:**
 
-<!-- PENDIENTE: pegar aqui el mensaje exacto que devolvio msdeploy -->
+```
+Error: No se reconoce el argumento
+'"-dest:contentPath=\"site101654\",computerName=\"https://site101654.siteasp.net:8172/msdeploy.axd?site=site101654\",userName=\"site101654\",password=\"…\",authType=\"Basic\""'.
+Todos los argumentos deben comenzar con "-".
+Recuento de errores: 1.
+```
 
-#### El arreglo
+#### Lea el mensaje antes de tocar nada
 
-**El mismo comando, metido dentro de `cmd.exe /c` y entre comillas simples:**
+**Ese error dice exactamente qué pasó, y no es lo que uno supone.**
+
+| Lo que uno sospecha primero | Lo que dice el mensaje |
+|---|---|
+| «La contraseña está mal» | **No.** Ni siquiera llegó a intentar conectarse |
+| «WebDeploy está apagado» | **No.** No hubo conexión |
+| «La ruta de `msdeploy.exe` está mal» | **No.** `msdeploy` sí corrió — **es él quien se queja** |
+
+> **`Todos los argumentos deben comenzar con "-"`** es un error de **lectura de
+> la línea de comandos**, no de permisos ni de red. **Un error de autenticación
+> se ve completamente distinto** — dice `ERROR_USER_UNAUTHORIZED` y menciona el
+> servidor.
+>
+> **Esto vale como hábito, más que como dato:** cuando una IA —o un
+> compañero— le proponga revisar la contraseña, el interruptor y la ruta,
+> vuelva al mensaje. **El mensaje ya había descartado las tres.**
+
+#### Qué pasó de verdad
+
+**Mírelo con cuidado:** el argumento que `msdeploy` recibió empieza con una
+comilla, no con el guion.
+
+```
+'"-dest:contentPath=\"site101654\",…"'
+ ^                   ^^           ^^
+ |                   las comillas de adentro llegaron escapadas
+ una comilla de más, envolviendo TODO el argumento
+```
+
+**PowerShell no le pasa la línea al programa tal como usted la escribió.** La
+lee, la parte y **la vuelve a armar**. Y cuando un argumento ya trae comillas
+dobles adentro, **le pone otro par por fuera y escapa las de adentro**.
+
+**Para `msdeploy`, eso es un argumento que empieza por `"`** — y lo rechaza
+antes de hacer nada.
+
+#### Por qué la misma línea funciona en una máquina y no en otra
+
+**Porque ese comportamiento cambió entre versiones de PowerShell.** La forma de
+armar la línea para programas externos **no es la misma en Windows PowerShell
+5.1 que en PowerShell 7**, y en las 7.3 en adelante hasta se puede configurar.
+
+**Compruebe cuál tiene cada máquina:**
+
+```powershell
+$PSVersionTable.PSVersion
+```
+
+> **Y por eso este error es tan desconcertante en clase:** el profesor lo corre
+> en el tablero y funciona; el estudiante lo copia **idéntico** y le falla.
+> **No se equivocó nadie. Son dos PowerShell distintos.**
+
+#### Lo que NO lo arregla
+
+**Duplicar las comillas** —`""site101654""`— es lo primero que se intenta, y
+**empeora las cosas**: PowerShell vuelve a envolver, y el mensaje sale igual.
+
+```
+Error: No se reconoce el argumento '"-dest:contentPath=\"site101654\",…"'.
+Todos los argumentos deben comenzar con "-".
+```
+
+**Partir el comando en varias líneas con el acento grave tampoco cambia nada
+por sí solo.** El acento grave es **solo un continuador de línea**: el
+argumento que se arma al final es el mismo. Si en una máquina funcionó así,
+fue por la versión de PowerShell, no por los acentos graves.
+
+#### El arreglo que sí funciona siempre
+
+**El mismo comando, dentro de `cmd.exe /c` y entre comillas simples:**
 
 ```powershell
 cmd.exe /c '"C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="C:\...\api_facturas\publicado" -dest:contentPath="siteXXXXX",computerName="https://siteXXXXX.siteasp.net:8172/msdeploy.axd?site=siteXXXXX",userName="siteXXXXX",password="SU_CONTRASENA",authType="Basic" -enableRule:AppOffline -allowUntrusted'
 ```
 
-| Lo que cambia | |
+| La pieza | Qué hace |
 |---|---|
-| **`cmd.exe /c`** al principio | Le entrega la línea al intérprete viejo de Windows, que **no la reescribe** |
-| **Comillas simples** envolviendo todo | En PowerShell, lo que va entre comillas simples **se pasa tal cual**, sin tocar nada de adentro |
-| Las comillas dobles de adentro | **Se quedan como están** — y eso es justamente lo que se quería |
+| **`cmd.exe /c`** | Le entrega la línea al intérprete viejo de Windows, **que no la reescribe** |
+| **Las comillas simples** por fuera | En PowerShell, lo que va entre comillas simples **se pasa tal cual**: no toca nada de adentro |
+| Las comillas dobles de adentro | **Llegan como están**, que es justo lo que `msdeploy` espera |
 
-#### Por qué pasa, que es lo que vale aprender
-
-**PowerShell no le pasa la línea a un programa externo tal como usted la
-escribió: la interpreta primero.** Quita comillas, separa por espacios y vuelve
-a armar los argumentos a su manera.
-
-**Casi siempre acierta.** Pero el argumento `-dest:` de `msdeploy` es un caso
-difícil:
-
-```
--dest:contentPath="siteXXXXX",computerName="https://...?site=siteXXXXX",userName="...",password="...",authType="Basic"
-```
-
-| Tiene | Que para PowerShell significa algo |
-|---|---|
-| **Comas** | Separan elementos de una lista |
-| **Signos igual** | Asignan |
-| **Dos puntos** | Separan un parámetro de su valor |
-| **Y una contraseña** con `!`, `?`, `#`, `@` o `=` | Cualquiera de esos puede cambiar cómo se parte la línea |
-
-> **Es un argumento gigante con estructura propia, metido dentro de otro
-> lenguaje que también usa esos símbolos.** Que funcione la mayoría de las
-> veces es la suerte; que falle alguna, lo esperable.
-
-> **Y por eso el síntoma confunde tanto:** el comando **no está mal escrito**.
-> Está bien escrito y llega mal. Uno revisa el identificador cinco veces, cambia
-> la contraseña, vuelve a copiar la dirección — y el problema estaba **entre
-> PowerShell y el programa**, no en el comando.
-
-#### Dos formas de evitarlo
-
-| | |
-|---|---|
-| **`cmd.exe /c '…'`** | La que usamos. Funciona siempre y se copia y pega |
-| **El token `--%`** | `& "…msdeploy.exe" --% -verb:sync -source:…` — le dice a PowerShell **«de aquí en adelante no interprete nada»** |
-
-> **El `--%` es más elegante**, pero tiene una trampa: después de él **ninguna
-> variable de PowerShell se reemplaza**. Si su comando usa `$PWD` o similares,
-> dejan de funcionar. Con `cmd.exe /c` pasa lo mismo, pero se nota antes.
+> **La alternativa es el token `--%`:**
+> `& "…msdeploy.exe" --% -verb:sync -source:…` — significa **«de aquí en
+> adelante no interprete nada»**. Es más corto, pero tiene una trampa: después
+> de él **ninguna variable de PowerShell se reemplaza**.
 
 > **Guárdelo donde lo encuentre.** En este repositorio está en
-> `publicar_en_caso_de_error.txt`, en la raíz: el comando completo, listo para
-> cambiar el identificador y la contraseña. **A las dos horas de clase, con
-> veinte estudiantes publicando, no hay tiempo de deducir esto otra vez.**
+> **`publicar_en_caso_de_error.txt`**, en la raíz: el comando completo, listo
+> para cambiar el identificador y la contraseña. **A las dos horas de clase,
+> con veinte estudiantes publicando, no hay tiempo de deducir esto otra vez.**
+
+#### La lección, que no es sobre `msdeploy`
+
+> **Un argumento gigante, con comas, iguales, dos puntos y comillas, metido
+> dentro de otro lenguaje que usa esos mismos símbolos.** Que funcione la
+> mayoría de las veces es la suerte; que falle alguna, lo esperable.
+>
+> **Y el síntoma engaña porque el comando no está mal escrito.** Está bien
+> escrito **y llega mal**. Uno revisa el identificador cinco veces, cambia la
+> contraseña, vuelve a copiar la dirección — y el problema estaba **entre
+> PowerShell y el programa**, en un tramo que nadie mira.
 
 #### Ese `iisstart.htm` borrado es la demostración de qué es «sincronizar»
 

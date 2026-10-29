@@ -2418,6 +2418,75 @@ Numero total de cambios: 81 (80 agregados, 1 eliminados, 0 actualizados, 0 param
 | **0 actualizados** | No había nada que actualizar: estaba vacío |
 | **18.647.083 bytes** | Los 18 MB |
 
+#### Si el comando falla: envuélvalo en `cmd.exe /c`
+
+**Este comando no siempre corre igual en todas las máquinas**, y el proyecto lo
+sufrió en vivo: el mismo comando que funcionó en una computadora **falló en
+otra**, con el mismo `msdeploy` y la misma versión de Windows.
+
+**La salida** — cómo se ve el fallo:
+
+<!-- PENDIENTE: pegar aqui el mensaje exacto que devolvio msdeploy -->
+
+#### El arreglo
+
+**El mismo comando, metido dentro de `cmd.exe /c` y entre comillas simples:**
+
+```powershell
+cmd.exe /c '"C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="C:\...\api_facturas\publicado" -dest:contentPath="siteXXXXX",computerName="https://siteXXXXX.siteasp.net:8172/msdeploy.axd?site=siteXXXXX",userName="siteXXXXX",password="SU_CONTRASENA",authType="Basic" -enableRule:AppOffline -allowUntrusted'
+```
+
+| Lo que cambia | |
+|---|---|
+| **`cmd.exe /c`** al principio | Le entrega la línea al intérprete viejo de Windows, que **no la reescribe** |
+| **Comillas simples** envolviendo todo | En PowerShell, lo que va entre comillas simples **se pasa tal cual**, sin tocar nada de adentro |
+| Las comillas dobles de adentro | **Se quedan como están** — y eso es justamente lo que se quería |
+
+#### Por qué pasa, que es lo que vale aprender
+
+**PowerShell no le pasa la línea a un programa externo tal como usted la
+escribió: la interpreta primero.** Quita comillas, separa por espacios y vuelve
+a armar los argumentos a su manera.
+
+**Casi siempre acierta.** Pero el argumento `-dest:` de `msdeploy` es un caso
+difícil:
+
+```
+-dest:contentPath="siteXXXXX",computerName="https://...?site=siteXXXXX",userName="...",password="...",authType="Basic"
+```
+
+| Tiene | Que para PowerShell significa algo |
+|---|---|
+| **Comas** | Separan elementos de una lista |
+| **Signos igual** | Asignan |
+| **Dos puntos** | Separan un parámetro de su valor |
+| **Y una contraseña** con `!`, `?`, `#`, `@` o `=` | Cualquiera de esos puede cambiar cómo se parte la línea |
+
+> **Es un argumento gigante con estructura propia, metido dentro de otro
+> lenguaje que también usa esos símbolos.** Que funcione la mayoría de las
+> veces es la suerte; que falle alguna, lo esperable.
+
+> **Y por eso el síntoma confunde tanto:** el comando **no está mal escrito**.
+> Está bien escrito y llega mal. Uno revisa el identificador cinco veces, cambia
+> la contraseña, vuelve a copiar la dirección — y el problema estaba **entre
+> PowerShell y el programa**, no en el comando.
+
+#### Dos formas de evitarlo
+
+| | |
+|---|---|
+| **`cmd.exe /c '…'`** | La que usamos. Funciona siempre y se copia y pega |
+| **El token `--%`** | `& "…msdeploy.exe" --% -verb:sync -source:…` — le dice a PowerShell **«de aquí en adelante no interprete nada»** |
+
+> **El `--%` es más elegante**, pero tiene una trampa: después de él **ninguna
+> variable de PowerShell se reemplaza**. Si su comando usa `$PWD` o similares,
+> dejan de funcionar. Con `cmd.exe /c` pasa lo mismo, pero se nota antes.
+
+> **Guárdelo donde lo encuentre.** En este repositorio está en
+> `publicar_en_caso_de_error.txt`, en la raíz: el comando completo, listo para
+> cambiar el identificador y la contraseña. **A las dos horas de clase, con
+> veinte estudiantes publicando, no hay tiempo de deducir esto otra vez.**
+
 #### Ese `iisstart.htm` borrado es la demostración de qué es «sincronizar»
 
 **`iisstart.htm` era la página de «Your website is ready…»** — la que vimos

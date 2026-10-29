@@ -200,7 +200,8 @@ comandos, porque las pantallas que necesita son las mismas del 1.
 y qué cambio para que le hable a otra?»—** está
 [**CONEXIONES.md**](CONEXIONES.md), que es una sola hoja de consulta rápida.
 
-**Antes de publicar, lea [SECRETOS.md](SECRETOS.md).** Los tutoriales muestran
+**Antes de publicar, lea
+[los conceptos de secretos](docs/conceptos/CONCEPTOS_SECRETOS.md).** Los tutoriales muestran
 las contraseñas a propósito —sin verlas no se entiende de dónde sale cada
 dato—, pero **en el proyecto de aula no van así**. Esa hoja dice qué hacer en
 su lugar, **qué protege cada mecanismo y qué no**, y qué hacer si una clave ya
@@ -396,7 +397,7 @@ proyecto_aplicacion_y_servicios_web4/
 │   │                            #   una carpeta por versión con sus 9 .md
 │   │                            #   + la GUIA_IA de ESA versión (GUIA_IA1, GUIA_IA2…) (cómo
 │   │                            #   construirla con ayuda de una IA)
-│   ├── conceptos/               # QUÉ HAY QUE SABER: 23 .md con sus ilustraciones
+│   ├── conceptos/               # QUÉ HAY QUE SABER: 24 .md con sus ilustraciones
 │   │                            #   propias — POO, SOLID y patrones, ACID, Docker,
 │   │                            #   asincronía, pruebas, SDD, los dos tutoriales de BD
 │   └── dominio/                 # QUÉ ES ESTE SISTEMA: 18 .md — el plan del equipo,
@@ -472,7 +473,7 @@ de aceptación (commit + tag). Mapa completo:
 
 ## 5. Material conceptual del curso
 
-**Son 23 documentos en [`docs/conceptos/`](docs/conceptos/), cada uno con sus
+**Son 24 documentos en [`docs/conceptos/`](docs/conceptos/), cada uno con sus
 ilustraciones propias.** Los que conviene leer primero:
 
 | Documento | Qué cubre |
@@ -488,6 +489,7 @@ ilustraciones propias.** Los que conviene leer primero:
 | [SOLID, capas y patrones de diseño](docs/conceptos/SOLID_CAPAS_PATRONES.md) | Los 5 principios, las capas y los patrones que este código usa (repositorio, DI, fábrica, DTO) — y en qué versión se demuestra cada uno |
 | [Principios ACID](docs/conceptos/PRINCIPIOS_ACID.md) | Las 4 garantías transaccionales, por qué una facturación las exige |
 | [Conceptos de Docker](docs/conceptos/CONCEPTOS_DOCKER.md) | Imagen, contenedor, volumen, compose (con el del proyecto explicado línea por línea) y por qué NO se necesita Kubernetes |
+| [**Los secretos**](docs/conceptos/CONCEPTOS_SECRETOS.md) | **Antes de publicar:** qué es un secreto y qué no, las tres fugas (git, el disco, el servidor), las cuatro prácticas con su comando, **cómo se consulta cada uno** y hasta dónde llega un hospedaje gratuito |
 
 ## 6. El dominio: qué ES este sistema
 

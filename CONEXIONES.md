@@ -347,6 +347,11 @@ Invoke-WebRequest -Uri 'https://su-api.runasp.net/api/sesion' -Method Options -H
 
 ---
 
+**Las contraseñas van aparte:**
+[docs/conceptos/CONCEPTOS_SECRETOS.md](docs/conceptos/CONCEPTOS_SECRETOS.md) —
+dónde va cada secreto, **cómo se consulta cada uno** y qué protege cada
+mecanismo.
+
 **Para publicar desde cero**, los tutoriales van paso por paso:
 [1 — SQL Server y Blazor](TUTORIAL_1_SQLSERVER_BLAZOR.md) ·
 [2 — PostgreSQL y Flask](TUTORIAL_2_POSTGRES_FLASK.md) ·

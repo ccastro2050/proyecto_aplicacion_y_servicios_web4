@@ -47,3 +47,7 @@ publicados/
 
 # EXCEPCION: la variante PostgreSQL del front tampoco tiene secretos.
 !front_blazor/appsettings.Production.postgres.json
+
+# Dependencias y compilados de Node: los baja npm y los genera vite.
+node_modules/
+dist/

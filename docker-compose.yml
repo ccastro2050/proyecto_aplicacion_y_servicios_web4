@@ -197,6 +197,34 @@ services:
     depends_on:
       - api-facturas
 
+  # --- El TERCER front: React + Vite (v4) ---
+  # Y el primero que corre EN EL NAVEGADOR. Los otros dos arman el HTML en el
+  # servidor; este manda un div vacio y un archivo .js que lo llena.
+  #
+  # De ahi la consecuencia que ningun otro servicio de este compose tiene:
+  # quien llama a la API ya no es un servidor, es el navegador de la persona
+  # -desde http://localhost:8119-, y la API tiene que aceptar ese origen
+  # explicitamente. Eso es CORS, y esta configurado en appsettings.json.
+  #
+  # Por eso VITE_URL_API apunta a localhost:8035 y NO al nombre del servicio:
+  # `api-facturas` solo existe dentro de la red de Docker, y el navegador
+  # esta afuera.
+  front-react:
+    build: ./front_react
+    container_name: facturas-front-react-aysw-v4
+    restart: unless-stopped
+    ports:
+      - "8119:8119"
+    volumes:
+      - ./front_react:/app
+      # node_modules queda DENTRO del contenedor (Linux), sin mezclarse con
+      # lo que hubiera en Windows.
+      - /app/node_modules
+    environment:
+      VITE_URL_API: "http://localhost:8035"
+    depends_on:
+      - api-facturas
+
 volumes:
   mssqldata:      # declaración del volumen nombrado (la "memoria" de la BD)
   pgdata:         # v4: la "memoria" del segundo motor

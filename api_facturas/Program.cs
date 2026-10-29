@@ -277,6 +277,37 @@ builder.Services.AddSwaggerGen(opciones =>
     });
 });             // arma el documento OpenAPI
 
+// ------------------------------------------------------------
+// 2c. CORS — QUIEN PUEDE LLAMARME DESDE UN NAVEGADOR (v4)
+//
+// POR QUE APARECE AHORA Y NO ANTES: los fronts de Blazor y de Flask arman el
+// HTML EN EL SERVIDOR, asi que quien llama a esta API es OTRO SERVIDOR, y a
+// nadie le importa de donde. El front de React corre EN EL NAVEGADOR: quien
+// llama es el navegador de la persona, desde una direccion distinta de la de
+// esta API. Y el navegador BLOQUEA esa llamada salvo que la API diga, en una
+// cabecera, que acepta esa procedencia.
+//
+// NO ES UNA PROTECCION DE LA API, y conviene no confundirse: cualquiera puede
+// llamarla con curl o con Postman sin que CORS diga nada. Es una regla QUE
+// APLICA EL NAVEGADOR para que una pagina cualquiera no pueda usar, a espaldas
+// suyas, la sesion que usted tiene abierta en otro sitio.
+//
+// Las direcciones permitidas vienen de la configuracion -OrigenesPermitidos-
+// y no escritas aqui: cambian con cada despliegue, y recompilar por eso seria
+// absurdo.
+// ------------------------------------------------------------
+var origenes = builder.Configuration
+    .GetSection("OrigenesPermitidos")
+    .Get<string[]>() ?? new[] { "http://localhost:5173" };
+
+builder.Services.AddCors(opciones =>
+{
+    opciones.AddPolicy("FrontsDelCurso", politica => politica
+        .WithOrigins(origenes)      // SOLO estas, no AllowAnyOrigin
+        .AllowAnyHeader()           // hace falta para mandar Authorization
+        .AllowAnyMethod());         // GET, POST, PUT, PATCH y DELETE
+});
+
 // Construir la aplicación con todo lo registrado:
 var app = builder.Build();
 
@@ -303,6 +334,12 @@ app.MapGet("/", () => Results.Json(new
 // ------------------------------------------------------------
 // EL CONTROL DE ACCESO, Y EL ORDEN IMPORTA (v3)
 // ------------------------------------------------------------
+// CORS va ANTES de la autenticacion, y tampoco es un gusto: el navegador
+// manda primero una peticion OPTIONS de tanteo -el «preflight»- SIN el token.
+// Si la autenticacion la viera antes, la rechazaria con 401 y el navegador
+// concluiria que no tiene permiso, sin llegar a hacer la peticion de verdad.
+app.UseCors("FrontsDelCurso");
+
 // UseAuthentication va ANTES de UseAuthorization, y no es un gusto: el primero
 // lee el token y averigua QUIEN es; el segundo decide si PUEDE. Al reves, el
 // segundo no tendria a quien consultar — y dejaria pasar todo.

@@ -37,21 +37,40 @@
 
 ### Antes de empezar
 
-**Este tutorial da por hecho el [tutorial 1](TUTORIAL_1_SQLSERVER_BLAZOR.md).**
-De él se reutilizan la cuenta de MonsterASP, la API ya publicada y el hábito
-de `dotnet publish` + `msdeploy`.
+**Este tutorial se apoya en el [tutorial 1](TUTORIAL_1_SQLSERVER_BLAZOR.md),
+pero no lo exige completo.** Lo que de verdad hace falta es la **cuenta de
+MonsterASP** y saber **crear un sitio con WebDeploy encendido**:
 
-### Esta serie son cuatro documentos
+| Del tutorial 1 | ¿Hace falta aquí? |
+|---|---|
+| **Paso 1** — la cuenta en MonsterASP | **Sí** |
+| **Pasos 2, 3 y 4** — la base de datos SQL Server, su esquema y sus datos | **No.** Eso es exactamente lo que **Neon reemplaza** |
+| **Paso 5** — crear el sitio y encender WebDeploy | **Sí** — el paso 8.8 vuelve a hacerlo, igualito |
+| **Paso 6** — publicar la API | **No**: el paso 8.9 lo repite completo |
+| **Paso 7** — publicar el front de Blazor | **No, pero se parece:** aquí se publica **el mismo front**, apuntando a la otra API |
+
+> **¿Y la API arranca sin ningún SQL Server? Sí.** `Program.cs` exige que las
+> **dos** cadenas de conexión *existan* —y `appsettings.json`, que está
+> versionado, ya trae las dos apuntando a `localhost`—, pero con
+> `"Motor": "postgres"` **solo construye la fábrica de PostgreSQL**: no intenta
+> abrir SQL Server ni una vez.
+>
+> **Lo que sí se pierde** haciendo únicamente éste es la **comparación**: el
+> «mismo `.dll`, dos motores» se demuestra con **los dos sitios vivos al mismo
+> tiempo**.
+
+### Los cuatro tutoriales de esta serie
 
 | | Motor | Interfaz | Dónde |
 |---|---|---|---|
 | [**1**](TUTORIAL_1_SQLSERVER_BLAZOR.md) | SQL Server | Blazor | MonsterASP |
 | [**2**](TUTORIAL_2_POSTGRES_FLASK.md) | PostgreSQL | **Flask** | Neon · MonsterASP · Render |
 | **3 — éste** | PostgreSQL | Blazor | Neon · MonsterASP |
-| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las dos | los cuatro |
+| [**4**](TUTORIAL_4_POSTGRES_REACT.md) | PostgreSQL | **React** | Neon · MonsterASP |
+| [**completo**](TUTORIAL_PUBLICAR.md) | los dos | las tres | los cuatro |
 
-> **El 2 y el 3 comparten toda la primera mitad** — la base en Neon y la API
-> contra PostgreSQL son las mismas. **Se separan al final**, cuando cada uno
+> **El 2, el 3 y el 4 comparten toda la primera mitad** — la base de datos en
+> Neon y la API contra PostgreSQL son las mismas. **Se separan al final**, cuando cada uno
 > publica su interfaz.
 
 > **Sobre la numeración:** los pasos conservan el número del
@@ -787,12 +806,32 @@ Info: Adding file (site101144\publicado\appsettings.Production.json).
 Info: Adding file (site101144\publicado\web.config).
 ```
 
-**Se subió una carpeta `publicado` dentro del sitio nuevo** — la salida del
-Paso 6, **la de SQL Server**. Y adentro iba su `appsettings.Production.json`,
-**con la contraseña de la base de datos de MonsterASP**.
+**Se subió una carpeta `publicado` dentro del sitio nuevo**, y no es basura
+cualquiera: **es la salida de la publicación del
+[tutorial 1](TUTORIAL_1_SQLSERVER_BLAZOR.md)** —su paso 6.2, aquel
+`dotnet publish -c Release -o publicado`—, o sea **la API contra SQL Server**.
+Y adentro iba su `appsettings.Production.json`, **con la contraseña de la base
+de datos SQL Server que MonsterASP le creó allá**.
+
+> **¿Cuál SQL Server? El del tutorial 1**, que sigue vivo en su cuenta
+> mientras usted hace éste. **Si usted NO hizo el tutorial 1, esto no le puede
+> pasar**: no existe ninguna carpeta `publicado` que colarse, y el paso 8.9 le
+> funciona derecho. Léalo igual, porque la lección del final sí le sirve.
+>
+> Si lo hizo, **las dos publicaciones conviven en su disco**, dentro de
+> `api_facturas`:
+>
+> | La carpeta | De dónde salió | Contra qué base de datos | A qué sitio sube |
+> |---|---|---|---|
+> | `publicado` | del tutorial 1 | **SQL Server**, en MonsterASP | `site101125` |
+> | `publicado_pg` | de este paso | **PostgreSQL**, en Neon | `site101144` |
+>
+> **Mismo `ApiFacturas.dll` en las dos.** Lo único distinto es el
+> `appsettings.Production.json` — y por eso **es justo el archivo que no puede
+> cruzarse de carpeta**.
 
 > **O sea: el secreto de un sitio viajó al otro.** Exactamente lo que el paso
-> 8.7 advertiía que no debía pasar — y pasó **sin que nadie lo escribiera en
+> 8.7 advertía que no debía pasar — y pasó **sin que nadie lo escribiera en
 > ninguna parte.**
 
 #### Por qué ocurre

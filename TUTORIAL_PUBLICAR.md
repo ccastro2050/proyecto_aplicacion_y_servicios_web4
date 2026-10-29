@@ -4533,11 +4533,18 @@ Info: Adding file (site101144\publicado\web.config).
 ```
 
 **Se subió una carpeta `publicado` dentro del sitio nuevo** — la salida del
-Paso 6, **la de SQL Server**. Y adentro iba su `appsettings.Production.json`,
-**con la contraseña de la base de datos de MonsterASP**.
+**Paso 6.2**, o sea **la API contra SQL Server**. Y adentro iba su
+`appsettings.Production.json`, **con la contraseña de la base de datos SQL
+Server que MonsterASP creó en el Paso 2**.
+
+> **Las dos publicaciones conviven en su disco**, dentro de `api_facturas`:
+> `publicado` —SQL Server, para `site101125`— y `publicado_pg` —PostgreSQL en
+> Neon, para `site101144`—. **Mismo `ApiFacturas.dll` en las dos**; lo único
+> distinto es el `appsettings.Production.json`, **y por eso es justo el archivo
+> que no puede cruzarse de carpeta**.
 
 > **O sea: el secreto de un sitio viajó al otro.** Exactamente lo que el paso
-> 8.7 advertiía que no debía pasar — y pasó **sin que nadie lo escribiera en
+> 8.7 advertía que no debía pasar — y pasó **sin que nadie lo escribiera en
 > ninguna parte.**
 
 #### Por qué ocurre

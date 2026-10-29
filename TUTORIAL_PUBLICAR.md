@@ -5056,4 +5056,175 @@ encuentra el `Dockerfile`. Eso no hay que escogerlo.
 **Y ahora sí: `Deploy web service`.**
 
 
+### 9.6 · La compilación, leída
+
+![El registro de la compilacion en Render](docs/tutorial_publicar/img/70_render_compilacion.png)
+
+**Render clona, construye la imagen y la arranca.** El registro va saliendo en
+vivo, y hay media docena de renglones que vale la pena entender — porque son
+los que confirman que todo lo que preparamos sirvió.
+
+#### 1. Construye el `Dockerfile`, paso por paso
+
+```
+#6 [1/5] FROM docker.io/library/python:3.12-slim
+#8 [3/5] COPY requirements.txt .
+#9 [4/5] RUN pip install --no-cache-dir -r requirements.txt
+#10 [5/5] COPY . .
+```
+
+**Son exactamente las instrucciones del `front_flask/Dockerfile`**, en orden.
+Render no sabe que esto es Flask: **sigue la receta.**
+
+#### 2. Instala lo que pide `requirements.txt`
+
+```
+Successfully installed blinker-1.9.0 certifi-2026.10.23 ... flask-3.1.3
+gunicorn-23.0.0 ... requests-2.34.2 ... werkzeug-3.1.9
+```
+
+> **Catorce paquetes, y nosotros solo pedimos tres** — `flask`, `requests` y
+> `gunicorn`. Los otros once son **las dependencias de esos tres**: Jinja2 para
+> las plantillas, Werkzeug para el servidor, `urllib3` y `certifi` para las
+> peticiones HTTPS. **Eso es lo que significa «instalar un paquete».**
+
+#### 3. Arranca con **gunicorn**, sin que nadie lo configure
+
+```
+==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+[INFO] Starting gunicorn 23.0.0
+[INFO] Listening at: http://0.0.0.0:10000 (1)
+[INFO] Booting worker with pid: 7
+[INFO] Booting worker with pid: 8
+```
+
+**Aquí se cobran dos decisiones que tomamos antes de publicar nada:**
+
+| Lo que dice el registro | Por qué |
+|---|---|
+| **`Starting gunicorn`**, no el servidor de Flask | La imagen trae **`DEPURAR=0`** por defecto. **Nadie puso esa variable en Render** |
+| **`Listening at: http://0.0.0.0:10000`** | **Render impone el puerto con la variable `PORT`**, y `app.py` la lee **antes** que `PUERTO`. Por eso el mismo código corre en Docker local (8118) y aquí (10000) |
+
+> **Si el `app.py` solo leyera `PUERTO`**, la aplicación arrancaría en el 8118,
+> Render no encontraría nada en el 10000 y **reportaría el servicio como
+> caído** — con la aplicación viva adentro. **Es el fallo más común al
+> publicar en una plataforma de contenedores**, y el más desconcertante.
+
+> **Y fíjese en la discusión silenciosa:** Render anuncia
+> `WEB_CONCURRENCY=1`, pero arrancaron **dos** trabajadores (`pid: 7` y
+> `pid: 8`). Es porque nuestro `Dockerfile` dice `--workers 2`, **y lo
+> explícito gana sobre lo sugerido.**
+
+#### 4. Está viva
+
+```
+==> Your service is live 🎉
+==> Available at your primary URL https://facturas-flask.onrender.com
+```
+
+### 9.7 · Las variables de entorno
+
+**El servicio ya corre, pero todavía no sirve** — y conviene entender por qué
+antes de intentar entrar.
+
+> **El front está buscando la API en `http://localhost:8035`**, que es el valor
+> por defecto del código. **Dentro del contenedor de Render, `localhost` es el
+> contenedor mismo**: ahí no hay ninguna API. Es el mismo malentendido que
+> explica por qué el `docker-compose` usa `api-facturas` y no `localhost`.
+
+**`Environment` → `Add Environment Variable`, dos veces:**
+
+![Las dos variables de entorno](docs/tutorial_publicar/img/71_render_variables.png)
+
+| KEY | VALUE |
+|---|---|
+| **`API_FACTURAS_URL`** | `https://apifacturas-carrloscastro.runasp.net` |
+| **`CLAVE_SESION`** | Una cadena larga cualquiera |
+
+> **`CLAVE_SESION` firma la cookie de sesión.** Sin ella, el front usa la clave
+> de desarrollo **que está escrita en el código** — y cualquiera que lea el
+> repositorio podría falsificar una sesión.
+
+**Tres cosas que se equivocan al escribir la dirección:**
+
+| | |
+|---|---|
+| **Con `https://` adelante** | Sin el esquema, `requests` no sabe qué hacer con eso |
+| **Sin barra al final** | Con ella, el front arma `...runasp.net//api/sesion` — **dos barras**— y la API responde `404` |
+| **Copiada, no escrita** | La de este ejemplo es `apifacturas-ca`**`rr`**`loscastro`, con **dos erres**. Una letra de más o de menos y el front no encuentra nada — **y el error no dice que sea un nombre mal escrito** |
+
+**`Save, rebuild, and deploy`**, y Render reinicia solo.
+
+#### Y la segunda compilación dura 3 segundos
+
+```
+#8 [3/5] COPY requirements.txt .      CACHED
+#9 [4/5] RUN pip install ...          CACHED
+#10 [2/5] WORKDIR /app                CACHED
+#11 [5/5] COPY . .                    CACHED
+```
+
+**La primera tardó 31 segundos; ésta, 3.** Todo salió de la caché.
+
+> **Y esto es el `Dockerfile` bien escrito, cobrándose solo.** Recuerde el
+> comentario que trae adentro:
+>
+> *«Los requisitos PRIMERO y el código después: así Docker reusa la capa de los
+> paquetes mientras `requirements.txt` no cambie»*
+>
+> **Como no cambió ningún archivo —solo una variable de entorno— ni siquiera
+> hubo que reinstalar Flask.** Si el `Dockerfile` copiara todo el código antes
+> de instalar, **cada cambio de una coma volvería a bajar los catorce
+> paquetes.**
+
+### 9.8 · La prueba: el sistema completo, en cuatro proveedores
+
+```
+https://facturas-flask.onrender.com
+```
+
+**Entre con `admin@correo.com` / `admin123` y abra `Personas`.**
+
+**Comprobado desde la terminal, contra el sitio publicado:**
+
+```
+GET https://facturas-flask.onrender.com/e/persona   (con la sesion abierta)
+
+Carlos Pérez
+María Gómez
+```
+
+> **La primera carga tarda**, y esta vez hay **dos cosas dormidas en fila**: el
+> servicio de Render y el sitio de MonsterASP. El propio panel lo advierte:
+> *«Your free instance will spin down with inactivity, which can delay requests
+> by **50 seconds or more**»*.
+
+#### Lo que acaba de recorrer esa petición
+
+```
+su navegador
+   |  https
+front en Flask      Render, Frankfurt           (Python, en Docker)
+   |  https
+API                 MonsterASP, Europa          (C#, sobre IIS)
+   |  red interna del centro de datos
+base de datos       SQL Server                  (db75266)
+```
+
+| | |
+|---|---|
+| **Cuatro proveedores** | Render, MonsterASP, GitHub y —en la otra variante— Neon |
+| **Dos lenguajes** | Python y C# |
+| **Dos formas de publicar** | **Docker** en Render, **archivos compilados** en MonsterASP |
+| **Un solo sistema** | Y ninguna de las piezas sabe cómo está hecha la otra |
+
+> **Eso es lo que hace posible que las piezas se hablen por contratos y no por
+> dentro.** El front en Flask no sabe que la API es de C#; la API no sabe que
+> hay dos fronts; la base de datos no sabe que existe internet.
+>
+> **Y la prueba de que no es un discurso:** este mismo front, cambiando **una
+> variable de entorno**, le habla a la API de PostgreSQL en vez de a la de SQL
+> Server. **Sin tocar una línea de código ni volver a compilar.**
+
+
 <!-- Se escriben uno a uno, con sus capturas, a medida que se validan. -->
